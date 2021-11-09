@@ -8,7 +8,7 @@
 #  List of enabled self service indicators, remove any unwanted indicators from this array
 class self_service(
 
-  Array[String] $self_service_indicators = ['S0001','S0003','S0003','S0004'],
+  Array[String] $self_service_indicators = ['S0001','S0003','S0003','S0004','S0005'],
 )
   {
 

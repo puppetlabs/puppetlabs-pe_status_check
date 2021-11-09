@@ -26,7 +26,7 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0003) do
     confine is_pe: true
-    # check for noop logic flip as false is the desired statea
+    # check for noop logic flip as false is the desired state
     result = Facter::Core::Execution.execute('puppet config print noop')
     if result.include?('false')
       { S0003: true }
@@ -37,7 +37,7 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0004) do
     confine is_pe: true
-    # Check for status that is not gree, potentially need a better way of doing this, or perhaps calling the api directly for each service
+    # Check for status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
     result = Facter::Core::Execution.execute('puppet infrastructure status')
     if result.include?('Unknown') || result.include?('Unreachable')
       { S0004: false }
@@ -47,6 +47,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0005) do
+    #Check if the CA expires within 90 days confined to servers where the ca_cert exists
     confine do
       File.exist? '/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem' or File.exist? '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
     end
