@@ -25,8 +25,8 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0003) do
+    confine is_pe: true
     # check for noop logic flip as false is the desired statea
-    # TODO confine to infrastructure components
     result = Facter::Core::Execution.execute('puppet config print noop')
     if result.include?('false')
       { S0003: true }
@@ -36,6 +36,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0004) do
+    confine is_pe: true
     result = Facter::Core::Execution.execute('puppet infrastructure status')
     if result.include?('Unknown') || result.include?('Unreachable')
       { S0004: false }
