@@ -37,11 +37,30 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0004) do
     confine is_pe: true
+    # Check for status that is not gree, potentially need a better way of doing this, or perhaps calling the api directly for each service
     result = Facter::Core::Execution.execute('puppet infrastructure status')
     if result.include?('Unknown') || result.include?('Unreachable')
       { S0004: false }
     else
       { S0004: true }
+    end
+  end
+
+  chunk(:S0005) do
+    confine do
+      File.exist? '/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem' or File.exist? '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
+    end
+    raw_ca_cert = if File.exist? '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
+                    File.read '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
+                  else
+                    File.read '/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem'
+                  end
+    certificate = OpenSSL::X509::Certificate.new raw_ca_cert
+    result = certificate.not_after - Time.now
+    if result > 7_776_000
+      { S0005: true }
+    else
+      { S0005: false }
     end
   end
 end
