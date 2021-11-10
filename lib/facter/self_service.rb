@@ -1,5 +1,6 @@
 # Self service fact aims to have all chunks reporting as true, this indicates ideal state, any individual chunk reporting false should be alerted on and checked against documentation for next steps
-# TODO confine each fact to an appropriate running platform
+require 'puppet'
+### TODO now puppet is required, use puppet functions insead of execute shell blocks where possible
 
 Facter.add(:self_service, type: :aggregate) do
   confine kernel: 'Linux'
@@ -25,15 +26,8 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0003) do
-    if Facter.value(:is_pe)
-      # check for noop logic flip as false is the desired state
-      result = Facter::Core::Execution.execute('puppet config print noop')
-      if result.include?('false')
-        { S0003: true }
-      else
-        { S0003: false }
-      end
-    end
+    # check for noop logic flip as false is the desired state
+    { S0003: !Puppet.settings['noop'] } if Facter.value(:is_pe)
   end
 
   chunk(:S0004) do
