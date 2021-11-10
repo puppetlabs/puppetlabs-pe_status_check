@@ -8,18 +8,13 @@
 #  List of enabled self service indicators, remove any unwanted indicators from this array
 class self_service(
 
-  Array[String] $self_service_indicators = ['S0001','S0003','S0003','S0004','S0005'],
+  Array[String] $exclude_self_service_indicators = ['S0001'],
 )
   {
 
+$negatives = $facts['self_service'].filter | $k, $v | { $v == false and ! ($k in $exclude_self_service_indicators) }
 
-each ($self_service_indicators) |$indicator| {
-
-if $facts['self_service']["$indicator"] == false  {
+$negatives.each |$indicator, $_v| {
 notify {"${indicator} is at fault, please refer to documentation for required action":}
 }
-
 }
-
-  }
-
