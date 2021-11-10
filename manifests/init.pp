@@ -4,11 +4,11 @@
 #
 # @example
 #   include self_service
-# @param [Array[String]] self_service_indicators
-#  List of enabled self service indicators, remove any unwanted indicators from this array
+# @param [Array[String]] exclude_self_service_indicators
+#  List of disabled indicators, place any indicator ids you do not wish to report on in this list
 class self_service(
 
-  Array[String] $exclude_self_service_indicators = ['S0001'],
+  Array[String] $exclude_self_service_indicators = [],
 )
   {
 
