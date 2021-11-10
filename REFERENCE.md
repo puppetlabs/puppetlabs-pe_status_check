@@ -26,13 +26,13 @@ include self_service
 
 The following parameters are available in the `self_service` class:
 
-* [`self_service_indicators`](#self_service_indicators)
+* [`exclude_self_service_indicators`](#exclude_self_service_indicators)
 
-##### <a name="self_service_indicators"></a>`self_service_indicators`
+##### <a name="exclude_self_service_indicators"></a>`exclude_self_service_indicators`
 
 Data type: `Array[String]`
 
-List of enabled self service indicators, remove any unwanted indicators from this array
+List of disabled indicators, place any indicator ids you do not wish to report on in this list
 
-Default value: `['S0001','S0003','S0003','S0004']`
+Default value: `[]`
 
