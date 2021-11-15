@@ -27,11 +27,11 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0003) do
     # check for noop logic flip as false is the desired state
-    { S0003: !Puppet.settings['noop'] } if Facter.value(:is_pe)
+    { S0003: !Puppet.settings['noop'] } if Facter.value(:pe_build)
   end
 
   chunk(:S0004) do
-    if Facter.value(:is_pe) && File.exist?('/etc/puppetlabs/client-tools/services.conf') # Is PE and has client tools installed covers pe-psql only nodes
+    if Facter.value(:pe_build) && File.exist?('/etc/puppetlabs/client-tools/services.conf') # Is PE and has client tools installed covers pe-psql only nodes
       # Check for service status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
       result = Facter::Core::Execution.execute('puppet infrastructure status')
       if result.include?('Unknown') || result.include?('Unreachable')
@@ -44,7 +44,7 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0005) do
     # Check if the CA expires within 90 days confined to servers where the ca_cert exists
-    if File.exist?('/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem') || File.exist?('/etc/puppetlabs/puppetserver/ca/ca_crt.pem')
+    if File.exist?('/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem') || File.exist?('/etc/puppetlabs/puppetserver/ca/ca_crt.pem') || File.exist?('/opt/puppetlabs/bin/puppet-infrastructure')
       raw_ca_cert = if File.exist? '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
                       File.read '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
                     else
@@ -57,7 +57,6 @@ Facter.add(:self_service, type: :aggregate) do
       else
         { S0005: false }
       end
-    end 
+    end
   end
 end
-

@@ -10,9 +10,17 @@
   ],
   "operatingsystem_support": [
     {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "7",
+        "8"
+      ]
+    },
+    {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "7"
+        "7",
+        "8"
       ]
     },
     {
@@ -22,21 +30,9 @@
       ]
     },
     {
-      "operatingsystem": "RedHat",
-      "operatingsystemrelease": [
-        "8"
-      ]
-    },
-    {
       "operatingsystem": "Scientific",
       "operatingsystemrelease": [
         "7"
-      ]
-    },
-    {
-      "operatingsystem": "Debian",
-      "operatingsystemrelease": [
-        "10"
       ]
     },
     {
@@ -48,24 +44,17 @@
     {
       "operatingsystem": "SLES",
       "operatingsystemrelease": [
-        "15"
-      ]
-    },
-    {
-      "operatingsystem": "windows",
-      "operatingsystemrelease": [
-        "2019",
-        "10"
+        "12"
       ]
     }
   ],
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 6.21.0 < 8.0.0"
+      "version_requirement": ">= 6.16.0 < 8.0.0"
     }
   ],
-  "pdk-version": "2.1.1",
+  "pdk-version": "2.3.0",
   "template-url": "https://github.com/puppetlabs/pdk-templates#main",
   "template-ref": "tags/2.3.0-0-g8aaceff"
 }
