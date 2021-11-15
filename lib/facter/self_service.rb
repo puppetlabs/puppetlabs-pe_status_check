@@ -31,8 +31,8 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0004) do
-    if Facter.value(:is_pe)
-      # Check for status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
+    if Facter.value(:is_pe) && File.exist?('/etc/puppetlabs/client-tools/services.conf') # Is PE and has client tools installed covers pe-psql only nodes
+      # Check for service status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
       result = Facter::Core::Execution.execute('puppet infrastructure status')
       if result.include?('Unknown') || result.include?('Unreachable')
         { S0004: false }
@@ -57,6 +57,7 @@ Facter.add(:self_service, type: :aggregate) do
       else
         { S0005: false }
       end
-    end
+    end 
   end
 end
+

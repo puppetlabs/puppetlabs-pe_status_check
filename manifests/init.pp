@@ -1,6 +1,6 @@
 # @summary This class should be enabled if you wish Puppet to notify when self_service indicators are not at optimal values
 #
-# When this class is enabled, when any of the indicators in the self_service fact are false puppet will notify of this, individual tests can be disabled by removing them from the self_service_indicators parameter
+# When this class is enabled, when any of the indicators in the self_service fact are false puppet will notify of this, individual tests can be disabled by adding the ID to the exclude_self_service_indicators parameter
 #
 # @example
 #   include self_service
