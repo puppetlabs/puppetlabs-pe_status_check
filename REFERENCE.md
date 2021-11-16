@@ -26,9 +26,9 @@ include self_service
 
 The following parameters are available in the `self_service` class:
 
-* [`exclude_self_service_indicators`](#exclude_self_service_indicators)
+* [`indicator_exclusions`](#indicator_exclusions)
 
-##### <a name="exclude_self_service_indicators"></a>`exclude_self_service_indicators`
+##### <a name="indicator_exclusions"></a>`indicator_exclusions`
 
 Data type: `Array[String]`
 

@@ -52,11 +52,11 @@ node 'node.example.com' {
 ```
 
 While the entirity of the default indictors should be reported on for maximum coverage, it may be nessary to make exceptions for your particular environment.
-to do this classify the array parameter exclude_self_service_indicators with an list of all indicators you do not want to report on.
+to do this classify the array parameter indicator_exclusions with an list of all indicators you do not want to report on.
 
 ```
 class { 'self_service':
-  exclude_self_service_indicators             => ['S0001','S0003','S0003','S0004'],
+  indicator_exclusions             => ['S0001','S0003','S0003','S0004'],
 }
 ```
 
