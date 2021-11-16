@@ -24,7 +24,7 @@ describe 'self_service class' do
     end
 
     # Test Confirms nofifications are working as expected, appearing if a fact is set to false, and not triggering
-    # if the same fact is placed in the exclude_self_service_indicators parameter
+    # if the same fact is placed in the indicator_exclusions parameter
     # This test also serves as confirmation fact S0001 is working Correctly
     describe 'check notifications work as expected' do
       it 'if S0001 reports false notify with message' do
@@ -40,7 +40,7 @@ describe 'self_service class' do
       it 'if in the exclude list a parameter should not notify' do
         ppp = <<-MANIFEST
         class {'self_service':
-            exclude_self_service_indicators => ['S0001'],
+            indicator_exclusions => ['S0001'],
             }
         MANIFEST
         idempotent_apply(ppp)
