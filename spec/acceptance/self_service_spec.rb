@@ -53,19 +53,19 @@ describe 'self_service class' do
       it 'if S0002 conditions for false are met' do
         run_shell('puppet resource service pxp-agent ensure=stopped')
         result = run_shell('facter -p self_service.S0002')
-        expect(result.stdout).to output(%r{false}).to_stdout
+        expect(result.stdout).to match(%r{false})
       end
       it 'if S0003 conditions for false are met' do
         run_shell('puppet config set noop true', expect_failures: false)
         result = run_shell('facter -p self_service.S0003')
         expect(result.stdout).to match(%r{false})
-        run_shell('puppet config set noop false --section agent', expect_failures: false)
+        run_shell('puppet config set noop false', expect_failures: false)
       end
       it 'if S0004 conditions for false are met' do
         run_shell('puppet resource service pe-orchestration-services  ensure=stopped')
         result = run_shell('facter -p self_service.S0004')
         expect(result.stdout).to match(%r{false})
-        run_shell('puppet resource service pe-orchestration-services  ensure=stopped')
+        run_shell('puppet resource service pe-orchestration-services  ensure=running')
       end
     end
   end
