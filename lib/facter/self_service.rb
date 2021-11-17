@@ -26,7 +26,8 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0004) do
-    next unless Facter.value(:pe_build) && File.exist?('/etc/puppetlabs/client-tools/services.conf')  && File.exist?('/opt/puppetlabs/bin/puppet-infrastructure')# Is PE and has client tools installed covers pe-psql only nodes and compilers
+    next unless Facter.value(:pe_build) && File.exist?('/etc/puppetlabs/client-tools/services.conf') && File.exist?('/opt/puppetlabs/bin/puppet-infrastructure')
+    # Is PE and has clienttools covers pe-psql and compilers
     # Check for service status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
     result = Facter::Core::Execution.execute("#{puppet_bin} infrastructure status")
     if result.include?('Unknown') || result.include?('Unreachable')
@@ -46,5 +47,11 @@ Facter.add(:self_service, type: :aggregate) do
     certificate = OpenSSL::X509::Certificate.new raw_ca_cert
     result = certificate.not_after - Time.now
     { S0005: result > 7_776_000 }
+  end
+
+  chunk(:S0006) do
+    next unless Facter.value(:pe_build) # Only run on infrastructure
+    # check for sustained load average greater than available cores
+    { S0006: Facter.value(:load_averages)['15m'] <= Facter.value(:processors)['count'] }
   end
 end

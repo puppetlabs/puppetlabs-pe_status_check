@@ -20,6 +20,7 @@ describe 'self_service class' do
         expect(host_inventory['facter']['self_service']['S0003']).to eq true
         expect(host_inventory['facter']['self_service']['S0004']).to eq true
         expect(host_inventory['facter']['self_service']['S0005']).to eq true
+        expect(host_inventory['facter']['self_service']['S0006']).to eq true
       end
     end
 
