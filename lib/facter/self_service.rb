@@ -54,4 +54,10 @@ Facter.add(:self_service, type: :aggregate) do
     # check for sustained load average greater than available cores
     { S0006: Facter.value(:load_averages)['15m'] <= Facter.value(:processors)['count'] }
   end
+  chunk(:S0007) do
+    next unless Facter.value(:pe_build) && Facter.value(:pe_postgresql_info)['data_partition_size_bytes'] > 0 # Only run on infrastructure with pe-postgres
+    # check postgres data mount has at least 20% free
+    percent = Facter.value(:pe_postgresql_info)['data_partition_available_bytes'].fdiv(Facter.value(:pe_postgresql_info)['data_partition_size_bytes']) * 100
+    { S0007: percent >= 20 }
+  end
 end
