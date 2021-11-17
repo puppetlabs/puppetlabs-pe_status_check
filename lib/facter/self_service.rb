@@ -26,7 +26,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0004) do
-    next unless Facter.value(:pe_build) && File.exist?('/etc/puppetlabs/client-tools/services.conf') # Is PE and has client tools installed covers pe-psql only nodes
+    next unless Facter.value(:pe_build) && File.exist?('/etc/puppetlabs/client-tools/services.conf')  && File.exist?('/opt/puppetlabs/bin/puppet-infrastructure')# Is PE and has client tools installed covers pe-psql only nodes and compilers
     # Check for service status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
     result = Facter::Core::Execution.execute("#{puppet_bin} infrastructure status")
     if result.include?('Unknown') || result.include?('Unreachable')
@@ -37,7 +37,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0005) do
-    next unless File.exist?('/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem') || File.exist?('/etc/puppetlabs/puppetserver/ca/ca_crt.pem') || File.exist?('/opt/puppetlabs/bin/puppet-infrastructure')
+    next unless File.exist?('/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem') || File.exist?('/etc/puppetlabs/puppetserver/ca/ca_crt.pem')
     raw_ca_cert = if File.exist? '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
                     File.read '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
                   else
