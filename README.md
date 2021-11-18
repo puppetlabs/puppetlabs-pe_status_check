@@ -14,7 +14,7 @@
 ## Description
 
 puppetlabs-self_service aims to provide a mechnism to alert the end-user when Puppet Enterprise is not in an ideal state.
-It uses a pre-set indicators and has a simplified output that directs the end-user to next steps for resolution.
+It uses pre-set indicators and has a simplified output that directs the end-user to next steps for resolution.
 
 Users of the tool should expect greater ability to provide the self served resolutions, as well as shorter incident resolution times with Puppet Enterprise Support due to higher quality information available to support cases.
 
@@ -31,7 +31,7 @@ Plugin-Sync should be enabled to deliver the facts this module requires
 
 ### Beginning with self_service
 
-puppetlabs-self_service is primarly provides the indicators by means of facts so installing the module and allowing plugin sync to occur will allow the module to start functioning
+puppetlabs-self_service primarly provides the indicators by means of facts so installing the module and allowing plugin sync to occur will allow the module to start functioning
 
 ## Usage
 
@@ -72,8 +72,8 @@ This section should be referred to for next steps when any indicator reports a f
 | S0003        | Determines if Infrastructure components are running in NOOP | Following this documentation to disable [noop](https://puppet.com/docs/puppet/7/configuration.html#noop)                                       |                                                                                                                                                                                                                                        |
 | S0004        | Determines if infrastructure status is not green            | Run `puppet infrastructure status` note any services showing in an error state and examine the corresponding service logs for potential causes | raise a support case quoting reference S0004 along with the output of `puppet infrastructure status`  and any service logs associated with the errors                                                                                  |
 | S0005        | Determines if CA expires within 90 days                     | Install the following module https://forge.puppet.com/modules/puppetlabs/ca_extend and follow the documentation to extend the CA               |                                                                                                                                                                                                                                        |
-| S0006        |                                                             |                                                                                                                                                |                                                                                                                                                                                                                                        |
-| S0007        |                                                             |                                                                                                                                                |                                                                                                                                                                                                                                        |
+| S0006        | Determines if 15m Load Average is greater than available cores |                                                                                                                                                 |                                                                                                                                                                                                                                        |
+| S0007        | Determines if there is at least 20% disk free on postgres Data partition|                                                                                                                                                |                                                                                                                                                                                                                                        |
 | S0008        |                                                             |                                                                                                                                                |                                                                                                                                                                                                                                        |
 
 
