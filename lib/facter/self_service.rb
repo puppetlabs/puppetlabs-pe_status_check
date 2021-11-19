@@ -60,4 +60,9 @@ Facter.add(:self_service, type: :aggregate) do
     percent = Facter.value(:pe_postgresql_info)['data_partition_available_bytes'].fdiv(Facter.value(:pe_postgresql_info)['data_partition_size_bytes']) * 100
     { S0007: percent >= 20 }
   end
+  chunk(:S0008) do
+    next unless Facter.value(:pe_build) && Dir.exist?('/etc/puppetlabs/puppetserver')
+    # check codedir data mount has at least 20% free
+    { S0008: `df -m #{Puppet.settings['codedir']}`.split(%r{\b})[26].to_i <= 80 }
+  end
 end
