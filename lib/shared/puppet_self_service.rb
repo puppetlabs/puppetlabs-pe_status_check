@@ -46,4 +46,14 @@ module PuppetSelfService
 
     service_running(name, service) and service_enabled(name, service)
   end
+
+  # Get the free disk percentage from a path
+  # @param name [String] The path on the file system
+  # @return [Integer] The percentage of used disk space
+  def self.filesystem_free(path)
+    require 'sys/filesystem'
+
+    stat = Sys::Filesystem.stat(path)
+    (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
+  end
 end
