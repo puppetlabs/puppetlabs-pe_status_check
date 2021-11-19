@@ -46,4 +46,72 @@ module PuppetSelfService
 
     service_running(name, service) and service_enabled(name, service)
   end
+
+  # Return the name of the pe-postgresql service for the current OS
+  # @return [String] The name of the pe-postgresql service
+  def self.pe_postgres_service_name
+    if Facter.value(:os)['family'].eql?('Debian')
+      "pe-postgresql#{Facter.value(:pe_postgresql_info)['installed_server_version']}"
+    else
+      'pe-postgresql'
+    end
+  end
+
+  # Checks if passed service file exists in correct directory for the OS
+  # @return [Boolean] true if file exists
+  # @param configfile [String] The name of the pe service to be tested
+  def self.service_file_exist?(configfile)
+    configdir = if Facter.value(:os)['family'].eql?('RedHat') || Facter.value(:os)['family'].eql?('Suse')
+                  '/etc/sysconfig'
+                else
+                  '/etc/default'
+                end
+    File.exist?("#{configdir}/#{configfile}")
+  end
+
+  # Check if Primary node
+  # @return [Boolean] true is primary node
+  def self.primary?
+    service_file_exist?('pe-puppetserver') &&
+      service_file_exist?('pe-orchestration-services') &&
+      service_file_exist?('pe-console-services') &&
+      service_file_exist?('pe-puppetdb')
+  end
+
+  # Check if replica node
+  # @return [Boolean]
+  def self.replica?
+    service_file_exist?('pe-puppetserver') &&
+      !service_file_exist?('pe-orchestration-services') &&
+      service_file_exist?('pe-console-services') &&
+      service_file_exist?('pe-puppetdb')
+  end
+
+  # Check if Compiler node
+  # @return [Boolean]
+  def self.compiler?
+    service_file_exist?('pe-puppetserver') &&
+      !service_file_exist?('pe-orchestration-services') &&
+      !service_file_exist?('pe-console-services') &&
+      service_file_exist?('pe-puppetdb')
+  end
+
+  # Check if lagacy compiler node
+  # @return [Boolean] true
+  def self.legacy_compiler?
+    service_file_exist?('pe-puppetserver') &&
+      !service_file_exist?('pe-orchestration-services') &&
+      !service_file_exist?('pe-console-services') &&
+      !service_file_exist?('pe-puppetdb')
+  end
+
+  # Check if Pe postgres  node
+  # @return [Boolean]
+  def self.postgres?
+    !service_file_exist?('pe-puppetserver') &&
+      !service_file_exist?('pe-orchestration-services') &&
+      !service_file_exist?('pe-console-services') &&
+      !service_file_exist?('pe-puppetdb') &&
+      service_file_exist?('pe-pgsql/pe-postgresql')
+  end
 end
