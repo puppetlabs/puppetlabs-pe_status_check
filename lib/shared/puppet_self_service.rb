@@ -114,4 +114,14 @@ module PuppetSelfService
       !service_file_exist?('pe-puppetdb') &&
       service_file_exist?('pe-pgsql/pe-postgresql')
   end
+
+  # Get the free disk percentage from a path
+  # @param name [String] The path on the file system
+  # @return [Integer] The percentage of free disk space on the mount
+  def self.filesystem_free(path)
+    require 'sys/filesystem'
+
+    stat = Sys::Filesystem.stat(path)
+    (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
+  end
 end

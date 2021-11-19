@@ -15,17 +15,8 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service']['S0001']).to eq true
-        expect(host_inventory['facter']['self_service']['S0002']).to eq true
-        expect(host_inventory['facter']['self_service']['S0003']).to eq true
-        expect(host_inventory['facter']['self_service']['S0004']).to eq true
-        expect(host_inventory['facter']['self_service']['S0005']).to eq true
-        expect(host_inventory['facter']['self_service']['S0006']).to eq true
-        expect(host_inventory['facter']['self_service']['S0007']).to eq true
-        expect(host_inventory['facter']['self_service']['S0008']).to eq true
-        expect(host_inventory['facter']['self_service']['S0009']).to eq true
-        expect(host_inventory['facter']['self_service']['S0010']).to eq true
-        expect(host_inventory['facter']['self_service']['S0011']).to eq true
+        expect(host_inventory['facter']['self_service'].size).to eq(11)
+        expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
 
@@ -81,13 +72,24 @@ describe 'self_service class' do
         run_shell('rm -f /etc/puppetlabs/facter/facts.d/load_averages.json')
       end
 
-      it 'if S0007 and S0008 conditions for false are met' do
-        run_shell('fallocate -l $(($(facter -p mountpoints.\'/\'.available_bytes)-1073741824)) /largefile.txt')
-        result = run_shell('facter -p self_service.S0007')
-        expect(result.stdout).to match(%r{false})
-        result = run_shell('facter -p self_service.S0008')
-        expect(result.stdout).to match(%r{false})
-        run_shell('rm -rf  /largefile.txt')
+      context 'when filesystem usage exceeds 80%' do
+        before(:all) do
+          run_shell('fallocate -l $(($(facter -p mountpoints.\'/\'.available_bytes)-1073741824)) /largefile.txt')
+        end
+
+        after(:all) do
+          run_shell('rm -rf  /largefile.txt')
+        end
+
+        it 'sets S0007 to false' do
+          result = run_shell('facter -p self_service.S0007')
+          expect(result.stdout).to match(%r{false})
+        end
+
+        it 'sets S0008 to false' do
+          result = run_shell('facter -p self_service.S0008')
+          expect(result.stdout).to match(%r{false})
+        end
       end
 
       it 'if S0009 conditions for false are met' do

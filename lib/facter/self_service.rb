@@ -53,20 +53,24 @@ Facter.add(:self_service, type: :aggregate) do
     # check for sustained load average greater than available cores
     { S0006: Facter.value(:load_averages)['15m'] <= Facter.value(:processors)['count'] }
   end
+
   chunk(:S0007) do
     next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.postgres?
     # check postgres data mount has at least 20% free
-    percent = Facter.value(:pe_postgresql_info)['data_partition_available_bytes'].fdiv(Facter.value(:pe_postgresql_info)['data_partition_size_bytes']) * 100
-    { S0007: percent >= 20 }
+    pg_version = Facter.value(:pe_postgresql_info)['installed_server_version']
+    data_dir = Facter.value(:pe_postgresql_info)['versions'][pg_version].fetch('data_dir', '/opt/puppetlabs/server/data/postgresql')
+
+    { S0007: PuppetSelfService.filesystem_free(data_dir) >= 20 }
   end
+
   chunk(:S0008) do
     next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
     # check codedir data mount has at least 20% free
-    { S0008: `df -m #{Puppet.settings['codedir']}`.split(%r{\b})[26].to_i <= 80 }
+    { S0008: PuppetSelfService.filesystem_free(Puppet.settings['codedir']) >= 20 }
   end
 
   chunk(:S0009) do
-    next unless  PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
+    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
     # Is the Pe-puppetsever Service Running and Enabled
     { S0009: PuppetSelfService.service_running_enabled('pe-puppetserver') }
   end
