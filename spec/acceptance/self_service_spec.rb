@@ -22,6 +22,10 @@ describe 'self_service class' do
         expect(host_inventory['facter']['self_service']['S0005']).to eq true
         expect(host_inventory['facter']['self_service']['S0006']).to eq true
         expect(host_inventory['facter']['self_service']['S0007']).to eq true
+        expect(host_inventory['facter']['self_service']['S0008']).to eq true
+        expect(host_inventory['facter']['self_service']['S0009']).to eq true
+        expect(host_inventory['facter']['self_service']['S0010']).to eq true
+        expect(host_inventory['facter']['self_service']['S0011']).to eq true
       end
     end
 
@@ -77,11 +81,34 @@ describe 'self_service class' do
         run_shell('rm -f /etc/puppetlabs/facter/facts.d/load_averages.json')
       end
 
-      it 'if S0007 conditions for false are met' do
+      it 'if S0007 and S0008 conditions for false are met' do
         run_shell('fallocate -l $(($(facter -p mountpoints.\'/\'.available_bytes)-1073741824)) /largefile.txt')
         result = run_shell('facter -p self_service.S0007')
         expect(result.stdout).to match(%r{false})
+        result = run_shell('facter -p self_service.S0008')
+        expect(result.stdout).to match(%r{false})
         run_shell('rm -rf  /largefile.txt')
+      end
+
+      it 'if S0009 conditions for false are met' do
+        run_shell('puppet resource service pe-puppetserver ensure=stopped')
+        result = run_shell('facter -p self_service.S0009')
+        expect(result.stdout).to match(%r{false})
+        run_shell('puppet resource service pe-puppetserver ensure=running')
+      end
+
+      it 'if S0010 conditions for false are met' do
+        run_shell('puppet resource service pe-puppetdb ensure=stopped')
+        result = run_shell('facter -p self_service.S0010')
+        expect(result.stdout).to match(%r{false})
+        run_shell('puppet resource service pe-puppetdb ensure=running')
+      end
+
+      it 'if S0011 conditions for false are met' do
+        run_shell('puppet resource service pe-postgresql ensure=stopped')
+        result = run_shell('facter -p self_service.S0011')
+        expect(result.stdout).to match(%r{false})
+        run_shell('puppet resource service pe-postgresql ensure=running')
       end
     end
   end
