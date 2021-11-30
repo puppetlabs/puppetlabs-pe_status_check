@@ -10,7 +10,7 @@
 class self_service (
   Array[String[1]] $indicator_exclusions = [],
 ) {
-  $negatives = $facts['self_service'].filter | $k, $v | { $v == false and ! ($k in $indicator_exclusions) }
+  $negatives = getvar('facts.self_service', []).filter | $k, $v | { $v == false and ! ($k in $indicator_exclusions) }
 
   $negatives.each |$indicator, $_v| {
     notify { "Self Service ${indicator}":
