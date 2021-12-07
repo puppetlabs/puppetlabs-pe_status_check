@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(11)
+        expect(host_inventory['facter']['self_service'].size).to eq(13)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -111,6 +111,19 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0011')
         expect(result.stdout).to match(%r{false})
         run_shell('puppet resource service pe-postgresql ensure=running')
+      end
+      it 'if S0012 conditions for false are met' do
+        run_shell('service puppet stop; puppet config set runinterval 20')
+        result = run_shell('facter -p self_service.S0012')
+        expect(result.stdout).to match(%r{false})
+        run_shell(' puppet config set runinterval 1800;service puppet start')
+      end
+      it 'if S0013 conditions for false are met' do
+        run_shell('cp $(puppet config print lastrunfile) $(puppet config print lastrunfile).bk;
+                          sed -i \'/catalog_application/d\'  $(puppet config print lastrunfile)')
+        result = run_shell('facter -p self_service.S0013')
+        expect(result.stdout).to match(%r{false})
+        run_shell('mv -f  $(puppet config print lastrunfile).bk $(puppet config print lastrunfile)')
       end
     end
   end
