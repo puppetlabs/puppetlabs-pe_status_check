@@ -119,10 +119,10 @@ describe 'self_service class' do
         run_shell(' puppet config set runinterval 1800;puppet agent --enable')
       end
       it 'if S0013 conditions for false are met' do
-        run_shell('export lastrunfile=$(puppet config print lastrunfile) && cp ${lastrunfile}{,.bk} && sed -i \'/catalog_application/d\' $lastrunfile')
+        run_shell('export lastrunfile=$(puppet config print lastrunfile) && cp $lastrunfile ${lastrunfile}.bk  && sed -i \'/catalog_application/d\' $lastrunfile')
         result = run_shell('facter -p self_service.S0013')
         expect(result.stdout).to match(%r{false})
-        run_shell('mv -f $(puppet config print lastrunfile){.bk,}')
+        run_shell('export lastrunfile=$(puppet config print lastrunfile) && mv -f ${lastrunfile}.bk $lastrunfile')
       end
     end
   end
