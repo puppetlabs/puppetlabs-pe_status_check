@@ -113,17 +113,16 @@ describe 'self_service class' do
         run_shell('puppet resource service pe-postgresql ensure=running')
       end
       it 'if S0012 conditions for false are met' do
-        run_shell('service puppet stop; puppet config set runinterval 20')
+        run_shell('puppet agent --disable; puppet config set runinterval 20')
         result = run_shell('facter -p self_service.S0012')
         expect(result.stdout).to match(%r{false})
-        run_shell(' puppet config set runinterval 1800;service puppet start')
+        run_shell(' puppet config set runinterval 1800;puppet agent --enable')
       end
       it 'if S0013 conditions for false are met' do
-        run_shell('cp $(puppet config print lastrunfile) $(puppet config print lastrunfile).bk;
-                          sed -i \'/catalog_application/d\'  $(puppet config print lastrunfile)')
+        run_shell('export lastrunfile=$(puppet config print lastrunfile) && cp ${lastrunfile}{,.bk} && sed -i \'/catalog_application/d\' $lastrunfile')
         result = run_shell('facter -p self_service.S0013')
         expect(result.stdout).to match(%r{false})
-        run_shell('mv -f  $(puppet config print lastrunfile).bk $(puppet config print lastrunfile)')
+        run_shell('mv -f $(puppet config print lastrunfile){.bk,}')
       end
     end
   end
