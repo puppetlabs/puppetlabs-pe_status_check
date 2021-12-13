@@ -88,6 +88,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0012) do
+<<<<<<< HEAD
     summary_path = Puppet.settings['lastrunfile']
     next unless File.exist?(summary_path)
     next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
