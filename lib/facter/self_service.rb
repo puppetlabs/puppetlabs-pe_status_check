@@ -1,13 +1,12 @@
 # Self service fact aims to have all chunks reporting as true, this indicates ideal state, any individual chunk reporting false should be alerted on and checked against documentation for next steps
-require 'puppet'
 # Use shared logic from PuppetSelfService
-require_relative '../shared/puppet_self_service'
-### TODO now puppet is required, use puppet functions insead of execute shell blocks where possible
 
 Facter.add(:self_service, type: :aggregate) do
   confine kernel: 'Linux'
   confine { Facter.value(:pe_build) }
-
+  require 'puppet'
+  require 'yaml'
+  require_relative '../shared/puppet_self_service'
   puppet_bin = '/opt/puppetlabs/bin/puppet'
 
   chunk(:S0001) do
@@ -86,5 +85,28 @@ Facter.add(:self_service, type: :aggregate) do
     # Is the pe-postgres Service Running and Enabled
     postgresversion = PuppetSelfService.pe_postgres_service_name
     { S0011: PuppetSelfService.service_running_enabled(postgresversion.to_s) }
+  end
+
+  chunk(:S0012) do
+    summary_path = Puppet.settings['lastrunfile']
+    next unless File.exist?(summary_path)
+    next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+    # Did Puppet Produce a report in the last run interval
+    lastrunfile = YAML.load_file(summary_path)
+    time_lastrun = lastrunfile.dig('time', 'last_run')
+    if time_lastrun.nil?
+      { S0012: false }
+    else
+      since_lastrun = Time.now - time_lastrun
+      { S0012: since_lastrun.to_i <= Puppet.settings['runinterval'] }
+    end
+  end
+
+  chunk(:S0013) do
+    summary_path = Puppet.settings['lastrunfile']
+    next unless File.exist?(summary_path)
+    next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+    # Did catalog apply successfully on last puppet run
+    { S0013: File.open(summary_path).read.include?('catalog_application') }
   end
 end
