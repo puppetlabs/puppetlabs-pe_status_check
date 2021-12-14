@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-self_service",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Marty Ewings",
   "summary": "A Puppet Enterprise Module to Promote Preventative Maintenance and Self Service",
   "license": "Apache-2.0",
