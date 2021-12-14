@@ -12,7 +12,8 @@
 
 ### <a name="self_service"></a>`self_service`
 
-When this class is enabled, when any of the indicators in the self_service fact are false puppet will notify of this, individual tests can be disabled by removing them from the self_service_indicators parameter
+When this class is enabled, when any of the indicators in the self_service fact are false puppet will notify of this,
+ individual tests can be disabled by adding the ID to the indicator_exclusions parameter
 
 #### Examples
 
@@ -30,7 +31,7 @@ The following parameters are available in the `self_service` class:
 
 ##### <a name="indicator_exclusions"></a>`indicator_exclusions`
 
-Data type: `Array[String]`
+Data type: `Array[String[1]]`
 
 List of disabled indicators, place any indicator ids you do not wish to report on in this list
 
