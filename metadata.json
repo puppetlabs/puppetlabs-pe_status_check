@@ -2,9 +2,11 @@
   "name": "puppetlabs-self_service",
   "version": "0.1.0",
   "author": "Marty Ewings",
-  "summary": "",
+  "summary": "A Puppet Enterprise Module to Promote Preventative Maintenance and Self Service",
   "license": "Apache-2.0",
-  "source": "",
+  "source": "https://github.com/puppetlabs/puppetlabs-self_service",
+  "project_page": "https://github.com/puppetlabs/puppetlabs-self_service",
+  "issues_url": "https://github.com/puppetlabs/puppetlabs-self_service/issues",
   "dependencies": [
 
   ],
