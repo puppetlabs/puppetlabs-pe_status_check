@@ -90,7 +90,6 @@ Facter.add(:self_service, type: :aggregate) do
   chunk(:S0012) do
     summary_path = Puppet.settings['lastrunfile']
     next unless File.exist?(summary_path)
-    next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
     # Did Puppet Produce a report in the last run interval
     lastrunfile = YAML.load_file(summary_path)
     time_lastrun = lastrunfile.dig('time', 'last_run')
@@ -105,14 +104,12 @@ Facter.add(:self_service, type: :aggregate) do
   chunk(:S0013) do
     summary_path = Puppet.settings['lastrunfile']
     next unless File.exist?(summary_path)
-    next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
     # Did catalog apply successfully on last puppet run
     { S0013: File.open(summary_path).read.include?('catalog_application') }
   end
 
   chunk(:S0021) do
     # Is there at least 9% memory available
-    next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
   end
 end
