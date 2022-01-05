@@ -109,4 +109,10 @@ Facter.add(:self_service, type: :aggregate) do
     # Did catalog apply successfully on last puppet run
     { S0013: File.open(summary_path).read.include?('catalog_application') }
   end
+
+  chunk(:S0021) do
+    # Is there at least 9% memory available
+    next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+    { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
+  end
 end

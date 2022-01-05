@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(13)
+        expect(host_inventory['facter']['self_service'].size).to eq(14)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -123,6 +123,24 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0013')
         expect(result.stdout).to match(%r{false})
         run_shell('export lastrunfile=$(puppet config print lastrunfile) && mv -f ${lastrunfile}.bk $lastrunfile')
+      end
+      it 'if S0021 conditions for false are met' do
+        run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{
+  "memory": {
+    "system": {
+      "available": "10.32 GiB",
+      "available_bytes": 11076337664,
+      "capacity": "95.27%",
+      "total": "15.46 GiB",
+      "total_bytes": 16598274048,
+      "used": "5.14 GiB",
+      "used_bytes": 5521936384
+    }
+  }
+}\' > /etc/puppetlabs/facter/facts.d/memory.json')
+        result = run_shell('facter -p self_service.S0021')
+        expect(result.stdout).to match(%r{false})
+        run_shell('rm -f /etc/puppetlabs/facter/facts.d/memory.json')
       end
     end
   end
