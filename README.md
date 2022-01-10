@@ -23,7 +23,7 @@ Users of the tool should expect greater ability to provide the self served resol
 
 ### What self_service affects
 
-This module installs a structured fact named self_service, which contains an array of key pairs tha simply output an indicator ID and a boolean value. 
+This module installs a structured fact named self_service, which contains an array of key pairs tha simply output an indicator ID and a boolean value.
 
 ### Setup Requirements
 
