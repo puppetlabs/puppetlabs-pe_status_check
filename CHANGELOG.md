@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v0.2.0](https://github.com/puppetlabs/puppetlabs-self_service/tree/v0.2.0) (2022-01-11)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-self_service/compare/v0.1.0...v0.2.0)
+
+### Added
+
+- \(SUP-2898\) Available Memory on the platform is less than 10% [\#18](https://github.com/puppetlabs/puppetlabs-self_service/pull/18) ([MartyEwings](https://github.com/MartyEwings))
+
 ## [v0.1.0](https://github.com/puppetlabs/puppetlabs-self_service/tree/v0.1.0) (2021-12-14)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-self_service/compare/f6d5d880a989fad41190a0df43e8dc0a34713df2...v0.1.0)
