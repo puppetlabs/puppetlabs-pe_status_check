@@ -112,4 +112,9 @@ Facter.add(:self_service, type: :aggregate) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
   end
+
+  chunk(:S0041) do
+    # returns true if agent is configured to send reports
+    { S0041: Puppet.settings['report'] }
+  end
 end
