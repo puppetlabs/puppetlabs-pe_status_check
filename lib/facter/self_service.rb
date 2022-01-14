@@ -8,6 +8,7 @@ Facter.add(:self_service, type: :aggregate) do
   require 'yaml'
   require_relative '../shared/puppet_self_service'
   puppet_bin = '/opt/puppetlabs/bin/puppet'
+  psql_bin = '/opt/puppetlabs/server/bin/psql'
 
   chunk(:S0001) do
     # Is the Agent Service Running and Enabled
@@ -112,4 +113,13 @@ Facter.add(:self_service, type: :aggregate) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
   end
+
+    chunk(:S0029) do
+    # Is there at least 10% of available postgres connctions left
+    next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary?
+    max  = Facter::Core::Execution.execute("#{psql_bin} sudo su - pe-postgres -s /bin/bash -c \"/opt/puppetlabs/server/bin/psql  -qtAX  -c \"SELECT current_setting('max_connections');\"\"")
+    current = Facter::Core::Execution.execute("#{psql_bin} sudo su - pe-postgres -s /bin/bash -c \"/opt/puppetlabs/server/bin/psql  -qtAX  -c \"select count used from pg_stat_activity;;\"\"")
+    { S0029: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
+  end
+
 end
