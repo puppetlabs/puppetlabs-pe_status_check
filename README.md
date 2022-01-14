@@ -22,7 +22,7 @@ Users of the tool should expect greater ability to provide the self served resol
 
 ### What self_service affects
 
-This module installs a structured fact named self_service, which contains an array of key pairs tha simply output an indicator ID and a boolean value.
+This module installs a structured fact named `self_service`, which contains an array of key pairs that output an indicator ID and a boolean value.
 
 ### Setup Requirements
 
@@ -49,7 +49,7 @@ node 'node.example.com' {
 }
 ```
 
-While the entirety of the default indicators should be reported on for maximum coverage, it may be necessarily to make exceptions for your particular environment.
+While the entirety of the default indicators should be reported on for maximum coverage, it may be necessary to make exceptions for your particular environment.
 to do this classify the array parameter indicator_exclusions with an list of all indicators you do not want to report on.
 
 ```puppet
