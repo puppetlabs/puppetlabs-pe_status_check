@@ -112,4 +112,11 @@ Facter.add(:self_service, type: :aggregate) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
   end
+
+  chunk(:S0042) do
+    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler?
+    # Is the PuppetDB Queue Depth less than 1000?
+    queue_depth = Dir.glob('/opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/*').length
+    { S0042: queue_depth <= 1000 }
+  end
 end
