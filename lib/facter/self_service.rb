@@ -112,4 +112,14 @@ Facter.add(:self_service, type: :aggregate) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
   end
+
+  chunk(:S0036) do
+    str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
+    max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
+    if max_queued_requests.nil?
+      { S0036: true }
+    else
+      { S0036: max_queued_requests[1].to_i < 150 }
+    end
+  end
 end
