@@ -109,10 +109,12 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S00014) do
-    file_time = (File.mtime('/opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q'))
-    time_now = (Time.now)
+    file_time = File.mtime('/opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q')
+    time_now = Time.now
     if (time_now - 1800) < file_time 
       { S00014: true }
+    else
+      { S00014: false }
     end
   end
 
