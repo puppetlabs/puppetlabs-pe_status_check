@@ -1,15 +1,17 @@
 # puppetlabs-self_service
 
 
-1. [Description](#description)
-1. [Setup - The basics of getting started with self_service](#setup)
-    * [What self_service affects](#what-self_service-affects)
-    * [Setup requirements](#setup-requirements)
-    * [Beginning with self_service](#beginning-with-self_service)
-1. [Usage - Configuration options and additional functionality](#usage)
-1. [Reference - what to do when a indicator repors a fault](#reference)
-1. [Limitations - OS compatibility, etc.](#limitations)
-1. [Development - Guide for contributing to the module](#development)
+- [puppetlabs-self_service](#puppetlabs-self_service)
+  - [Description](#description)
+  - [Setup](#setup)
+    - [What self_service affects](#what-self_service-affects)
+    - [Setup Requirements](#setup-requirements)
+    - [Beginning with self_service](#beginning-with-self_service)
+  - [Usage](#usage)
+    - [Class Delcaration *Optional.*](#class-delcaration-optional)
+  - [Reference](#reference)
+  - [Limitations](#limitations)
+  - [Development](#development)
 
 ## Description
 
@@ -80,7 +82,7 @@ This section should be referred to for next steps when any indicator reports a f
 | S0011        | Determines if Pe-postgres Service is Running and Enabled on relevant components    | Check the Service can be started and enabled   `puppet resource service pe-postgres ensure=running`  examing /var/log/puppetlabs/postgresql/<postgresversion>/postgresql-<today>.log for failures                                                                                                                                                                                                                                                                           | Raise a support case quoting reference S0011 along with the log below, showing an unsuccessful startup /var/log/puppetlabs/postgresql/<postgresversion>/ postgresql-<today>.log                                                       |
 | S0012        | Determines if Puppet produced a report within the last run interval                | https://puppet.com/docs/pe/2021.4/run_puppet_on_nodes.html#troubleshooting_puppet_run_failures                                                                                                                                                                                                                                                                                                                                                                              | Raise a support case quoting reference S0012 along with the output of `puppet agent -td > debug.log 2>&1`                                                                                                                             |
 | S0013        | Determines if a catalog successfully applied on Puppet Agent Last run              | https://puppet.com/docs/pe/2021.4/run_puppet_on_nodes.html#troubleshooting_puppet_run_failures                                                                                                                                                                                                                                                                                                                                                                              | Raise a support case quoting reference S0013 along with the output of  `puppet agent -td > debug.log 2>&1`                                                                                                                            |
-
+| S0036        | Determines if max-queued-requests is set above 150                       | The maximum value for jruby_puppet_max_queued_requests is 150                (https://support.puppet.com/hc/en-us/articles/115003769433-Prevent-a-thundering-herd-Use-max-queued-requests-in-Puppet-Enterprise-2017-3-1-and-later)                                                                      | If you are unable, or encounter an error when changing the value of jruby_puppet_max_queued_requests, raise a support case quoting reference S0036 and any errors output when attempting to change the setting  
 
 ## Limitations
 
