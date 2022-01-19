@@ -148,6 +148,12 @@ describe 'self_service class' do
         expect(result.stdout).to match(%r{false})
         run_shell('rm -f /etc/puppetlabs/facter/facts.d/memory.json')
       end
+      it 'if S0036 conditions for false are met' do
+        run_shell('echo "puppet_enterprise::master::puppetserver::jruby_puppet_max_queued_requests: 151" >> /etc/puppetlabs/code/environments/production/data/common.yaml; puppet agent -t',
+expect_failures: true)
+        result = run_shell('facter -p self_service.S0036')
+        expect(result.stdout).to match(%r{false})
+      end
     end
   end
 end
