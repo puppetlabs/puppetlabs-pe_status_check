@@ -122,4 +122,12 @@ Facter.add(:self_service, type: :aggregate) do
     # check for use_cached_catalog logic flip as false is the desired state
     { S0030: !Puppet.settings['use_cached_catalog'] }
   end
+  chunk(:S0033) do
+    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
+    hiera_config_path = Puppet.settings['hiera_config']
+    next unless File.exist?(hiera_config_path)
+    hiera_config_file = YAML.load_file(hiera_config_path)
+    # Is Hiera 5 in use?
+    { S0033: hiera_config_file.dig('version') == 5 }
+  end
 end
