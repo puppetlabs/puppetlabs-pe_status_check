@@ -108,6 +108,12 @@ Facter.add(:self_service, type: :aggregate) do
     { S0013: File.open(summary_path).read.include?('catalog_application') }
   end
 
+  chunk(:S00014) do
+    file_time = File.mtime("/opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q")
+    time_now = Time.now
+    { S00014: (time_now - 1800) < file_time }
+  end
+
   chunk(:S0021) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
