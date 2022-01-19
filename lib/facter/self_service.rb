@@ -269,4 +269,12 @@ Facter.add(:self_service, type: :aggregate) do
     # last upgrade was sooner than 1 year ago
     { S0034: last_upgrade_time >= (Time.now - 31_536_000).utc }
   end
+  chunk(:S0033) do
+    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
+    hiera_config_path = Puppet.settings['hiera_config']
+    next unless File.exist?(hiera_config_path)
+    hiera_config_file = YAML.load_file(hiera_config_path)
+    # Is Hiera 5 in use?
+    { S0033: hiera_config_file.dig('version') == 5 }
+  end
 end

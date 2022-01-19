@@ -16,10 +16,14 @@ describe 'self_service class' do
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
 <<<<<<< HEAD
+<<<<<<< HEAD
         expect(host_inventory['facter']['self_service'].size).to eq(26)
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(15)
 >>>>>>> (SUP-2939) Remove High Load Average test
+=======
+        expect(host_inventory['facter']['self_service'].size).to eq(16)
+>>>>>>> (SUP-2912) added a check to see if Global hiera is Hiera 5
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -218,12 +222,15 @@ describe 'self_service class' do
         expect(result.stdout).to match(%r{false})
         run_shell('puppet config set use_cached_catalog false', expect_failures: false)
       end
+<<<<<<< HEAD
       it 'if S0031 conditions for false are met' do
         run_shell('mkdir -p /opt/puppetlabs/server/data/packages/public/2018.1.5/el-7-x86_64-5.5.8')
         result = run_shell('facter -p self_service.S0031')
         expect(result.stdout).to match(%r{false})
         run_shell('rm -rf /opt/puppetlabs/server/data/packages/public/2018.1.5')
       end
+=======
+>>>>>>> (SUP-2912) added a check to see if Global hiera is Hiera 5
       it 'if S0033 conditions for false are met' do
         run_shell('cat <<EOF > /etc/puppetlabs/puppet/hiera.yaml
 ---
@@ -268,6 +275,7 @@ hierarchy:
 - name: Classifier Configuration Data
   data_hash: classifier_data')
       end
+<<<<<<< HEAD
       it 'if S0034 conditions for false are met' do
         run_shell('touch -d "2 years ago"  /opt/puppetlabs/server/pe_build')
         result = run_shell('facter -p self_service.S0034')
@@ -303,6 +311,8 @@ hierarchy:
         run_shell('systemctl start puppet_system_processes-metrics.timer')
         run_shell('puppet agent --enable')
       end
+=======
+>>>>>>> (SUP-2912) added a check to see if Global hiera is Hiera 5
     end
   end
 end
