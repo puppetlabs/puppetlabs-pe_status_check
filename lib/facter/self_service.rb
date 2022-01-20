@@ -108,10 +108,10 @@ Facter.add(:self_service, type: :aggregate) do
     { S0013: File.open(summary_path).read.include?('catalog_application') }
   end
 
-  chunk(:S00014) do
+  chunk(:S0014) do
     file_time = File.mtime('/opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q')
-    time_now = Time.now
-    { S00014: ((time_now - 1800).to_i) < file_time.to_i }
+    time_now = Time.now - 1800
+    { S0014: time_now.to_i < file_time.to_i }
   end
 
   chunk(:S0021) do
