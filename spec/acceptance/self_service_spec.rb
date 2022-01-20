@@ -131,22 +131,30 @@ describe 'self_service class' do
         run_shell('touch /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q')
       end
       it 'if S0016 conditions for false are met' do
-        run_shell('export puppetserverlogs=$(puppet config print logdir) && cp $puppetserverlogs/../puppetserver/puppetserver.log $puppetserverlogs/../puppetserver/puppetserver.log.bk && echo "java.lang.OutOfMemoryError" >> $puppetserverlogs/../puppetserver/puppetserver.log.bk')
+        run_shell('export logdir=$(puppet config print logdir) &&
+         cp $logdir/../puppetserver/puppetserver.log $logdir/../puppetserver/puppetserver.log.bk &&
+        echo "java.lang.OutOfMemoryError" >> $logdir/../puppetserver/puppetserver.log')
         result = run_shell('facter -p self_service.S0016')
         expect(result.stdout).to match(%r{false})
-        run_shell('export puppetserverlogs=$(puppet config print logdir) && rm -f $puppetserverlogs/../puppetserver/puppetserver.log.bk')
+        run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../puppetserver/puppetserver.log &&
+        mv $logdir/../puppetserver/puppetserver.log.bk $logdir/../puppetserver/puppetserver.log')
       end
       it 'if S0017 conditions for false are met' do
-        run_shell('export puppetdblogs=$(puppet config print logdir) && cp $puppetdblogs/../puppetdb/puppetdb.log $puppetdblogs/../puppetdb/puppetdb.log.bk && echo "java.lang.OutOfMemoryError" >> $puppetdblogs/../puppetdb/puppetdb.log.bk')
+        run_shell('export logdir=$(puppet config print logdir) && cp $logdir/../puppetdb/puppetdb.log $logdir/../puppetdb/puppetdb.log.bk &&
+         echo "java.lang.OutOfMemoryError" >> $logdir/../puppetdb/puppetdb.log.bk')
         result = run_shell('facter -p self_service.S0017')
         expect(result.stdout).to match(%r{false})
-        run_shell('export puppetdblogs=$(puppet config print logdir) && rm -f $puppetdblogs/../puppetdb/puppetdb.log.bk')
+        run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../puppetdb/puppetdb.log &&
+        mv $logdir/../puppetdb/puppetdb.log.bk $logdir/../puppetdb/puppetdb.log')
       end
       it 'if S0018 conditions for false are met' do
-        run_shell('export orchestratorlogs=$(puppet config print logdir) && cp $orchestratorlogs/../orchestration-services/orchestration-services.log $orchestratorlogs/../orchestration-services/orchestration-services.log.bk && echo "java.lang.OutOfMemoryError" >> $orchestratorlogs/../orchestration-services/orchestration-services.log.bk')
+        run_shell('export logdir=$(puppet config print logdir) &&
+         cp $logdir/../orchestration-services/orchestration-services.log $logdir/../orchestration-services/orchestration-services.log.bk &&
+         echo "java.lang.OutOfMemoryError" >> $logdir/../orchestration-services/orchestration-services.log.bk')
         result = run_shell('facter -p self_service.S0018')
         expect(result.stdout).to match(%r{false})
-        run_shell('export orchestratorlogs=$(puppet config print logdir) && rm -f $orchestratorlogs/../orchestration-services/orchestration-services.log.bk')
+        run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../orchestration-services/orchestration-services.log &&
+        mv $logdir/../orchestration-services/orchestration-services.log.bk $logdir/../orchestration-services/orchestration-services.log')
       end
       it 'if S0021 conditions for false are met' do
         run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{
