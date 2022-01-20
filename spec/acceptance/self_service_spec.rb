@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(15)
+        expect(host_inventory['facter']['self_service'].size).to eq(16)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -149,6 +149,12 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0036')
         expect(result.stdout).to match(%r{false})
         run_shell('puppet resource service puppet ensure=running')
+      end
+      it 'if S0030 conditions for false are met' do
+        run_shell('puppet config set use_cached_catalog true', expect_failures: false)
+        result = run_shell('facter -p self_service.S0030')
+        expect(result.stdout).to match(%r{false})
+        run_shell('puppet config set use_cached_catalog false', expect_failures: false)
       end
     end
   end
