@@ -17,6 +17,7 @@ describe 'self_service class' do
       it 'if idempotent all facts should be true' do
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         expect(host_inventory['facter']['self_service'].size).to eq(26)
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(15)
@@ -24,6 +25,9 @@ describe 'self_service class' do
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(16)
 >>>>>>> (SUP-2912) added a check to see if Global hiera is Hiera 5
+=======
+        expect(host_inventory['facter']['self_service'].size).to eq(17)
+>>>>>>> (SUP-2919) - is puppet_metrics_collector::system configured
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -276,6 +280,7 @@ hierarchy:
   data_hash: classifier_data')
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
       it 'if S0034 conditions for false are met' do
         run_shell('touch -d "2 years ago"  /opt/puppetlabs/server/pe_build')
         result = run_shell('facter -p self_service.S0034')
@@ -303,6 +308,8 @@ hierarchy:
         expect(result.stdout).to match(%r{false})
         apply_manifest(absent)
       end
+=======
+>>>>>>> (SUP-2919) - is puppet_metrics_collector::system configured
       it 'if S0040 conditions for false are met' do
         run_shell('puppet agent --disable')
         run_shell('systemctl stop puppet_system_processes-metrics.timer')
@@ -311,8 +318,11 @@ hierarchy:
         run_shell('systemctl start puppet_system_processes-metrics.timer')
         run_shell('puppet agent --enable')
       end
+<<<<<<< HEAD
 =======
 >>>>>>> (SUP-2912) added a check to see if Global hiera is Hiera 5
+=======
+>>>>>>> (SUP-2919) - is puppet_metrics_collector::system configured
     end
   end
 end
