@@ -114,6 +114,27 @@ Facter.add(:self_service, type: :aggregate) do
     { S0014: time_now.to_i < file_time.to_i }
   end
 
+  chunk(:S0016) do
+    # Puppetserver
+    next unless PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+    log_path = Puppet.settings['logdir'].to_s + '/../puppetserver/puppetserver.log'
+    { S0016: !File.open(log_path).read.include?('java.lang.OutOfMemoryError') }
+  end
+
+  chunk(:S0017) do
+    # PuppetDB
+    next unless PuppetSelfService.primary?
+    log_path = Puppet.settings['logdir'].to_s + '/../puppetdb/puppetdb.log'
+    { S0017: !File.open(log_path).read.include?('java.lang.OutOfMemoryError') }
+  end
+
+  chunk(:S0018) do
+    # Orchestrator
+    next unless PuppetSelfService.primary?
+    log_path = Puppet.settings['logdir'].to_s + '/../orchestration-services/orchestration-services.log'
+    { S0018: !File.open(log_path).read.include?('java.lang.OutOfMemoryError') }
+  end
+
   chunk(:S0021) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
