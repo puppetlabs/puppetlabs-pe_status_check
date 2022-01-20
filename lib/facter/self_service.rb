@@ -118,21 +118,75 @@ Facter.add(:self_service, type: :aggregate) do
     # Puppetserver
     next unless PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
     log_path = Puppet.settings['logdir'].to_s + '/../puppetserver/puppetserver.log'
-    { S0016: !File.open(log_path).read.include?('java.lang.OutOfMemoryError') }
+    line_count = `wc -l < #{log_path}`.to_i
+    lines_to_read = 500
+    # if the number of lines in the logfile is smaller than the amount we want to read, set to read all lines in the file
+    if line_count < 500
+      lines_to_read = line_count
+    end
+    range_from = line_count - lines_to_read
+    # read each line and match for error
+    lines = IO.readlines(log_path)[range_from..line_count]
+    result = 'dummy'
+    lines.each_index.each do |i|
+      if lines[i].include?('java.lang.OutOfMemoryError')
+        result = false
+        break
+      else
+        result = true
+      end
+    end
+    { S0016: result }
   end
 
   chunk(:S0017) do
     # PuppetDB
     next unless PuppetSelfService.primary?
     log_path = Puppet.settings['logdir'].to_s + '/../puppetdb/puppetdb.log'
-    { S0017: !File.open(log_path).read.include?('java.lang.OutOfMemoryError') }
+    line_count = `wc -l < #{log_path}`.to_i
+    lines_to_read = 500
+    # if the number of lines in the logfile is smaller than the amount we want to read, set to read all lines in the file
+    if line_count < 500
+      lines_to_read = line_count
+    end
+    range_from = line_count - lines_to_read
+    # read each line and match for error
+    lines = IO.readlines(log_path)[range_from..line_count]
+    result = 'dummy'
+    lines.each_index.each do |i|
+      if lines[i].include?('java.lang.OutOfMemoryError')
+        result = false
+        break
+      else
+        result = true
+      end
+    end
+    { S0017: result }
   end
 
   chunk(:S0018) do
     # Orchestrator
     next unless PuppetSelfService.primary?
     log_path = Puppet.settings['logdir'].to_s + '/../orchestration-services/orchestration-services.log'
-    { S0018: !File.open(log_path).read.include?('java.lang.OutOfMemoryError') }
+    line_count = `wc -l < #{log_path}`.to_i
+    lines_to_read = 500
+    # if the number of lines in the logfile is smaller than the amount we want to read, set to read all lines in the file
+    if line_count < 500
+      lines_to_read = line_count
+    end
+    range_from = line_count - lines_to_read
+    # read each line and match for error
+    lines = IO.readlines(log_path)[range_from..line_count]
+    result = 'dummy'
+    lines.each_index.each do |i|
+      if lines[i].include?('java.lang.OutOfMemoryError')
+        result = false
+        break
+      else
+        result = true
+      end
+    end
+    { S0018: result }
   end
 
   chunk(:S0021) do

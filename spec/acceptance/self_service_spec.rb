@@ -141,7 +141,7 @@ describe 'self_service class' do
       end
       it 'if S0017 conditions for false are met' do
         run_shell('export logdir=$(puppet config print logdir) && cp $logdir/../puppetdb/puppetdb.log $logdir/../puppetdb/puppetdb.log.bk &&
-         echo "java.lang.OutOfMemoryError" >> $logdir/../puppetdb/puppetdb.log.bk')
+         echo "java.lang.OutOfMemoryError" >> $logdir/../puppetdb/puppetdb.log')
         result = run_shell('facter -p self_service.S0017')
         expect(result.stdout).to match(%r{false})
         run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../puppetdb/puppetdb.log &&
@@ -150,7 +150,7 @@ describe 'self_service class' do
       it 'if S0018 conditions for false are met' do
         run_shell('export logdir=$(puppet config print logdir) &&
          cp $logdir/../orchestration-services/orchestration-services.log $logdir/../orchestration-services/orchestration-services.log.bk &&
-         echo "java.lang.OutOfMemoryError" >> $logdir/../orchestration-services/orchestration-services.log.bk')
+         echo "java.lang.OutOfMemoryError" >> $logdir/../orchestration-services/orchestration-services.log')
         result = run_shell('facter -p self_service.S0018')
         expect(result.stdout).to match(%r{false})
         run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../orchestration-services/orchestration-services.log &&
