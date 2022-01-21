@@ -128,4 +128,8 @@ Facter.add(:self_service, type: :aggregate) do
       { S0036: max_queued_requests[1].to_i < 150 }
     end
   end
+  chunk(:S0030) do
+    # check for use_cached_catalog logic flip as false is the desired state
+    { S0030: !Puppet.settings['use_cached_catalog'] }
+  end
 end
