@@ -125,10 +125,10 @@ describe 'self_service class' do
         run_shell('export lastrunfile=$(puppet config print lastrunfile) && mv -f ${lastrunfile}.bk $lastrunfile')
       end
       it 'if S0014 conditions for false are met' do
-        run_shell('touch -d "32 minutes ago" /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q')
+        run_shell('touch -d "40 minutes ago" /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
         result = run_shell('facter -p self_service.S0014')
         expect(result.stdout).to match(%r{false})
-        run_shell('touch /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q')
+        run_shell('rm -f /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
       end
       it 'if S0021 conditions for false are met' do
         run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{

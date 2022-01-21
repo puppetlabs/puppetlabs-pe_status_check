@@ -109,9 +109,15 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0014) do
-    file_time = File.mtime('/opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q')
-    time_now = Time.now - Puppet.settings['runinterval']
-    { S0014: time_now.to_i < file_time.to_i }
+    q_path = '/opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q'
+    # Find the oldest file in the q
+    if Dir.empty?(q_path)
+      { S0014: true }
+    else
+      file_time = File.mtime(Dir.entries(q_path).map { |e| File.join(q_path, e) }.select { |f| File.file? f}.sort_by { |f| File.mtime f }.first)
+      time_now = Time.now - Puppet.settings['runinterval']
+      { S0014: time_now.to_i < file_time.to_i }
+    end
   end
 
   chunk(:S0021) do
