@@ -114,6 +114,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0036) do
+    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
     max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
     if max_queued_requests.nil?
