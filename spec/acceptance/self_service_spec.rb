@@ -156,6 +156,11 @@ describe 'self_service class' do
         expect(result.stdout).to match(%r{false})
         run_shell('puppet config set use_cached_catalog false', expect_failures: false)
       end
+
+      it 'if S0027 conditions for false are met' do
+        result = run_shell('facter -p self_service.S0027')
+        expect(result.stdout).to match(%r{false})
+      end
     end
   end
 end

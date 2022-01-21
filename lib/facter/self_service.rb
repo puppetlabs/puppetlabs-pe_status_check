@@ -114,6 +114,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0036) do
+    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
     max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
     if max_queued_requests.nil?
@@ -125,5 +126,12 @@ Facter.add(:self_service, type: :aggregate) do
   chunk(:S0030) do
     # check for use_cached_catalog logic flip as false is the desired state
     { S0030: !Puppet.settings['use_cached_catalog'] }
+  end
+
+  chunk(:S0027) do
+    next unless PuppetSelfService.primary?
+    # Check if thundering herd is occuring.
+    psqldata = PuppetSelfService.psql_thundering_herd
+    { S0027: false }
   end
 end
