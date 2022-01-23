@@ -112,4 +112,15 @@ Facter.add(:self_service, type: :aggregate) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
   end
+
+  chunk(:S0025) do
+    active_nodes =  curl -sk https://localhost:8081/pdb/query/v4/nodes \
+    -X POST \
+    -H 'Content-Type:application/json' \
+    --cert   $(puppet config print hostcert) \
+    --key    $(puppet config print hostprivkey) \
+    --cacert $(puppet config print localcacert) \
+    -d '{"query":["extract", [["function","count"],"deactivated"],["null?", "deactivated", true],["group_by", "deactivated"]]}' | tr { '\n' | tr , '\n' | tr } '\n' | grep "count" | awk  -F':' '{print $2}'
+    { S0021: active_nodes}
+  end
 end
