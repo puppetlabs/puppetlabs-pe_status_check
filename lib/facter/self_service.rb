@@ -48,11 +48,6 @@ Facter.add(:self_service, type: :aggregate) do
     { S0005: result > 7_776_000 }
   end
 
-  chunk(:S0006) do
-    # check for sustained load average greater than available cores
-    { S0006: Facter.value(:load_averages)['15m'] <= Facter.value(:processors)['count'] }
-  end
-
   chunk(:S0007) do
     next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.postgres?
     # check postgres data mount has at least 20% free
