@@ -240,4 +240,18 @@ Facter.add(:self_service, type: :aggregate) do
     # Is puppet_metrics_collector::system configured
     { S0040: PuppetSelfService.service_running_enabled('puppet_system_processes-metrics.timer') }
   end
+
+  chunk(:S0034) do
+    # PE has not been upgraded / updated in 1 year
+    # It was decided not to include infra components as this was deemed unecessary as they should align with the primary.
+
+    # gets the file for the most recent upgrade output
+    last_upgrade_file = Dir.glob('/var/log/puppetlabs/installer/*.install.log').max_by { |f| File.mtime(f) }
+
+    # get the timestamp for the most recent upgrade
+    last_upgrade_time = File.mtime(last_upgrade_file)
+
+    # last upgrade was sooner than 1 year ago
+    { S0034: last_upgrade_time >= (Time.now - 31_536_000).utc }
+  end
 end

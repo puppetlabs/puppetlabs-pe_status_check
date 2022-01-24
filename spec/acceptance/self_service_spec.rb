@@ -256,6 +256,12 @@ hierarchy:
 - name: Classifier Configuration Data
   data_hash: classifier_data')
       end
+      it 'if S0034 conditions for false are met' do
+        run_shell('mv /var/log/puppetlabs/installer/*.install.log  /var/log/puppetlabs/installer/orig ; touch -d "2 years ago" 2022-01-06T09.45.21+0000.install.log')
+        result = run_shell('facter -p self_service.S0034')
+        expect(result.stdout).to match(%r{false})
+        run_shell('mv /var/log/puppetlabs/installer/orig  /var/log/puppetlabs/installer/2021-01-06T09.45.21+0000.install.log ')
+      end
       it 'if S0036 conditions for false are met' do
         present = <<-PUPPETCODE
         pe_hocon_setting { 'jruby-puppet.max-queued-requests':
