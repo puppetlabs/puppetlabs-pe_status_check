@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(26)
+        expect(host_inventory['facter']['self_service'].size).to eq(27)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -216,6 +216,17 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0031')
         expect(result.stdout).to match(%r{false})
         run_shell('rm -rf /opt/puppetlabs/server/data/packages/public/2018.1.5')
+      end
+      it 'if S0032 conditions for false are met' do
+        configdir = if Facter.value(:os)['family'].eql?('RedHat') || Facter.value(:os)['family'].eql?('Suse')
+                      '/etc/sysconfig'
+                    else
+                      '/etc/default'
+                    end
+        run_shell("touch #{configdir}/mcollective")
+        result = run_shell('facter -p self_service.S0032')
+        expect(result.stdout).to match(%r{false})
+        run_shell("rm #{configdir}/mcollective -f")
       end
       it 'if S0033 conditions for false are met' do
         run_shell('cat <<EOF > /etc/puppetlabs/puppet/hiera.yaml

@@ -227,6 +227,14 @@ Facter.add(:self_service, type: :aggregate) do
     { S0031: no_old_packages }
   end
 
+  chunk(:S0032) do
+    # MCollective/ActiveMQ enabled/exists?
+    amq  = PuppetSelfService.service_running_enabled('pe-activemq') || PuppetSelfService.service_file_exist?('pe-activemq')
+    cron = PuppetSelfService.get_resource('cron', 'pe-mcollective-metadata').nil?
+    mco  = PuppetSelfService.service_running_enabled('mcollective') || PuppetSelfService.service_file_exist?('mcollective')
+    { S0032: !mco && !amq && cron }
+  end
+
   chunk(:S0033) do
     next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
     hiera_config_path = Puppet.settings['hiera_config']
