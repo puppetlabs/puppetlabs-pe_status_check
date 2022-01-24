@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(24)
+        expect(host_inventory['facter']['self_service'].size).to eq(25)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -255,6 +255,12 @@ version: 5
 hierarchy:
 - name: Classifier Configuration Data
   data_hash: classifier_data')
+      end
+      it 'if S0034 conditions for false are met' do
+        run_shell('touch -d "2 years ago"  /opt/puppetlabs/server/pe_build')
+        result = run_shell('facter -p self_service.S0034')
+        expect(result.stdout).to match(%r{false})
+        run_shell('touch -d "1 day ago"  /opt/puppetlabs/server/pe_build')
       end
       it 'if S0036 conditions for false are met' do
         present = <<-PUPPETCODE
