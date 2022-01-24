@@ -15,7 +15,11 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
+<<<<<<< HEAD
         expect(host_inventory['facter']['self_service'].size).to eq(26)
+=======
+        expect(host_inventory['facter']['self_service'].size).to eq(15)
+>>>>>>> (SUP-2939) Remove High Load Average test
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -65,6 +69,7 @@ describe 'self_service class' do
         run_shell('puppet resource service pe-orchestration-services  ensure=running')
       end
 
+<<<<<<< HEAD
       it 'if S0006 conditions for false are met' do
         run_shell('puppet agent --disable')
         run_shell('systemctl stop puppet_puppetserver-metrics.timer')
@@ -74,6 +79,8 @@ describe 'self_service class' do
         run_shell('puppet agent --enable')
       end
 
+=======
+>>>>>>> (SUP-2939) Remove High Load Average test
       context 'when filesystem usage exceeds 80%' do
         before(:all) do
           run_shell('fallocate -l $(($(facter -p mountpoints.\'/\'.available_bytes)-1073741824)) /largefile.txt')
