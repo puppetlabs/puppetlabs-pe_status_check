@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(14)
+        expect(host_inventory['facter']['self_service'].size).to eq(16)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -63,13 +63,6 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0004')
         expect(result.stdout).to match(%r{false})
         run_shell('puppet resource service pe-orchestration-services  ensure=running')
-      end
-
-      it 'if S0006 conditions for false are met' do
-        run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{"load_averages": {"15m": 20.5}}\' > /etc/puppetlabs/facter/facts.d/load_averages.json')
-        result = run_shell('facter -p self_service.S0006')
-        expect(result.stdout).to match(%r{false})
-        run_shell('rm -f /etc/puppetlabs/facter/facts.d/load_averages.json')
       end
 
       context 'when filesystem usage exceeds 80%' do
@@ -141,6 +134,64 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0021')
         expect(result.stdout).to match(%r{false})
         run_shell('rm -f /etc/puppetlabs/facter/facts.d/memory.json')
+      end
+      it 'if S0036 conditions for false are met' do
+        run_shell('echo "puppet_enterprise::master::puppetserver::jruby_puppet_max_queued_requests: 151" >> /etc/puppetlabs/code/environments/production/data/common.yaml')
+        run_shell('puppet resource service puppet ensure=stopped')
+        run_shell('puppet agent -t', expect_failures: true)
+        result = run_shell('facter -p self_service.S0036')
+        expect(result.stdout).to match(%r{false})
+        run_shell('puppet resource service puppet ensure=running')
+      end
+      it 'if S0030 conditions for false are met' do
+        run_shell('puppet config set use_cached_catalog true', expect_failures: false)
+        result = run_shell('facter -p self_service.S0030')
+        expect(result.stdout).to match(%r{false})
+        run_shell('puppet config set use_cached_catalog false', expect_failures: false)
+      end
+      it 'if S0033 conditions for false are met' do
+        run_shell('cat <<EOF > /etc/puppetlabs/puppet/hiera.yaml
+---
+:backends:
+  - mongodb
+  - eyaml
+  - yaml
+:yaml:
+  :datadir: "/etc/puppetlabs/code/environments/%{environment}/hieradata"
+:mongodb:
+  :connections:
+    :dbname: hdata
+    :collection: config
+    :host: localhost
+:eyaml:
+  :datadir: "/etc/puppetlabs/code/environments/%{environment}/hieradata"
+  :pkcs7_private_key: /etc/puppetlabs/puppet/eyaml/private_key.pkcs7.pem
+  :pkcs7_public_key:  /etc/puppetlabs/puppet/eyaml/public_key.pkcs7.pem
+:hierarchy:
+  - "nodes/%{trusted.certname}"
+  - "location/%{facts.whereami}/%{facts.group}"
+  - "groups/%{facts.group}"
+  - "os/%{facts.os.family}"
+  - "common"
+:logger: console
+:merge_behavior: native
+:deep_merge_options: {}')
+        result = run_shell('facter -p self_service.S0033')
+        expect(result.stdout).to match(%r{false})
+        run_shell('cat << EOF > /etc/puppetlabs/puppet/hiera.yaml
+---
+# Hiera 5 Global configuration file
+
+version: 5
+
+# defaults:
+#   data_hash: yaml_data
+# hierarchy:
+#  - name: Common
+#    data_hash: yaml_data
+hierarchy:
+- name: Classifier Configuration Data
+  data_hash: classifier_data')
       end
     end
   end
