@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(16)
+        expect(host_inventory['facter']['self_service'].size).to eq(17)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -63,6 +63,15 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0004')
         expect(result.stdout).to match(%r{false})
         run_shell('puppet resource service pe-orchestration-services  ensure=running')
+      end
+
+      it 'if S0006 conditions for false are met' do
+        run_shell('puppet agent --disable')
+        run_shell('systemctl stop puppet_puppetserver-metrics.timer')
+        result = run_shell('facter -p self_service.S0006')
+        expect(result.stdout).to match(%r{false})
+        run_shell('systemctl start puppet_puppetserver-metrics.timer')
+        run_shell('puppet agent --enable')
       end
 
       context 'when filesystem usage exceeds 80%' do

@@ -48,6 +48,11 @@ Facter.add(:self_service, type: :aggregate) do
     { S0005: result > 7_776_000 }
   end
 
+  chunk(:S0006) do
+    # Is puppet_metrics_collector running
+    { S0006: PuppetSelfService.service_running_enabled('puppet_puppetserver-metrics.timer') }
+  end
+
   chunk(:S0007) do
     next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.postgres?
     # check postgres data mount has at least 20% free
