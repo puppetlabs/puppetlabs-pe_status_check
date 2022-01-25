@@ -130,4 +130,9 @@ Facter.add(:self_service, type: :aggregate) do
     # Is Hiera 5 in use?
     { S0033: hiera_config_file.dig('version') == 5 }
   end
+
+  chunk(:S0035) do
+    # return false if any Warnings appear in the 'puppet module list...'
+    { S0035: ! `#{puppet_bin} module list --tree 2>&1`.encode("ASCII", "UTF-8", undef: :replace).match?(/Warning:\s+/) }
+  end
 end
