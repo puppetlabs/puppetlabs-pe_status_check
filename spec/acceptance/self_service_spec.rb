@@ -78,6 +78,9 @@ describe 'self_service class' do
       end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> (SUP-2946) Check Metrics Collector is enabled
       it 'if S0006 conditions for false are met' do
         run_shell('puppet agent --disable')
         run_shell('systemctl stop puppet_puppetserver-metrics.timer')
@@ -87,8 +90,11 @@ describe 'self_service class' do
         run_shell('puppet agent --enable')
       end
 
+<<<<<<< HEAD
 =======
 >>>>>>> (SUP-2939) Remove High Load Average test
+=======
+>>>>>>> (SUP-2946) Check Metrics Collector is enabled
       context 'when filesystem usage exceeds 80%' do
         before(:all) do
           run_shell('fallocate -l $(($(facter -p mountpoints.\'/\'.available_bytes)-1073741824)) /largefile.txt')

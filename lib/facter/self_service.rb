@@ -49,14 +49,21 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   chunk(:S0006) do
     next unless PuppetSelfService.primary?
+=======
+  chunk(:S0006) do
+>>>>>>> (SUP-2946) Check Metrics Collector is enabled
     # Is puppet_metrics_collector running
     { S0006: PuppetSelfService.service_running_enabled('puppet_puppetserver-metrics.timer') }
   end
 
+<<<<<<< HEAD
 =======
 >>>>>>> (SUP-2939) Remove High Load Average test
+=======
+>>>>>>> (SUP-2946) Check Metrics Collector is enabled
   chunk(:S0007) do
     next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.postgres?
     # check postgres data mount has at least 20% free
