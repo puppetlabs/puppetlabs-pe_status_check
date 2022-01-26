@@ -253,7 +253,7 @@ module Exec
       _, status = Process.waitpid2(pid, Process::WNOHANG)
       break if status
       unless timeout.zero?
-        raise Timeout::Error if (deadline < Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_second))
+        raise Timeout::Error if deadline < Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_second)
       end
       # Sleep for a bit so that we don't spin in a tight loop burning
       # CPU on waitpid() syscalls.
