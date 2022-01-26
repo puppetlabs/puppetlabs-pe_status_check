@@ -114,13 +114,12 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0025) do
-    active_nodes =  curl -sk https://localhost:8081/pdb/query/v4/nodes \
-    -X POST \
-    -H 'Content-Type:application/json' \
-    --cert   $(puppet config print hostcert) \
-    --key    $(puppet config print hostprivkey) \
-    --cacert $(puppet config print localcacert) \
-    -d '{"query":["extract", [["function","count"],"deactivated"],["null?", "deactivated", true],["group_by", "deactivated"]]}' | tr { '\n' | tr , '\n' | tr } '\n' | grep "count" | awk  -F':' '{print $2}'
-    { S0021: active_nodes}
+    # This is used to illustrate a connection to the puppetdb API to obtain active nodes.
+    # This is for demo purposes at the moment and orchestration API authentication is
+    # RBAC only. This self-service test has turned out to be impossible due to the limitation
+    # that this module has to operate without RBAC tokens.
+    
+    { S0025: PuppetSelfService.activenodes_vs_orchnodes? }
   end
+
 end

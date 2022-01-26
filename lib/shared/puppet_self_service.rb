@@ -124,4 +124,56 @@ module PuppetSelfService
     stat = Sys::Filesystem.stat(path)
     (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
   end
+
+  def self.curlpuppetAPI(curl_host,curl_port,curl_API,curl_DB,curl_header,curl_query)
+
+    
+    curl_command = '/opt/puppetlabs/puppet/bin/curl -sk https://' + curl_host + ':' + curl_port + curl_API +  curl_DB + '   \
+    -X POST   -H ' + curl_header + '  \
+    --cert   $(puppet config print hostcert)   \
+    --key    $(puppet config print hostprivkey)   \
+    --cacert $(puppet config print localcacert) \
+    ' + curl_query + ''
+
+    # Using '' to ensure that the output is contained within the function and it is not pass to the console
+    
+    exec_curl_command = `#{curl_command}`
+    
+  end
+
+  # This is used to illustrate a connection to the puppetdb API to obtain active nodes.
+  # This is for demo purposes at the moment and orchestration API authentication is
+  # RBAC only. This self-service test has turned out to be impossible due to the limitation
+  # that this module has to operate without RBAC tokens.
+
+  # This function uses a generic https API call to PE with certificate based authentication
+  # The variables below can be updated at will to connect to any PE endpoint by blanking any
+  # unnecessary variable/s
+
+
+  def self.activenodes_vs_orchnodes?
+
+    # Variable names self explanatory use empty spaces if not used
+
+    curl_host = "localhost"
+    curl_port = "8081"
+    curl_API = "/pdb/query/v4"
+    curl_DB = "/nodes"
+
+    # "curl_header" variable contains a trailing space
+
+    curl_header = '"Content-Type:application/json" '
+
+    # "curl_query" shows an example to parse the output of the puppetdb query
+
+    curl_query = '-d \'{"query":["extract", [["function","count"],"deactivated"],["null?", "deactivated", true],["group_by", "deactivated"]]}\' | tr { "\n" | tr , "\n" | tr } "\n" | grep "count" | awk  -F":" \'{print $2}\''
+
+    active_nodes = PuppetSelfService.curlpuppetAPI(curl_host,curl_port,curl_API,curl_DB,curl_header,curl_query) 
+
+    # Using XXXX for active_nodes.to_i == XXXX as a proof of concept for this module
+    
+    return active_nodes.to_i == XXXX
+
+  end
+
 end
