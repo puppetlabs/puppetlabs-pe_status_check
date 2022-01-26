@@ -48,11 +48,6 @@ Facter.add(:self_service, type: :aggregate) do
     { S0005: result > 7_776_000 }
   end
 
-  chunk(:S0006) do
-    # check for sustained load average greater than available cores
-    { S0006: Facter.value(:load_averages)['15m'] <= Facter.value(:processors)['count'] }
-  end
-
   chunk(:S0007) do
     next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.postgres?
     # check postgres data mount has at least 20% free
@@ -195,6 +190,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0036) do
+    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
     max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
     if max_queued_requests.nil?
@@ -202,5 +198,17 @@ Facter.add(:self_service, type: :aggregate) do
     else
       { S0036: max_queued_requests[1].to_i < 150 }
     end
+  end
+  chunk(:S0030) do
+    # check for use_cached_catalog logic flip as false is the desired state
+    { S0030: !Puppet.settings['use_cached_catalog'] }
+  end
+  chunk(:S0033) do
+    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
+    hiera_config_path = Puppet.settings['hiera_config']
+    next unless File.exist?(hiera_config_path)
+    hiera_config_file = YAML.load_file(hiera_config_path)
+    # Is Hiera 5 in use?
+    { S0033: hiera_config_file.dig('version') == 5 }
   end
 end
