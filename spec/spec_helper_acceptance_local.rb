@@ -14,7 +14,7 @@ RSpec.configure do |c|
     PuppetLitmus::PuppetHelpers.run_shell('echo -e "#######################\n#  Begin License File #\n#######################\n \n# PUPPET ENTERPRISE LICENSE - test
       \nuuid: ****test****\n \nto: test\n \nnodes: 100\n \nlicense_type: Subscription\n \nsupport_type: PE Premium\n \nstart: 2022-01-01\n \nend: 2025-12-31
       \n#####################\n#  End License File #\n#####################" >> /etc/puppetlabs/license.key')
-    PuppetLitmus::PuppetHelpers.run_shell('sudo chown root:root /etc/puppetlabs/license.key') 
-    PuppetLitmus::PuppetHelpers.run_shell('sudo chmod 644 /etc/puppetlabs/license.key') 
+    PuppetLitmus::PuppetHelpers.run_shell('sudo chown root:root /etc/puppetlabs/license.key')
+    PuppetLitmus::PuppetHelpers.run_shell('sudo chmod 644 /etc/puppetlabs/license.key')
   end
 end
