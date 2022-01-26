@@ -130,4 +130,11 @@ Facter.add(:self_service, type: :aggregate) do
     # Is Hiera 5 in use?
     { S0033: hiera_config_file.dig('version') == 5 }
   end
+
+  chunk(:S0027) do
+    next unless PuppetSelfService.primary?
+    # Check if thundering herd is occuring.
+    psqldata = PuppetSelfService.psql_thundering_herd
+    { S0027: false }
+  end
 end
