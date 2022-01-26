@@ -19,6 +19,7 @@ describe 'self_service class' do
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         expect(host_inventory['facter']['self_service'].size).to eq(26)
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(15)
@@ -32,6 +33,9 @@ describe 'self_service class' do
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(19)
 >>>>>>> (SUP-2901) License check, tests and readme update
+=======
+        expect(host_inventory['facter']['self_service'].size).to eq(20)
+>>>>>>> SUP-2910 to check the Old PE package
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -232,6 +236,7 @@ describe 'self_service class' do
         expect(result.stdout).to match(%r{false})
         run_shell('mv /tmp/license.key /etc/puppetlabs/license.key')
       end
+<<<<<<< HEAD
       it 'if S0036 conditions for false are met' do
         run_shell('echo "puppet_enterprise::master::puppetserver::jruby_puppet_max_queued_requests: 151" >> /etc/puppetlabs/code/environments/production/data/common.yaml')
         run_shell('puppet resource service puppet ensure=stopped')
@@ -241,6 +246,8 @@ describe 'self_service class' do
         expect(result.stdout).to match(%r{false})
         run_shell('mv /tmp/license.key /etc/puppetlabs/license.key')
       end
+=======
+>>>>>>> SUP-2910 to check the Old PE package
       it 'if S0030 conditions for false are met' do
         run_shell('puppet config set use_cached_catalog true', expect_failures: false)
         result = run_shell('facter -p self_service.S0030')
@@ -248,14 +255,20 @@ describe 'self_service class' do
         run_shell('puppet config set use_cached_catalog false', expect_failures: false)
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> SUP-2910 to check the Old PE package
       it 'if S0031 conditions for false are met' do
         run_shell('mkdir -p /opt/puppetlabs/server/data/packages/public/2018.1.5/el-7-x86_64-5.5.8')
         result = run_shell('facter -p self_service.S0031')
         expect(result.stdout).to match(%r{false})
         run_shell('rm -rf /opt/puppetlabs/server/data/packages/public/2018.1.5')
       end
+<<<<<<< HEAD
 =======
 >>>>>>> (SUP-2912) added a check to see if Global hiera is Hiera 5
+=======
+>>>>>>> SUP-2910 to check the Old PE package
       it 'if S0033 conditions for false are met' do
         run_shell('cat <<EOF > /etc/puppetlabs/puppet/hiera.yaml
 ---
@@ -302,6 +315,7 @@ hierarchy:
       end
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       it 'if S0034 conditions for false are met' do
         run_shell('touch -d "2 years ago"  /opt/puppetlabs/server/pe_build')
         result = run_shell('facter -p self_service.S0034')
@@ -331,6 +345,16 @@ hierarchy:
       end
 =======
 >>>>>>> (SUP-2919) - is puppet_metrics_collector::system configured
+=======
+      it 'if S0036 conditions for false are met' do
+        run_shell('echo "puppet_enterprise::master::puppetserver::jruby_puppet_max_queued_requests: 151" >> /etc/puppetlabs/code/environments/production/data/common.yaml')
+        run_shell('puppet resource service puppet ensure=stopped')
+        run_shell('puppet agent -t', expect_failures: true)
+        result = run_shell('facter -p self_service.S0036')
+        expect(result.stdout).to match(%r{false})
+        run_shell('puppet resource service puppet ensure=running')
+      end
+>>>>>>> SUP-2910 to check the Old PE package
       it 'if S0040 conditions for false are met' do
         run_shell('puppet agent --disable')
         run_shell('systemctl stop puppet_system_processes-metrics.timer')
