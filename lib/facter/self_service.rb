@@ -134,6 +134,45 @@ Facter.add(:self_service, type: :aggregate) do
     { S0022: validity }
   end
 
+  chunk(:S0030) do
+    # check for use_cached_catalog logic flip as false is the desired state
+    { S0030: !Puppet.settings['use_cached_catalog'] }
+  end
+
+  chunk(:S0031) do
+    # check for Old pe_repo versions have been cleaned up
+    next unless PuppetSelfService.primary?
+    pe_version = Facter.value(:pe_server_version)
+    packages_dir = '/opt/puppetlabs/server/data/packages/public'
+    no_old_packages = true
+    # Guard against current version. On database node the 'current' symlink doesn't exist
+    if Dir.exist?(packages_dir)
+      current_ver = if File.exist?("#{packages_dir}/current") && File.symlink?("#{packages_dir}/current")
+                      File.basename(File.readlink("#{packages_dir}/current"))
+                    else
+                      pe_version
+                    end
+      version = Gem::Version.new(pe_version)
+      Dir.chdir(packages_dir) do
+        Dir.glob('*').select { |f| f.match(%r{\A\d+\.\d+\.\d+}) }.each do |dir|
+          if File.directory?(dir) && dir != current_ver && (Gem::Version.new(dir) < version)
+            no_old_packages = false
+          end
+        end
+      end
+    end
+    { S0031: no_old_packages }
+  end
+
+  chunk(:S0033) do
+    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
+    hiera_config_path = Puppet.settings['hiera_config']
+    next unless File.exist?(hiera_config_path)
+    hiera_config_file = YAML.load_file(hiera_config_path)
+    # Is Hiera 5 in use?
+    { S0033: hiera_config_file.dig('version') == 5 }
+  end
+
   chunk(:S0036) do
     next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
@@ -144,18 +183,7 @@ Facter.add(:self_service, type: :aggregate) do
       { S0036: max_queued_requests[1].to_i < 150 }
     end
   end
-  chunk(:S0030) do
-    # check for use_cached_catalog logic flip as false is the desired state
-    { S0030: !Puppet.settings['use_cached_catalog'] }
-  end
-  chunk(:S0033) do
-    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
-    hiera_config_path = Puppet.settings['hiera_config']
-    next unless File.exist?(hiera_config_path)
-    hiera_config_file = YAML.load_file(hiera_config_path)
-    # Is Hiera 5 in use?
-    { S0033: hiera_config_file.dig('version') == 5 }
-  end
+
   chunk(:S0040) do
     # Is puppet_metrics_collector::system configured
     { S0040: PuppetSelfService.service_running_enabled('puppet_system_processes-metrics.timer') }
