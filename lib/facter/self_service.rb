@@ -123,11 +123,7 @@ Facter.add(:self_service, type: :aggregate) do
         end_date = Date.parse(File.readlines('/etc/puppetlabs/license.key').grep(%r{end:}).to_s)
         today_date = Date.today
         daysexp = (end_date - today_date).to_i
-        validity = if (today_date > start_date) && (today_date < end_date) && (daysexp > 90)
-                     true
-                   else
-                     false
-                   end
+        validity = (today_date > start_date) && (today_date < end_date) && (daysexp > 90) ? true : false
       end
     else
       validity = false
