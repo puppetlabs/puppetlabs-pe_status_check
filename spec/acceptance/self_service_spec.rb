@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(16)
+        expect(host_inventory['facter']['self_service'].size).to eq(17)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -192,6 +192,14 @@ version: 5
 hierarchy:
 - name: Classifier Configuration Data
   data_hash: classifier_data')
+      end
+      it 'if S0040 conditions for false are met' do
+        run_shell('puppet agent --disable')
+        run_shell('systemctl stop puppet_system_processes-metrics.timer')
+        result = run_shell('facter -p self_service.S0040')
+        expect(result.stdout).to match(%r{false})
+        run_shell('systemctl start puppet_system_processes-metrics.timer')
+        run_shell('puppet agent --enable')
       end
     end
   end
