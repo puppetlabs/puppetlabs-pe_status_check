@@ -160,6 +160,17 @@ Facter.add(:self_service, type: :aggregate) do
     end
   end
 
+  chunk(:S0019) do
+    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+    pupserv_api = PuppetSelfService.status_check('8140', 'pe-jruby-metrics?level=debug')
+    if pupserv_api.nil?
+      { S0019: false }
+    else
+      jruby_check = pupserv_api.dig('status', 'experimental', 'metrics', 'average-free-jrubies')
+      { S0019: jruby_check >= 0.9 }
+    end
+  end
+
   chunk(:S0021) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }

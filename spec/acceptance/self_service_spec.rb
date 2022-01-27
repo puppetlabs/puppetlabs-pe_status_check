@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(25)
+        expect(host_inventory['facter']['self_service'].size).to eq(26)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -175,6 +175,11 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0016')
         expect(result.stdout).to match(%r{false})
         run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../orchestration-services/test_err_pid_123.log')
+      end
+      it 'if S0019 returns false when Average Free JRubies is > 0.9' do
+        run_shell('puppet agent -t && puppet agent -t && puppet agent -t', expect_failures: true)
+        result = run_shell('facter -p self_service.S0019')
+        expect(result.stdout).to match(%r{false})
       end
       it 'if S0021 conditions for false are met' do
         run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{
