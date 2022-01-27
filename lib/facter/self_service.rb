@@ -115,15 +115,13 @@ Facter.add(:self_service, type: :aggregate) do
     validity = true # true by default
     if File.file?('/etc/puppetlabs/license.key')
       license_type = File.readlines('/etc/puppetlabs/license.key').grep(%r{license_type:}).to_s
-      if license_type.include? 'Perpetual'
-        validity = true
-      else
+      unless license_type.include? 'Perpetual'
         require 'date'
         start_date = Date.parse(File.readlines('/etc/puppetlabs/license.key').grep(%r{start:}).to_s)
         end_date = Date.parse(File.readlines('/etc/puppetlabs/license.key').grep(%r{end:}).to_s)
         today_date = Date.today
         daysexp = (end_date - today_date).to_i
-        validity = (today_date > start_date) && (today_date < end_date) && (daysexp > 90) ? true : false
+        validity = (today_date >= start_date) && (today_date <= end_date) && (daysexp >= 90) ? true : false
       end
     else
       validity = false
