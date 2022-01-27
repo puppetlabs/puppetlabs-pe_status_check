@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(17)
+        expect(host_inventory['facter']['self_service'].size).to eq(19)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -143,6 +143,12 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0021')
         expect(result.stdout).to match(%r{false})
         run_shell('rm -f /etc/puppetlabs/facter/facts.d/memory.json')
+      end
+      it 'if S0022 conditions for false are met' do
+        run_shell('mv /etc/puppetlabs/license.key /tmp/license.key')
+        result = run_shell('facter -p self_service.S0022')
+        expect(result.stdout).to match(%r{false})
+        run_shell('mv /tmp/license.key /etc/puppetlabs/license.key')
       end
       it 'if S0036 conditions for false are met' do
         run_shell('echo "puppet_enterprise::master::puppetserver::jruby_puppet_max_queued_requests: 151" >> /etc/puppetlabs/code/environments/production/data/common.yaml')
