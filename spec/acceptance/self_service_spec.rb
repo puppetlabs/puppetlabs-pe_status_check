@@ -18,6 +18,7 @@ describe 'self_service class' do
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         expect(host_inventory['facter']['self_service'].size).to eq(26)
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(15)
@@ -28,6 +29,9 @@ describe 'self_service class' do
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(17)
 >>>>>>> (SUP-2919) - is puppet_metrics_collector::system configured
+=======
+        expect(host_inventory['facter']['self_service'].size).to eq(19)
+>>>>>>> (SUP-2901) License check, tests and readme update
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -223,6 +227,17 @@ describe 'self_service class' do
       it 'if S0022 conditions for false are met' do
         run_shell('mv /etc/puppetlabs/license.key /tmp/license.key')
         result = run_shell('facter -p self_service.S0022')
+<<<<<<< HEAD
+=======
+        expect(result.stdout).to match(%r{false})
+        run_shell('mv /tmp/license.key /etc/puppetlabs/license.key')
+      end
+      it 'if S0036 conditions for false are met' do
+        run_shell('echo "puppet_enterprise::master::puppetserver::jruby_puppet_max_queued_requests: 151" >> /etc/puppetlabs/code/environments/production/data/common.yaml')
+        run_shell('puppet resource service puppet ensure=stopped')
+        run_shell('puppet agent -t', expect_failures: true)
+        result = run_shell('facter -p self_service.S0036')
+>>>>>>> (SUP-2901) License check, tests and readme update
         expect(result.stdout).to match(%r{false})
         run_shell('mv /tmp/license.key /etc/puppetlabs/license.key')
       end

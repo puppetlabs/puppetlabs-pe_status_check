@@ -207,6 +207,7 @@ Facter.add(:self_service, type: :aggregate) do
     { S0022: validity }
   end
 
+<<<<<<< HEAD
   chunk(:S0030) do
     # check for use_cached_catalog logic flip as false is the desired state
     { S0030: !Puppet.settings['use_cached_catalog'] }
@@ -246,6 +247,8 @@ Facter.add(:self_service, type: :aggregate) do
     { S0033: hiera_config_file.dig('version') == 5 }
   end
 
+=======
+>>>>>>> (SUP-2901) License check, tests and readme update
   chunk(:S0036) do
     next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
