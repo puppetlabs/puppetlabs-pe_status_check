@@ -66,6 +66,30 @@ module PuppetSelfService
     File.exist?("#{configdir}/#{configfile}")
   end
 
+  # Queries the passed port and endpoint for the status API
+  # @return [Hash] Response body of the API call
+  # param port [Integer] The status API port to query
+  # @param endpoint [String] The status API endpoint to query
+  def self.status_check(port, endpoint)
+    require 'json'
+
+    host     = Puppet[:certname]
+    client   = Puppet.runtime[:http]
+    response = client.get(URI(Puppet::Util.uri_encode("https://#{host}:#{port}/status/v1/services/#{endpoint}")))
+    status   = JSON.parse(response.body)
+    status
+  rescue Puppet::HTTP::ResponseError => e
+    Facter.debug("fact 'self_service' - HTTP: #{e.response.code} #{e.response.reason}")
+  rescue Puppet::HTTP::ConnectionError => e
+    Facter.debug("fact 'self_service' - Connection error: #{e.message}")
+  rescue Puppet::SSL::SSLError => e
+    Facter.debug("fact 'self_service' - SSL error: #{e.message}")
+  rescue Puppet::HTTP::HTTPError => e
+    Facter.debug("fact 'self_service' - General HTTP error: #{e.message}")
+  rescue JSON::ParserError => e
+    Facter.debug("fact 'self_service' - Could not parse body for JSON: #{e}")
+  end
+
   # Check if Primary node
   # @return [Boolean] true is primary node
   def self.primary?
