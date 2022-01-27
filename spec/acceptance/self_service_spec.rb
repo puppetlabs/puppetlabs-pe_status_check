@@ -65,6 +65,15 @@ describe 'self_service class' do
         run_shell('puppet resource service pe-orchestration-services  ensure=running')
       end
 
+      it 'if S0006 conditions for false are met' do
+        run_shell('puppet agent --disable')
+        run_shell('systemctl stop puppet_puppetserver-metrics.timer')
+        result = run_shell('facter -p self_service.S0006')
+        expect(result.stdout).to match(%r{false})
+        run_shell('systemctl start puppet_puppetserver-metrics.timer')
+        run_shell('puppet agent --enable')
+      end
+
       context 'when filesystem usage exceeds 80%' do
         before(:all) do
           run_shell('fallocate -l $(($(facter -p mountpoints.\'/\'.available_bytes)-1073741824)) /largefile.txt')
