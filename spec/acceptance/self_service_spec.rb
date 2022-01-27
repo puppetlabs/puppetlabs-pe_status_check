@@ -207,12 +207,25 @@ hierarchy:
   data_hash: classifier_data')
       end
       it 'if S0036 conditions for false are met' do
-        run_shell('echo "puppet_enterprise::master::puppetserver::jruby_puppet_max_queued_requests: 151" >> /etc/puppetlabs/code/environments/production/data/common.yaml')
-        run_shell('puppet resource service puppet ensure=stopped')
-        run_shell('puppet agent -t', expect_failures: true)
+        present = <<-PUPPETCODE
+        pe_hocon_setting { 'jruby-puppet.max-queued-requests':
+          ensure  => present,
+          path    => '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf',
+          setting => 'jruby-puppet.max-queued-requests',
+          value   => 151,
+        }
+        PUPPETCODE
+        absent = <<-PUPPETCODE
+        pe_hocon_setting { 'jruby-puppet.max-queued-requests':
+          ensure  => absent,
+          path    => '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf',
+          setting => 'jruby-puppet.max-queued-requests',
+        }
+        PUPPETCODE
+        apply_manifest(present)
         result = run_shell('facter -p self_service.S0036')
         expect(result.stdout).to match(%r{false})
-        run_shell('puppet resource service puppet ensure=running')
+        apply_manifest(absent)
       end
       it 'if S0040 conditions for false are met' do
         run_shell('puppet agent --disable')
