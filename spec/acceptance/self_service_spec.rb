@@ -199,6 +199,14 @@ hierarchy:
 - name: Classifier Configuration Data
   data_hash: classifier_data')
       end
+      it 'if S0040 conditions for false are met' do
+        run_shell('puppet agent --disable')
+        run_shell('systemctl stop puppet_system_processes-metrics.timer')
+        result = run_shell('facter -p self_service.S0040')
+        expect(result.stdout).to match(%r{false})
+        run_shell('systemctl start puppet_system_processes-metrics.timer')
+        run_shell('puppet agent --enable')
+      end
     end
   end
 end
