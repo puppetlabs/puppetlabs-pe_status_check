@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(21)
+        expect(host_inventory['facter']['self_service'].size).to eq(24)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -131,6 +131,50 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0014')
         expect(result.stdout).to match(%r{false})
         run_shell('rm -f /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
+      end
+      it 'if S0016 conditions for false are met' do
+        run_shell('export logdir=$(puppet config print logdir) &&
+         cp $logdir/../puppetserver/puppetserver.log $logdir/../puppetserver/puppetserver.log.bk &&
+        echo "java.lang.OutOfMemoryError" >> $logdir/../puppetserver/puppetserver.log')
+        result = run_shell('facter -p self_service.S0016')
+        expect(result.stdout).to match(%r{false})
+        run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../puppetserver/puppetserver.log &&
+        mv $logdir/../puppetserver/puppetserver.log.bk $logdir/../puppetserver/puppetserver.log')
+      end
+      it 'if S0016 returns false when recent err_pid files are present' do
+        run_shell('export logdir=$(puppet config print logdir) && touch $logdir/../puppetserver/test_err_pid_123.log')
+        result = run_shell('facter -p self_service.S0016')
+        expect(result.stdout).to match(%r{false})
+        run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../puppetserver/test_err_pid_123.log')
+      end
+      it 'if S0017 conditions for false are met' do
+        run_shell('export logdir=$(puppet config print logdir) && cp $logdir/../puppetdb/puppetdb.log $logdir/../puppetdb/puppetdb.log.bk &&
+         echo "java.lang.OutOfMemoryError" >> $logdir/../puppetdb/puppetdb.log')
+        result = run_shell('facter -p self_service.S0017')
+        expect(result.stdout).to match(%r{false})
+        run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../puppetdb/puppetdb.log &&
+        mv $logdir/../puppetdb/puppetdb.log.bk $logdir/../puppetdb/puppetdb.log')
+      end
+      it 'if S0017 returns false when recent err_pid files are present' do
+        run_shell('export logdir=$(puppet config print logdir) && touch $logdir/../puppetdb/test_err_pid_123.log')
+        result = run_shell('facter -p self_service.S0016')
+        expect(result.stdout).to match(%r{false})
+        run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../puppetdb/test_err_pid_123.log')
+      end
+      it 'if S0018 conditions for false are met' do
+        run_shell('export logdir=$(puppet config print logdir) &&
+         cp $logdir/../orchestration-services/orchestration-services.log $logdir/../orchestration-services/orchestration-services.log.bk &&
+         echo "java.lang.OutOfMemoryError" >> $logdir/../orchestration-services/orchestration-services.log')
+        result = run_shell('facter -p self_service.S0018')
+        expect(result.stdout).to match(%r{false})
+        run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../orchestration-services/orchestration-services.log &&
+        mv $logdir/../orchestration-services/orchestration-services.log.bk $logdir/../orchestration-services/orchestration-services.log')
+      end
+      it 'if S0018 returns false when recent err_pid files are present' do
+        run_shell('export logdir=$(puppet config print logdir) && touch $logdir/../orchestration-services/test_err_pid_123.log')
+        result = run_shell('facter -p self_service.S0016')
+        expect(result.stdout).to match(%r{false})
+        run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../orchestration-services/test_err_pid_123.log')
       end
       it 'if S0021 conditions for false are met' do
         run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{

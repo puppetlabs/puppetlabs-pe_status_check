@@ -114,6 +114,51 @@ Facter.add(:self_service, type: :aggregate) do
     { S0014: res.nil? }
   end
 
+  chunk(:S0016) do
+    # Puppetserver
+    next unless PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.replica?
+    time_now = Time.now - Puppet.settings['runinterval']
+    log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/'
+    error_pid_log = Dir.glob(log_path + '*_err_pid*.log').find { |f| time_now.to_i < File.mtime(f).to_i }
+    if error_pid_log.nil?
+      log_file = log_path + 'puppetserver.log'
+      search_for_error = `tail -n 250 #{log_file} | grep 'java.lang.OutOfMemoryError'`
+      { S0016: search_for_error.empty? }
+    else
+      { S0016: false }
+    end
+  end
+
+  chunk(:S0017) do
+    # PuppetDB
+    next unless PuppetSelfService.primary? || PuppetSelfService.compiler?
+    time_now = Time.now - Puppet.settings['runinterval']
+    log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetdb/'
+    error_pid_log = Dir.glob(log_path + '*_err_pid*.log').find { |f| time_now.to_i < File.mtime(f).to_i }
+    if error_pid_log.nil?
+      log_file = log_path + 'puppetdb.log'
+      search_for_error = `tail -n 250 #{log_file} | grep 'java.lang.OutOfMemoryError'`
+      { S0017: search_for_error.empty? }
+    else
+      { S0017: false }
+    end
+  end
+
+  chunk(:S0018) do
+    # Orchestrator
+    next unless PuppetSelfService.primary?
+    time_now = Time.now - Puppet.settings['runinterval']
+    log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/orchestration-services/'
+    error_pid_log = Dir.glob(log_path + '*_err_pid*.log').find { |f| time_now.to_i < File.mtime(f).to_i }
+    if error_pid_log.nil?
+      log_file = log_path + 'orchestration-services.log'
+      search_for_error = `tail -n 250 #{log_file} | grep 'java.lang.OutOfMemoryError'`
+      { S0018: search_for_error.empty? }
+    else
+      { S0018: false }
+    end
+  end
+
   chunk(:S0021) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
