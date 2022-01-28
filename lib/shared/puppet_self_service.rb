@@ -2,6 +2,11 @@ require 'puppet'
 
 # PuppetSelfService - Shared code for Puppet Self Service facts
 module PuppetSelfService
+  PUP_PATHS = { puppetlabs_bin: '/opt/puppetlabs/bin',
+    puppet_bin:     '/opt/puppetlabs/puppet/bin',
+    server_bin:     '/opt/puppetlabs/server/bin',
+    server_data:    '/opt/puppetlabs/server/data' }.freeze
+
   # Gets the resource object by name
   # @param resource [String] The resource type to get
   # @param name [String] The name of the resource
