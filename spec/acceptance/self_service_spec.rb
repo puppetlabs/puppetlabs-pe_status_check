@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(20)
+        expect(host_inventory['facter']['self_service'].size).to eq(21)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -125,6 +125,12 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0013')
         expect(result.stdout).to match(%r{false})
         run_shell('export lastrunfile=$(puppet config print lastrunfile) && mv -f ${lastrunfile}.bk $lastrunfile')
+      end
+      it 'if S0014 conditions for false are met' do
+        run_shell('touch -d "40 minutes ago" /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
+        result = run_shell('facter -p self_service.S0014')
+        expect(result.stdout).to match(%r{false})
+        run_shell('rm -f /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
       end
       it 'if S0021 conditions for false are met' do
         run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{
