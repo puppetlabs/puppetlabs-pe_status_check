@@ -125,6 +125,7 @@ Facter.add(:self_service, type: :aggregate) do
     { S0014: res.nil? }
   end
 
+<<<<<<< HEAD
   chunk(:S0016) do
     # Puppetserver
     next unless PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.replica?
@@ -181,6 +182,8 @@ Facter.add(:self_service, type: :aggregate) do
     end
   end
 
+=======
+>>>>>>> (SUP-2890) - Check command queue depth Prior to this commit, there was no check for the command queue depth. This commit adds a check to see if there are no files older than 30min. S0014.
   chunk(:S0021) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }

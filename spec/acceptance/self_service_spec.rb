@@ -20,6 +20,7 @@ describe 'self_service class' do
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         expect(host_inventory['facter']['self_service'].size).to eq(26)
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(15)
@@ -36,6 +37,9 @@ describe 'self_service class' do
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(20)
 >>>>>>> SUP-2910 to check the Old PE package
+=======
+        expect(host_inventory['facter']['self_service'].size).to eq(21)
+>>>>>>> (SUP-2890) - Check command queue depth Prior to this commit, there was no check for the command queue depth. This commit adds a check to see if there are no files older than 30min. S0014.
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -161,6 +165,7 @@ describe 'self_service class' do
         expect(result.stdout).to match(%r{false})
         run_shell('rm -f /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
       end
+<<<<<<< HEAD
       it 'if S0016 conditions for false are met' do
         run_shell('export logdir=$(puppet config print logdir) &&
          cp $logdir/../puppetserver/puppetserver.log $logdir/../puppetserver/puppetserver.log.bk &&
@@ -210,6 +215,8 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0019')
         expect(result.stdout).to match(%r{false})
       end
+=======
+>>>>>>> (SUP-2890) - Check command queue depth Prior to this commit, there was no check for the command queue depth. This commit adds a check to see if there are no files older than 30min. S0014.
       it 'if S0021 conditions for false are met' do
         run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{
   "memory": {
