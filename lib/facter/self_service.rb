@@ -126,6 +126,9 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> (SUP-2892) - No recent OOM errors logged in any JVM Prior to this commit, there were no checks done to see if there are any OOM messages in the logs, this change will look for any of those errors in the last 250 lines of logs in puppetserver.log, puppetdb.log and orchestration-services.log . This includes S0016-18.
   chunk(:S0016) do
     # Puppetserver
     next unless PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.replica?
@@ -171,6 +174,7 @@ Facter.add(:self_service, type: :aggregate) do
     end
   end
 
+<<<<<<< HEAD
   chunk(:S0019) do
     next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
     pupserv_api = PuppetSelfService.status_check('8140', 'pe-jruby-metrics?level=debug')
@@ -184,6 +188,8 @@ Facter.add(:self_service, type: :aggregate) do
 
 =======
 >>>>>>> (SUP-2890) - Check command queue depth Prior to this commit, there was no check for the command queue depth. This commit adds a check to see if there are no files older than 30min. S0014.
+=======
+>>>>>>> (SUP-2892) - No recent OOM errors logged in any JVM Prior to this commit, there were no checks done to see if there are any OOM messages in the logs, this change will look for any of those errors in the last 250 lines of logs in puppetserver.log, puppetdb.log and orchestration-services.log . This includes S0016-18.
   chunk(:S0021) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }

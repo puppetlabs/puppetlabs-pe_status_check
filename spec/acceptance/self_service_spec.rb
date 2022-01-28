@@ -21,6 +21,7 @@ describe 'self_service class' do
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         expect(host_inventory['facter']['self_service'].size).to eq(26)
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(15)
@@ -40,6 +41,9 @@ describe 'self_service class' do
 =======
         expect(host_inventory['facter']['self_service'].size).to eq(21)
 >>>>>>> (SUP-2890) - Check command queue depth Prior to this commit, there was no check for the command queue depth. This commit adds a check to see if there are no files older than 30min. S0014.
+=======
+        expect(host_inventory['facter']['self_service'].size).to eq(24)
+>>>>>>> (SUP-2892) - No recent OOM errors logged in any JVM Prior to this commit, there were no checks done to see if there are any OOM messages in the logs, this change will look for any of those errors in the last 250 lines of logs in puppetserver.log, puppetdb.log and orchestration-services.log . This includes S0016-18.
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -166,6 +170,9 @@ describe 'self_service class' do
         run_shell('rm -f /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> (SUP-2892) - No recent OOM errors logged in any JVM Prior to this commit, there were no checks done to see if there are any OOM messages in the logs, this change will look for any of those errors in the last 250 lines of logs in puppetserver.log, puppetdb.log and orchestration-services.log . This includes S0016-18.
       it 'if S0016 conditions for false are met' do
         run_shell('export logdir=$(puppet config print logdir) &&
          cp $logdir/../puppetserver/puppetserver.log $logdir/../puppetserver/puppetserver.log.bk &&
@@ -191,7 +198,11 @@ describe 'self_service class' do
       end
       it 'if S0017 returns false when recent err_pid files are present' do
         run_shell('export logdir=$(puppet config print logdir) && touch $logdir/../puppetdb/test_err_pid_123.log')
+<<<<<<< HEAD
         result = run_shell('facter -p self_service.S0017')
+=======
+        result = run_shell('facter -p self_service.S0016')
+>>>>>>> (SUP-2892) - No recent OOM errors logged in any JVM Prior to this commit, there were no checks done to see if there are any OOM messages in the logs, this change will look for any of those errors in the last 250 lines of logs in puppetserver.log, puppetdb.log and orchestration-services.log . This includes S0016-18.
         expect(result.stdout).to match(%r{false})
         run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../puppetdb/test_err_pid_123.log')
       end
@@ -206,6 +217,7 @@ describe 'self_service class' do
       end
       it 'if S0018 returns false when recent err_pid files are present' do
         run_shell('export logdir=$(puppet config print logdir) && touch $logdir/../orchestration-services/test_err_pid_123.log')
+<<<<<<< HEAD
         result = run_shell('facter -p self_service.S0018')
         expect(result.stdout).to match(%r{false})
         run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../orchestration-services/test_err_pid_123.log')
@@ -217,6 +229,12 @@ describe 'self_service class' do
       end
 =======
 >>>>>>> (SUP-2890) - Check command queue depth Prior to this commit, there was no check for the command queue depth. This commit adds a check to see if there are no files older than 30min. S0014.
+=======
+        result = run_shell('facter -p self_service.S0016')
+        expect(result.stdout).to match(%r{false})
+        run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../orchestration-services/test_err_pid_123.log')
+      end
+>>>>>>> (SUP-2892) - No recent OOM errors logged in any JVM Prior to this commit, there were no checks done to see if there are any OOM messages in the logs, this change will look for any of those errors in the last 250 lines of logs in puppetserver.log, puppetdb.log and orchestration-services.log . This includes S0016-18.
       it 'if S0021 conditions for false are met' do
         run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{
   "memory": {
