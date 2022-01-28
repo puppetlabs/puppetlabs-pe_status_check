@@ -125,25 +125,6 @@ module PuppetSelfService
     (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
   end
 
-  # Execute a command line and return the result
-  #
-  # @param command_line [String] The command line to execute.
-  # @param timeout [Integer] Amount of time, in sections, allowed for
-  #   the command line to complete. A value of 0 will disable the timeout.
-  #
-  # @return [String] STDOUT from the command.
-  # @return [String] An empty string, if an exception is raised while
-  #   executing the command.
-  def self.exec_return_result(command_line, timeout = 300)
-    options = { timeout: timeout }
-    result = Exec.exec_cmd(command_line, **options)
-    if result.error.nil?
-      result.stdout
-    else
-      result.error
-    end
-  end
-
   # Execute psql queries.
   #
   # @param sql [String] SQL to execute via a psql command.
@@ -152,16 +133,13 @@ module PuppetSelfService
   # @return (see #exec_return_result)
   def self.psql_return_result(sql, psql_options = '')
     command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
-    exec_return_result(command)
+    Facter::Core::Execution.execute(command)
   end
 
   # Below method to execute the PSQL statement to identify thundering herd
   def self.psql_thundering_herd
     sql = %(
-      SELECT date_part('month', start_time) AS month,
-      date_part('day', start_time) AS day,
-      date_part('hour', start_time) AS hour,
-      date_part('minute', start_time) as minute, count(*)
+      SELECT count(*)
       FROM reports
       WHERE start_time BETWEEN now() - interval '7 days' AND now()
       GROUP BY date_part('month', start_time), date_part('day', start_time), date_part('hour', start_time), date_part('minute', start_time)
@@ -169,95 +147,5 @@ module PuppetSelfService
     )
     psql_options = '--dbname pe-puppetdb'
     psql_return_result(sql, psql_options)
-  end
-end
-
-
-# Execute external commands
-module Exec
-  # Command Result
-  #
-  # @param stdout [String] A string containing the standard output
-  #   written by the command.
-  # @param stderr [String] A string containing the standard error
-  #   written by the command.
-  # @param status [Integer] An integer representing the exit code of the
-  #   command.
-  # @param error [String, nil] A string holding an error message if
-  #   command execution was not successful.
-  Result = Struct.new(:stdout, :stderr, :status, :error)
-  # Exception class for failed commands
-  class ExecError < StandardError; end
-  # Execute a command and return a Result
-  #
-  # This is basically `Open3.popen3`, but with added logic to time the
-  # executed command out if it runs for too long.
-  #
-  # @param cmd [Array<String>] Command and arguments to execute. Commands
-  #  consisting of a single String will cause `Process.spawn` to wrap the
-  #  execution in a system shell such as `/bin/sh -c`.
-  # @param env [Hash] A hash of environment variables to set
-  #   when the command is executed.
-  # @param stdin_data [String] A string of standard input to pass
-  #   to the executed command. Sould be smaller than 4096 characters.
-  # @param timeout [Integer] Number of seconds to allow for command
-  #   execution to complete. A value of 0 will disable the timeout.
-  #
-  # @return [Result] A `Result` object containing the output and status
-  #   of the command.
-  def self.exec_cmd(*cmd, env: {}, stdin_data: nil, timeout: 300)
-    out_r, out_w = IO.pipe
-    err_r, err_w = IO.pipe
-    env_s = { 'LC_ALL' => 'C', 'LANG' => 'C' }.merge(env)
-    input = if stdin_data.nil?
-              :close
-            else
-              # NOTE: Pipe capacity is limited. Probably at least 4096 bytes.
-              #       65536 bytes at most.
-              in_r, in_w = IO.pipe
-              in_w.binmode
-              in_w.sync = true
-              in_w.write(stdin_data)
-              in_w.close
-              in_r
-            end
-    opts = { in: input,
-            out: out_w,
-            err: err_w }
-    pid = Process.spawn(env_s, *cmd, opts)
-    [out_w, err_w].each(&:close)
-    stdout_reader = Thread.new do
-      stdout = out_r.read
-      out_r.close
-      stdout
-    end
-    stderr_reader = Thread.new do
-      stderr = err_r.read
-      err_r.close
-      stderr
-    end
-    deadline = (Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_second) + timeout)
-    status = nil
-    loop do
-      _, status = Process.waitpid2(pid, Process::WNOHANG)
-      break if status
-      unless timeout.zero?
-        raise Timeout::Error if deadline < Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_second)
-      end
-      # Sleep for a bit so that we don't spin in a tight loop burning
-      # CPU on waitpid() syscalls.
-      sleep(0.01)
-    end
-    Result.new(stdout_reader.value, stderr_reader.value, status.to_i, nil)
-  rescue Timeout::Error
-    Process.kill(:TERM, pid)
-    Process.detach(pid)
-    Result.new('', '', -1, 'command failed to complete after %{timeout} seconds' %
-                { timeout: timeout })
-  rescue StandardError => e
-    # File not found. Permission denied. Etc.
-    Result.new('', '', -1, '%{class}: %{message}' %
-                { class: e.class,
-                message: e.message })
   end
 end

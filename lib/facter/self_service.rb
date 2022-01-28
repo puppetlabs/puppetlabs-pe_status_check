@@ -135,6 +135,14 @@ Facter.add(:self_service, type: :aggregate) do
     next unless PuppetSelfService.primary?
     # Check if thundering herd is occuring.
     psqldata = PuppetSelfService.psql_thundering_herd
-    { S0027: false }
+    thundering_occured = false
+    minvalue = psqldata.min.to_i
+    maxvalue = psqldata.max.to_i
+    differences = ((maxvalue - minvalue) * 100) / minvalue
+    if differences >= 75
+      thundering_occured = true
+    end
+
+    { S0027: thundering_occured }
   end
 end
