@@ -2,6 +2,11 @@ require 'puppet'
 
 # PuppetSelfService - Shared code for Puppet Self Service facts
 module PuppetSelfService
+  PUP_PATHS = { puppetlabs_bin: '/opt/puppetlabs/bin',
+    puppet_bin:     '/opt/puppetlabs/puppet/bin',
+    server_bin:     '/opt/puppetlabs/server/bin',
+    server_data:    '/opt/puppetlabs/server/data' }.freeze
+
   # Gets the resource object by name
   # @param resource [String] The resource type to get
   # @param name [String] The name of the resource
@@ -120,5 +125,29 @@ module PuppetSelfService
 
     stat = Sys::Filesystem.stat(path)
     (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
+  end
+
+  # Execute psql queries.
+  #
+  # @param sql [String] SQL to execute via a psql command.
+  # @param psql_options [String] list of options to pass to the psql command.
+  #
+  # @return (see #exec_return_result)
+  def self.psql_return_result(sql, psql_options = '')
+    command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
+    Facter::Core::Execution.execute(command)
+  end
+
+  # Below method to execute the PSQL statement to identify thundering herd
+  def self.psql_thundering_herd
+    sql = %(
+      SELECT count(*)
+      FROM reports
+      WHERE start_time BETWEEN now() - interval '7 days' AND now()
+      GROUP BY date_part('month', start_time), date_part('day', start_time), date_part('hour', start_time), date_part('minute', start_time)
+      ORDER BY date_part('month', start_time) DESC, date_part('day', start_time) DESC, date_part( 'hour', start_time ) DESC, date_part('minute', start_time) DESC;
+    )
+    psql_options = '--dbname pe-puppetdb'
+    psql_return_result(sql, psql_options)
   end
 end

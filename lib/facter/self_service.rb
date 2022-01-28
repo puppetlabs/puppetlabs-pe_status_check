@@ -188,4 +188,19 @@ Facter.add(:self_service, type: :aggregate) do
     # Is puppet_metrics_collector::system configured
     { S0040: PuppetSelfService.service_running_enabled('puppet_system_processes-metrics.timer') }
   end
+
+  chunk(:S0027) do
+    next unless PuppetSelfService.primary?
+    # Check if thundering herd is occuring.
+    thundering_query_output = PuppetSelfService.psql_thundering_herd.split(' ').drop(2).map(&:to_i)
+    thundering_query_output.delete(0)
+    thundering_occured = false
+    minvalue = thundering_query_output.min.to_i
+    maxvalue = thundering_query_output.max.to_i
+    differences = ((maxvalue - minvalue) * 100) / minvalue
+    if differences >= 75
+      thundering_occured = true
+    end
+    { S0027: thundering_occured }
+  end
 end

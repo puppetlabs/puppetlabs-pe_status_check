@@ -235,6 +235,10 @@ hierarchy:
         run_shell('systemctl start puppet_system_processes-metrics.timer')
         run_shell('puppet agent --enable')
       end
+      it 'if S0027 conditions for false are met' do
+        result = run_shell('facter -p self_service.S0027')
+        expect(result.stdout).to match(%r{false})
+      end
     end
   end
 end
