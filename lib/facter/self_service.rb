@@ -49,6 +49,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0006) do
+    next unless PuppetSelfService.primary?
     # Is puppet_metrics_collector running
     { S0006: PuppetSelfService.service_running_enabled('puppet_puppetserver-metrics.timer') }
   end
