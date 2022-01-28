@@ -52,9 +52,12 @@ Facter.add(:self_service, type: :aggregate) do
 <<<<<<< HEAD
   chunk(:S0006) do
     next unless PuppetSelfService.primary?
+<<<<<<< HEAD
 =======
   chunk(:S0006) do
 >>>>>>> (SUP-2946) Check Metrics Collector is enabled
+=======
+>>>>>>> (GH-52) Restrict S0006 to primaries
     # Is puppet_metrics_collector running
     { S0006: PuppetSelfService.service_running_enabled('puppet_puppetserver-metrics.timer') }
   end
