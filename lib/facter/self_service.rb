@@ -186,6 +186,19 @@ Facter.add(:self_service, type: :aggregate) do
     { S0022: validity }
   end
 
+  chunk(:S0029) do
+    next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary?
+    #check if concurrnet connections to Postgres approaching 90% defined
+    approaching_limit = false
+    maximum = PuppetSelfService.max_connections.to_i
+    current = PuppetSelfService.cur_connections.to_i
+    percent_used = current / maximum * 100
+    if percent_used >=90
+      approaching_limit = true
+      {S0029: approaching_limit }
+    end
+  end
+
   chunk(:S0030) do
     # check for use_cached_catalog logic flip as false is the desired state
     { S0030: !Puppet.settings['use_cached_catalog'] }
