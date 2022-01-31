@@ -255,10 +255,22 @@ Facter.add(:self_service, type: :aggregate) do
   end
 end
 
+Facter.add('maximum') do
+  setcode do
+    PuppetSelfService.max_connections.map(&:to_i)
+  end
+end
+
+Facter.add('current') do
+  setcode do
+    PuppetSelfService.cur_connections.map(&:to_i)
+  end
+end
+
 Facter.add('approaching_limit') do
   approaching_limit = false
-  maximum = max_connections.to_i
-  current = cur_connections.to_i
+  #maximum = max_connections.to_i
+  #current = cur_connections.to_i
   percent_used = current / maximum * 100
   if percent_used >= 90
     approaching_limit = true
