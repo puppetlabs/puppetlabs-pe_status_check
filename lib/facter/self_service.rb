@@ -254,3 +254,17 @@ Facter.add(:self_service, type: :aggregate) do
     { S0040: PuppetSelfService.service_running_enabled('puppet_system_processes-metrics.timer') }
   end
 end
+
+Facter.add('approaching_limit') do
+  approaching_limit = false
+  maximum = max_connections.to_i
+  current = cur_connections.to_i
+  percent_used = current / maximum * 100
+  if percent_used >= 90
+    approaching_limit = true
+  end
+
+  setcode do
+    approaching_limit
+  end
+end
