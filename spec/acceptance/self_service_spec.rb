@@ -157,7 +157,7 @@ describe 'self_service class' do
       end
       it 'if S0017 returns false when recent err_pid files are present' do
         run_shell('export logdir=$(puppet config print logdir) && touch $logdir/../puppetdb/test_err_pid_123.log')
-        result = run_shell('facter -p self_service.S0016')
+        result = run_shell('facter -p self_service.S0017')
         expect(result.stdout).to match(%r{false})
         run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../puppetdb/test_err_pid_123.log')
       end
@@ -172,7 +172,7 @@ describe 'self_service class' do
       end
       it 'if S0018 returns false when recent err_pid files are present' do
         run_shell('export logdir=$(puppet config print logdir) && touch $logdir/../orchestration-services/test_err_pid_123.log')
-        result = run_shell('facter -p self_service.S0016')
+        result = run_shell('facter -p self_service.S0018')
         expect(result.stdout).to match(%r{false})
         run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../orchestration-services/test_err_pid_123.log')
       end
