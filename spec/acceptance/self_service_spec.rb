@@ -58,12 +58,6 @@ describe 'self_service class' do
         expect(result.stdout).to match(%r{false})
         run_shell('puppet config set noop false', expect_failures: false)
       end
-      it 'if S0004 conditions for false are met' do
-        run_shell('puppet resource service pe-orchestration-services  ensure=stopped')
-        result = run_shell('facter -p self_service.S0004')
-        expect(result.stdout).to match(%r{false})
-        run_shell('puppet resource service pe-orchestration-services  ensure=running')
-      end
 
       it 'if S0006 conditions for false are met' do
         run_shell('puppet agent --disable')
