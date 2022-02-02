@@ -27,11 +27,13 @@ Facter.add(:self_service, type: :aggregate) do
     # Is PE and has clienttools covers pe-psql and compilers
     # Check for service status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
 
-    puppetendpoint = 'https://localhost:8140/status/v1/services'
+    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+
+    puppetendpoint = 'https://127.0.0.1:8140/status/v1/services'
 
     puppetendpointcall = PuppetSelfService.nethttp_puppet_api(puppetendpoint)
 
-    if puppetendpointcall.include?('Unknown') || puppetendpointcall.include?('Unreachable')
+    if puppetendpointcall.include?('error') || puppetendpointcall.include?('starting') || puppetendpointcall.include?('stopping') || puppetendpointcall.include?('unknown')
       { S0004: false }
     else
       { S0004: true }

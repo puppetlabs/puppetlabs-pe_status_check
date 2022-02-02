@@ -176,7 +176,7 @@ module PuppetSelfService
     rescue StandardError
       # returns a connection error
 
-      'Unreachable'
+      'error'
     end
   end
 end
