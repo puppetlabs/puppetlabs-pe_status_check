@@ -26,5 +26,7 @@ RSpec.configure do |c|
             \n#####################\n#  End License File #\n#####################" >> /etc/puppetlabs/license.key')
     PuppetLitmus::PuppetHelpers.run_shell('sudo chown root:root /etc/puppetlabs/license.key')
     PuppetLitmus::PuppetHelpers.run_shell('sudo chmod 644 /etc/puppetlabs/license.key')
+    # restarting puppet server to clear jruby stats for S0019
+    PuppetLitmus::PuppetHelpers.run_shell('puppet resource service pe-puppetserver ensure=stopped; puppet resource service pe-puppetserver ensure=running')
   end
 end
