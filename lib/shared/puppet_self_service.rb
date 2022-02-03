@@ -136,8 +136,6 @@ module PuppetSelfService
   def self.psql_return_result(sql, psql_options = '')
     command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
     Facter::Core::Execution.execute(command)
-  rescue => exception
-    nil
   end
 
   # Below method to execute the PSQL statement to identify thundering herd

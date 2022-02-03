@@ -192,16 +192,13 @@ Facter.add(:self_service, type: :aggregate) do
   chunk(:S0027) do
     next unless PuppetSelfService.primary?
     # Check if thundering herd is occuring.
-    output_data = PuppetSelfService.psql_thundering_herd
-    if !output_data.nil?
-      thundering_query_output = output_data.split(' ').drop(2).map(&:to_i)
-      thundering_query_output.delete(0)
-      minvalue = thundering_query_output.min.to_i
-      maxvalue = thundering_query_output.max.to_i
-      differences = ((maxvalue - minvalue) * 100) / minvalue
-      { S0027: differences <= 75 }
-    else
-      { S0027: true }
-    end
+    # output_data = PuppetSelfService.psql_thundering_herd
+
+    thundering_query_output = output_data.split(' ').drop(2).map(&:to_i)
+    thundering_query_output.delete(0)
+    minvalue = thundering_query_output.min.to_i
+    maxvalue = thundering_query_output.max.to_i
+    differences = ((maxvalue - minvalue) * 100) / minvalue
+    { S0027: differences <= 75 }
   end
 end
