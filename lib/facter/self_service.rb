@@ -192,9 +192,8 @@ Facter.add(:self_service, type: :aggregate) do
   chunk(:S0027) do
     next unless PuppetSelfService.primary?
     # Check if thundering herd is occuring.
-    # output_data = PuppetSelfService.psql_thundering_herd
-
-    thundering_query_output = output_data.split(' ').drop(2).map(&:to_i)
+    thundering_query_output = PuppetSelfService.psql_thundering_herd.split(' ').drop(2).map(&:to_i)
+    #thundering_query_output = output_data.split(' ').drop(2).map(&:to_i)
     thundering_query_output.delete(0)
     minvalue = thundering_query_output.min.to_i
     maxvalue = thundering_query_output.max.to_i
