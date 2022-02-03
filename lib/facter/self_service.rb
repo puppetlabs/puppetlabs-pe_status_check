@@ -7,7 +7,6 @@ Facter.add(:self_service, type: :aggregate) do
   require 'puppet'
   require 'yaml'
   require_relative '../shared/puppet_self_service'
-  puppet_bin = '/opt/puppetlabs/bin/puppet'
 
   chunk(:S0001) do
     # Is the Agent Service Running and Enabled
@@ -25,11 +24,16 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0004) do
-    next unless PuppetSelfService.primary?
     # Is PE and has clienttools covers pe-psql and compilers
     # Check for service status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
-    result = Facter::Core::Execution.execute("#{puppet_bin} infrastructure status")
-    if result.include?('Unknown') || result.include?('Unreachable')
+
+    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+
+    puppetendpoint = 'https://127.0.0.1:8140/status/v1/services'
+
+    puppetendpointcall = PuppetSelfService.nethttp_puppet_api(puppetendpoint)
+
+    if puppetendpointcall.include?('error') || puppetendpointcall.include?('starting') || puppetendpointcall.include?('stopping') || puppetendpointcall.include?('unknown')
       { S0004: false }
     else
       { S0004: true }
