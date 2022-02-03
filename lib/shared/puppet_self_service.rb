@@ -122,7 +122,7 @@ module PuppetSelfService
     (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
   end
 
-def psql_return_result(sql, psql_options = '')
+  def self.psql_return_result(sql, psql_options = '')
   command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
   Facter::Core::Execution.execute(command)
 end
