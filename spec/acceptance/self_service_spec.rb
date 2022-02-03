@@ -15,7 +15,7 @@ describe 'self_service class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no self_service fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['self_service'].size).to eq(26)
+        expect(host_inventory['facter']['self_service'].size).to eq(27)
         expect(host_inventory['facter']['self_service'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -215,6 +215,15 @@ describe 'self_service class' do
         result = run_shell('facter -p self_service.S0031')
         expect(result.stdout).to match(%r{false})
         run_shell('rm -rf /opt/puppetlabs/server/data/packages/public/2018.1.5')
+      end
+      it 'if S0039 conditions for false are met' do
+        run_shell('export logdir=$(puppet config print logdir) &&
+         cp $logdir/../puppetserver/puppetserver.log $logdir/../puppetserver/puppetserver.log.bk &&
+         echo "Error 503 on SERVER" >> $logdir/../puppetserver/puppetserver.log')
+        result = run_shell('facter -p self_service.S0039')
+        expect(result.stdout).to match(%r{false})
+        run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../puppetserver/puppetserver.log &&
+        mv $logdir/../puppetserver/puppetserver.log.bk $logdir/../puppetserver/puppetserver.log')
       end
       it 'if S0033 conditions for false are met' do
         run_shell('cat <<EOF > /etc/puppetlabs/puppet/hiera.yaml

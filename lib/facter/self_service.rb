@@ -266,4 +266,11 @@ Facter.add(:self_service, type: :aggregate) do
     # last upgrade was sooner than 1 year ago
     { S0034: last_upgrade_time >= (Time.now - 31_536_000).utc }
   end
+  chunk(:S0039) do
+    # PuppetServer
+    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+    log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver.log'
+    search_for_error = `tail -n 500 #{log_path} | grep 'Error 503 on SERVER'`
+    { S0039: search_for_error.empty? }
+  end
 end
