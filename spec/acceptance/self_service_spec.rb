@@ -51,6 +51,7 @@ describe 'self_service class' do
         run_shell('puppet resource service pxp-agent ensure=stopped')
         result = run_shell('facter -p self_service.S0002')
         expect(result.stdout).to match(%r{false})
+        run_shell('puppet resource service pxp-agent ensure=running')
       end
       it 'if S0003 conditions for false are met' do
         run_shell('puppet config set noop true', expect_failures: false)
@@ -66,12 +67,10 @@ describe 'self_service class' do
       end
 
       it 'if S0006 conditions for false are met' do
-        run_shell('puppet agent --disable')
         run_shell('systemctl stop puppet_puppetserver-metrics.timer')
         result = run_shell('facter -p self_service.S0006')
         expect(result.stdout).to match(%r{false})
         run_shell('systemctl start puppet_puppetserver-metrics.timer')
-        run_shell('puppet agent --enable')
       end
 
       context 'when filesystem usage exceeds 80%' do
@@ -115,10 +114,10 @@ describe 'self_service class' do
         run_shell('puppet resource service pe-postgresql ensure=running')
       end
       it 'if S0012 conditions for false are met' do
-        run_shell('puppet agent --disable; puppet config set runinterval 20')
+        run_shell('puppet config set runinterval 20')
         result = run_shell('facter -p self_service.S0012')
         expect(result.stdout).to match(%r{false})
-        run_shell(' puppet config set runinterval 1800;puppet agent --enable')
+        run_shell('puppet config set runinterval 1800')
       end
       it 'if S0013 conditions for false are met' do
         run_shell('export lastrunfile=$(puppet config print lastrunfile) && cp $lastrunfile ${lastrunfile}.bk  && sed -i \'/catalog_application/d\' $lastrunfile')
@@ -177,7 +176,7 @@ describe 'self_service class' do
         run_shell('export logdir=$(puppet config print logdir) && rm -f logdir/../orchestration-services/test_err_pid_123.log')
       end
       it 'if S0019 returns false when Average Free JRubies is > 0.9' do
-        run_shell('puppet agent -t && puppet agent -t && puppet agent -t', expect_failures: true)
+        run_shell('puppet agent --enable; puppet agent -t; puppet agent -t; puppet agent -t; puppet agent --disable', expect_failures: true)
         result = run_shell('facter -p self_service.S0019')
         expect(result.stdout).to match(%r{false})
       end
@@ -289,12 +288,10 @@ hierarchy:
         apply_manifest(absent)
       end
       it 'if S0040 conditions for false are met' do
-        run_shell('puppet agent --disable')
         run_shell('systemctl stop puppet_system_processes-metrics.timer')
         result = run_shell('facter -p self_service.S0040')
         expect(result.stdout).to match(%r{false})
         run_shell('systemctl start puppet_system_processes-metrics.timer')
-        run_shell('puppet agent --enable')
       end
     end
   end
