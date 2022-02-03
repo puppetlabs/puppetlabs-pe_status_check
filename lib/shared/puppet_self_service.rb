@@ -121,7 +121,6 @@ module PuppetSelfService
     stat = Sys::Filesystem.stat(path)
     (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
   end
-end
 
 def psql_return_result(sql, psql_options = '')
   command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
@@ -143,4 +142,5 @@ def self.cur_connections
   )
   psql_options = '-qtAX'
   psql_return_result(sql, psql_options)
+end
 end
