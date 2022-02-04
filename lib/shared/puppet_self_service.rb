@@ -145,4 +145,38 @@ module PuppetSelfService
     stat = Sys::Filesystem.stat(path)
     (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
   end
+
+  # This is a generic NET::HTTP function that can be reusable across different API requests
+  def self.nethttp_puppet_api(puppetendpoint)
+    uri = URI.parse(puppetendpoint.to_s)
+    request = Net::HTTP::Get.new(uri)
+    request.content_type = 'application/json'
+    request.body = JSON.dump({
+                               'level' => 'info',
+      'timeout' => '2'
+                             })
+
+    req_options = {
+      use_ssl: uri.scheme == 'https',
+      verify_mode: OpenSSL::SSL::VERIFY_NONE,
+      # waiting for a max of 2 secs to open connection
+      open_timeout: 2,
+      # waiting for a max of 2 secs to read response from socket
+      read_timeout: 2,
+    }
+
+    begin
+      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
+      end
+
+      # returns the body of the response
+
+      response.body
+    rescue StandardError
+      # returns a connection error
+
+      'error'
+    end
+  end
 end

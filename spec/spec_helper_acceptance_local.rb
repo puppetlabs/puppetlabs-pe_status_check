@@ -28,5 +28,12 @@ RSpec.configure do |c|
     PuppetLitmus::PuppetHelpers.run_shell('sudo chmod 644 /etc/puppetlabs/license.key')
     # restarting puppet server to clear jruby stats for S0019
     PuppetLitmus::PuppetHelpers.run_shell('puppet resource service pe-puppetserver ensure=stopped; puppet resource service pe-puppetserver ensure=running')
+    # Wait for the puppetserver to fully come online before running the tests
+    timeout = <<-TIME
+    timeout 300 bash -c 'while [[ "$(curl -s -k -o /dev/null -w ''%{http_code}'' https://127.0.0.1:8140/status/v1/simple)" != "200" ]]; do sleep 5; done' || false
+    TIME
+    PuppetLitmus::PuppetHelpers.run_shell(timeout)
+    # Ensure there is no running agent process and default to a disabled agent
+    PuppetLitmus::PuppetHelpers.run_shell('puppet resource service puppet ensure=stopped; puppet agent --disable; puppet resource service puppet ensure=running;')
   end
 end
