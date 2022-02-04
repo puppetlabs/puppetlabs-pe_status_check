@@ -193,7 +193,7 @@ Facter.add(:self_service, type: :aggregate) do
     next unless PuppetSelfService.primary?
     # Check if thundering herd is occuring.
     psql_output_data = PuppetSelfService.psql_thundering_herd
-    if psql_output_data.blank?
+    if psql_output_data.nil? || psql_output_data.empty?
       { S0027: true }
     else
       thundering_query_output = psql_output_data.split(' ').drop(2).map(&:to_i)
