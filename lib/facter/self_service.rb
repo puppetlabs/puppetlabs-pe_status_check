@@ -273,8 +273,14 @@ Facter.add(:self_service, type: :aggregate) do
   chunk(:S0039) do
     # PuppetServer
     next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
-    log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver.log'
-    search_for_error = `tail -n 500 #{log_path} | grep 'Error 503 on SERVER'`
-    { S0039: search_for_error.empty? }
+    logfile = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver-access.log'
+    apache_regex = %r{^(\S+) \S+ (\S+) \[([^\]]+)\] "([A-Z]+) ([^ "]+)? HTTP/[0-9.]+" (?<status>[0-9]{3})}
+
+    has_503 = File.foreach(logfile).any? do |line|
+      match = line.match(apache_regex)
+      match and match[:status] == '503'
+    end
+
+    { S0039: !has_503 }
   end
 end
