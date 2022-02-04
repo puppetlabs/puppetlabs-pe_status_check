@@ -281,6 +281,6 @@ Facter.add(:self_service, type: :aggregate) do
       match and match[:status] == '503'
     end
 
-    { S0039: has_503 }
+    { S0039: !has_503 }
   end
 end
