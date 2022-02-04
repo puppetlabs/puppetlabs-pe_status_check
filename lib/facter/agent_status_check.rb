@@ -1,7 +1,7 @@
-# Agent Self service fact aims to have all chunks reporting as true, indicating ideal state, any individual chunk reporting false should be alerted on and checked against documentation for next steps
-# Use shared logic from PuppetSelfService
+# Agent Status Check fact aims to have all chunks reporting as true, indicating ideal state, any individual chunk reporting false should be alerted on and checked against documentation for next steps
+# Use shared logic from PEStatusCheck
 
-Facter.add(:agent_self_service, type: :aggregate) do
+Facter.add(:agent_status_check, type: :aggregate) do
   confine { !Facter.value(:pe_build) }
   require 'puppet'
 
