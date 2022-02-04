@@ -217,13 +217,15 @@ describe 'self_service class' do
         run_shell('rm -rf /opt/puppetlabs/server/data/packages/public/2018.1.5')
       end
       it 'if S0039 conditions for false are met' do
+        # rubocop:disable Layout/LineLength
         run_shell('export logdir=$(puppet config print logdir) &&
-         cp $logdir/../puppetserver/puppetserver.log $logdir/../puppetserver/puppetserver.log.bk &&
-         echo "Error 503 on SERVER" >> $logdir/../puppetserver/puppetserver.log')
+         cp $logdir/../puppetserver/puppetserver-access.log $logdir/../puppetserver/puppetserver-access.log.bk &&
+         echo "0.0.0.0 - - [04/Feb/2022:17:04:09 +0000] \"PUT /puppet/v3/report/foo.bar.com?environment=production HTTP/1.1\" 503 12 \"-\" \"Agent String\" 91 16051 85" >> $logdir/../puppetserver/puppetserver-access.log')
+        # rubocop:enable Layout/LineLength
         result = run_shell('facter -p self_service.S0039')
         expect(result.stdout).to match(%r{false})
-        run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../puppetserver/puppetserver.log &&
-        mv $logdir/../puppetserver/puppetserver.log.bk $logdir/../puppetserver/puppetserver.log')
+        run_shell('export logdir=$(puppet config print logdir) && rm -f $logdir/../puppetserver/puppetserver-access.log &&
+        mv $logdir/../puppetserver/puppetserver-access.log.bk $logdir/../puppetserver/puppetserver-access.log')
       end
       it 'if S0033 conditions for false are met' do
         run_shell('cat <<EOF > /etc/puppetlabs/puppet/hiera.yaml
