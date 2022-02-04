@@ -136,6 +136,8 @@ module PuppetSelfService
   def self.psql_return_result(sql, psql_options = '')
     command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
     Facter::Core::Execution.execute(command)
+  rescue
+    nil
   end
 
   # Below method to execute the PSQL statement to identify thundering herd
@@ -143,7 +145,7 @@ module PuppetSelfService
     sql = %(
       SELECT count(*)
       FROM reports
-      WHERE start_time BETWEEN now() - interval '30 minutes' AND now()
+      WHERE start_time BETWEEN now() - interval '12 hours' AND now()
       GROUP BY date_part('month', start_time), date_part('day', start_time), date_part('hour', start_time), date_part('minute', start_time)
       ORDER BY date_part('month', start_time) DESC, date_part('day', start_time) DESC, date_part( 'hour', start_time ) DESC, date_part('minute', start_time) DESC;
     )

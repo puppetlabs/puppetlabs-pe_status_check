@@ -192,12 +192,32 @@ Facter.add(:self_service, type: :aggregate) do
   chunk(:S0027) do
     next unless PuppetSelfService.primary?
     # Check if thundering herd is occuring.
-    thundering_query_output = PuppetSelfService.psql_thundering_herd.split(' ').drop(2).map(&:to_i)
-    #thundering_query_output = output_data.split(' ').drop(2).map(&:to_i)
-    thundering_query_output.delete(0)
-    minvalue = thundering_query_output.min.to_i
-    maxvalue = thundering_query_output.max.to_i
-    differences = ((maxvalue - minvalue) * 100) / minvalue
-    { S0027: differences <= 75 }
+    psql_output_data = PuppetSelfService.psql_thundering_herd
+    if psql_output_data.blank?
+      { S0027: true }
+    else
+      thundering_query_output = psql_output_data.split(' ').drop(2).map(&:to_i)
+      thundering_query_output.delete(0)
+      if thundering_query_output.max.to_i < 20 || thundering_query_output.min.to_i < 1
+        # not meeting minimum requirement
+        { S0027: true }
+      else
+        # minvalue = thundering_query_output.min.to_i
+        # maxvalue = thundering_query_output.max.to_i
+        # differences = ((maxvalue - minvalue) * 100) / minvalue
+        # { S0027: differences <= 75 }
+
+        # Changing the approach based on standard deviation method
+        # taking only the first n number of items to check if thundering herd is occured or not.
+        if thundering_query_output.length > 25
+          thundering_query_output = thundering_query_output.first(25)
+        end
+        mean = thundering_query_output.sum(0.0) / thundering_query_output.size
+        sum = thundering_query_output.sum(0.0) { |element| (element - mean)**2 }
+        variance = sum / (thundering_query_output.size - 1)
+        standard_deviation = Math.sqrt(variance)
+        { S0027: standard_deviation <= 50 }
+      end
+    end
   end
 end
