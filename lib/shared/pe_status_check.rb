@@ -1,7 +1,7 @@
 require 'puppet'
 
-# PuppetSelfService - Shared code for Puppet Self Service facts
-module PuppetSelfService
+# PEStatusCheck - Shared code for pe_status_check facts
+module PEStatusCheck
   # Gets the resource object by name
   # @param resource [String] The resource type to get
   # @param name [String] The name of the resource

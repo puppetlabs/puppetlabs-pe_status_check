@@ -1,12 +1,12 @@
 {
-  "name": "puppetlabs-self_service",
+  "name": "puppetlabs-pe_status_check",
   "version": "0.2.0",
   "author": "Marty Ewings",
   "summary": "A Puppet Enterprise Module to Promote Preventative Maintenance and Self Service",
   "license": "Apache-2.0",
-  "source": "https://github.com/puppetlabs/puppetlabs-self_service",
-  "project_page": "https://github.com/puppetlabs/puppetlabs-self_service",
-  "issues_url": "https://github.com/puppetlabs/puppetlabs-self_service/issues",
+  "source": "https://github.com/puppetlabs/puppetlabs-pe_status_check",
+  "project_page": "https://github.com/puppetlabs/puppetlabs-pe_status_check",
+  "issues_url": "https://github.com/puppetlabs/puppetlabs-pe_status_check/issues",
   "dependencies": [
 
   ],

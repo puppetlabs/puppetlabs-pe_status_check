@@ -1,21 +1,21 @@
-# Self service fact aims to have all chunks reporting as true, this indicates ideal state, any individual chunk reporting false should be alerted on and checked against documentation for next steps
-# Use shared logic from PuppetSelfService
+# pe_status_check fact aims to have all chunks reporting as true, this indicates ideal state, any individual chunk reporting false should be alerted on and checked against documentation for next steps
+# Use shared logic from PEStatusCheck
 
-Facter.add(:self_service, type: :aggregate) do
+Facter.add(:pe_status_check, type: :aggregate) do
   confine kernel: 'Linux'
   confine { Facter.value(:pe_build) }
   require 'puppet'
   require 'yaml'
-  require_relative '../shared/puppet_self_service'
+  require_relative '../shared/pe_status_check'
 
   chunk(:S0001) do
     # Is the Agent Service Running and Enabled
-    { S0001: PuppetSelfService.service_running_enabled('puppet') }
+    { S0001: PEStatusCheck.service_running_enabled('puppet') }
   end
 
   chunk(:S0002) do
     # Is the Pxp-Agent Service Running and Enabled
-    { S0002: PuppetSelfService.service_running_enabled('pxp-agent') }
+    { S0002: PEStatusCheck.service_running_enabled('pxp-agent') }
   end
 
   chunk(:S0003) do
@@ -27,11 +27,11 @@ Facter.add(:self_service, type: :aggregate) do
     # Is PE and has clienttools covers pe-psql and compilers
     # Check for service status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
 
-    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
 
     puppetendpoint = 'https://127.0.0.1:8140/status/v1/services'
 
-    puppetendpointcall = PuppetSelfService.nethttp_puppet_api(puppetendpoint)
+    puppetendpointcall = PEStatusCheck.nethttp_puppet_api(puppetendpoint)
 
     if puppetendpointcall.include?('error') || puppetendpointcall.include?('starting') || puppetendpointcall.include?('stopping') || puppetendpointcall.include?('unknown')
       { S0004: false }
@@ -53,43 +53,43 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0006) do
-    next unless PuppetSelfService.primary?
+    next unless PEStatusCheck.primary?
     # Is puppet_metrics_collector running
-    { S0006: PuppetSelfService.service_running_enabled('puppet_puppetserver-metrics.timer') }
+    { S0006: PEStatusCheck.service_running_enabled('puppet_puppetserver-metrics.timer') }
   end
 
   chunk(:S0007) do
-    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.postgres?
+    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.postgres?
     # check postgres data mount has at least 20% free
     pg_version = Facter.value(:pe_postgresql_info)['installed_server_version']
     data_dir = Facter.value(:pe_postgresql_info)['versions'][pg_version].fetch('data_dir', '/opt/puppetlabs/server/data/postgresql')
 
-    { S0007: PuppetSelfService.filesystem_free(data_dir) >= 20 }
+    { S0007: PEStatusCheck.filesystem_free(data_dir) >= 20 }
   end
 
   chunk(:S0008) do
-    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
     # check codedir data mount has at least 20% free
-    { S0008: PuppetSelfService.filesystem_free(Puppet.settings['codedir']) >= 20 }
+    { S0008: PEStatusCheck.filesystem_free(Puppet.settings['codedir']) >= 20 }
   end
 
   chunk(:S0009) do
-    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
+    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
     # Is the Pe-puppetsever Service Running and Enabled
-    { S0009: PuppetSelfService.service_running_enabled('pe-puppetserver') }
+    { S0009: PEStatusCheck.service_running_enabled('pe-puppetserver') }
   end
 
   chunk(:S0010) do
-    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.primary?
+    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.primary?
     # Is the pe-puppetdb Service Running and Enabled
-    { S0010: PuppetSelfService.service_running_enabled('pe-puppetdb') }
+    { S0010: PEStatusCheck.service_running_enabled('pe-puppetdb') }
   end
 
   chunk(:S0011) do
-    next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary?
+    next unless PEStatusCheck.replica? || PEStatusCheck.postgres? || PEStatusCheck.primary?
     # Is the pe-postgres Service Running and Enabled
-    postgresversion = PuppetSelfService.pe_postgres_service_name
-    { S0011: PuppetSelfService.service_running_enabled(postgresversion.to_s) }
+    postgresversion = PEStatusCheck.pe_postgres_service_name
+    { S0011: PEStatusCheck.service_running_enabled(postgresversion.to_s) }
   end
 
   chunk(:S0012) do
@@ -121,7 +121,7 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0016) do
     # Puppetserver
-    next unless PuppetSelfService.primary? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.replica?
+    next unless PEStatusCheck.primary? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.replica?
     time_now = Time.now - Puppet.settings['runinterval']
     log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/'
     error_pid_log = Dir.glob(log_path + '*_err_pid*.log').find { |f| time_now.to_i < File.mtime(f).to_i }
@@ -136,7 +136,7 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0017) do
     # PuppetDB
-    next unless PuppetSelfService.primary? || PuppetSelfService.compiler?
+    next unless PEStatusCheck.primary? || PEStatusCheck.compiler?
     time_now = Time.now - Puppet.settings['runinterval']
     log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetdb/'
     error_pid_log = Dir.glob(log_path + '*_err_pid*.log').find { |f| time_now.to_i < File.mtime(f).to_i }
@@ -151,7 +151,7 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0018) do
     # Orchestrator
-    next unless PuppetSelfService.primary?
+    next unless PEStatusCheck.primary?
     time_now = Time.now - Puppet.settings['runinterval']
     log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/orchestration-services/'
     error_pid_log = Dir.glob(log_path + '*_err_pid*.log').find { |f| time_now.to_i < File.mtime(f).to_i }
@@ -165,8 +165,8 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0019) do
-    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
-    pupserv_api = PuppetSelfService.status_check('8140', 'pe-jruby-metrics?level=debug')
+    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    pupserv_api = PEStatusCheck.status_check('8140', 'pe-jruby-metrics?level=debug')
     if pupserv_api.nil?
       { S0019: false }
     else
@@ -183,7 +183,7 @@ Facter.add(:self_service, type: :aggregate) do
   chunk(:S0022) do
     # Is there a valid license present, which does not expire in 90 days
     # Also takes into account if the license is perpetual
-    next unless PuppetSelfService.primary?
+    next unless PEStatusCheck.primary?
     validity = true # true by default
     if File.file?('/etc/puppetlabs/license.key')
       license_type = File.readlines('/etc/puppetlabs/license.key').grep(%r{license_type:}).to_s
@@ -208,7 +208,7 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0031) do
     # check for Old pe_repo versions have been cleaned up
-    next unless PuppetSelfService.primary?
+    next unless PEStatusCheck.primary?
     pe_version = Facter.value(:pe_server_version)
     packages_dir = '/opt/puppetlabs/server/data/packages/public'
     no_old_packages = true
@@ -232,7 +232,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0033) do
-    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
+    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
     hiera_config_path = Puppet.settings['hiera_config']
     next unless File.exist?(hiera_config_path)
     hiera_config_file = YAML.load_file(hiera_config_path)
@@ -241,7 +241,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
 
   chunk(:S0036) do
-    next unless PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler? || PuppetSelfService.primary?
+    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
     max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
     if max_queued_requests.nil?
@@ -253,11 +253,11 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0040) do
     # Is puppet_metrics_collector::system configured
-    { S0040: PuppetSelfService.service_running_enabled('puppet_system_processes-metrics.timer') }
+    { S0040: PEStatusCheck.service_running_enabled('puppet_system_processes-metrics.timer') }
   end
 
   chunk(:S0034) do
-    next unless PuppetSelfService.primary?
+    next unless PEStatusCheck.primary?
     # PE has not been upgraded / updated in 1 year
     # It was decided not to include infra components as this was deemed unecessary as they should align with the primary.
 
@@ -272,7 +272,7 @@ Facter.add(:self_service, type: :aggregate) do
   end
   chunk(:S0039) do
     # PuppetServer
-    next unless PuppetSelfService.primary? || PuppetSelfService.replica? || PuppetSelfService.compiler? || PuppetSelfService.legacy_compiler?
+    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
     logfile = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver-access.log'
     apache_regex = %r{^(\S+) \S+ (\S+) \[([^\]]+)\] "([A-Z]+) ([^ "]+)? HTTP/[0-9.]+" (?<status>[0-9]{3})}
 
