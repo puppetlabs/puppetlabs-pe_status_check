@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'self_service' do
+describe 'pe_status_check' do
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:facts) { os_facts }
