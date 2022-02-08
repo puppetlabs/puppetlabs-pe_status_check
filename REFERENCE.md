@@ -6,13 +6,13 @@
 
 ### Classes
 
-* [`self_service`](#self_service): This class should be enabled if you wish Puppet to notify when self_service indicators are not at optimal values
+* [`pe_status_check`](#pe_status_check): This class should be enabled if you wish Puppet to notify when pe_status_check indicators are not at optimal values
 
 ## Classes
 
-### <a name="self_service"></a>`self_service`
+### <a name="pe_status_check"></a>`pe_status_check`
 
-When this class is enabled, when any of the indicators in the self_service fact are false puppet will notify of this,
+When this class is enabled, when any of the indicators in the pe_status_check fact are false puppet will notify of this,
  individual tests can be disabled by adding the ID to the indicator_exclusions parameter
 
 #### Examples
@@ -20,12 +20,12 @@ When this class is enabled, when any of the indicators in the self_service fact 
 ##### 
 
 ```puppet
-include self_service
+include pe_status_check
 ```
 
 #### Parameters
 
-The following parameters are available in the `self_service` class:
+The following parameters are available in the `pe_status_check` class:
 
 * [`indicator_exclusions`](#indicator_exclusions)
 
