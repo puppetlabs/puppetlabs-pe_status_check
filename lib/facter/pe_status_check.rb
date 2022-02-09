@@ -29,14 +29,17 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
     next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
 
-    puppetendpoint = 'https://127.0.0.1:8140/status/v1/services'
-
-    puppetendpointcall = PEStatusCheck.nethttp_puppet_api(puppetendpoint)
-
-    if puppetendpointcall.include?('error') || puppetendpointcall.include?('starting') || puppetendpointcall.include?('stopping') || puppetendpointcall.include?('unknown')
+    response = PEStatusCheck.http_get('/status/v1/services', 8140)
+    if !response
       { S0004: false }
     else
-      { S0004: true }
+      # In the reponse, keys are the names of the services and values are a hash of its properties
+      # We can check that all are in 'running' state to see if all are ok
+      all_running = response.values.all? do |service|
+        service['state'] == 'running'
+      end
+
+      { S0004: all_running }
     end
   end
 
@@ -166,12 +169,12 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0019) do
     next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
-    pupserv_api = PEStatusCheck.status_check('8140', 'pe-jruby-metrics?level=debug')
-    if pupserv_api.nil?
-      { S0019: false }
+    response = PEStatusCheck.http_get('/status/v1/services/pe-jruby-metrics?level=debug', 8140)
+    if response
+      free_jrubies = response.dig('status', 'experimental', 'metrics', 'average-free-jrubies')
+      { S0019: free_jrubies >= 0.9 }
     else
-      jruby_check = pupserv_api.dig('status', 'experimental', 'metrics', 'average-free-jrubies')
-      { S0019: jruby_check >= 0.9 }
+      { S0019: false }
     end
   end
 
