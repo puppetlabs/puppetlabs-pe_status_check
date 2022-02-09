@@ -188,14 +188,14 @@ Facter.add(:self_service, type: :aggregate) do
 
   chunk(:S0029) do
     next unless PuppetSelfService.replica? || PuppetSelfService.postgres? || PuppetSelfService.primary?
-    #check if concurrnet connections to Postgres approaching 90% defined
+    # check if concurrnet connections to Postgres approaching 90% defined
     approaching_limit = false
     maximum = PuppetSelfService.max_connections.to_i
     current = PuppetSelfService.cur_connections.to_i
     percent_used = current / maximum * 100
-    if percent_used >=90
+    if percent_used >= 90
       approaching_limit = true
-      {S0029: approaching_limit }
+      { S0029: approaching_limit }
     end
   end
 
@@ -255,18 +255,17 @@ Facter.add(:self_service, type: :aggregate) do
   end
 end
 
-#Facter.add('maximum') do
+# Facter.add('maximum') do
 #  setcode do
 #    PuppetSelfService.max_connections.map(&:to_i)
 #  end
-#end
+# end
 
-#Facter.add('current') do
+# Facter.add('current') do
 #  setcode do
 #    PuppetSelfService.cur_connections.map(&:to_i)
 #  end
-#end
-
+# end
 
 Facter.add('approaching_limit') do
   require_relative '../shared/puppet_self_service'
@@ -274,7 +273,7 @@ Facter.add('approaching_limit') do
   maximum = PuppetSelfService.max_connections.to_i
   current = PuppetSelfService.cur_connections.to_i
   percent_used = current / maximum * 100
-  if percent_used >= 90
+  if percent_used <= 90
     approaching_limit = true
   end
 

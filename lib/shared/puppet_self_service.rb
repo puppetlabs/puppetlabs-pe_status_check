@@ -127,24 +127,23 @@ module PuppetSelfService
   end
 
   def self.psql_return_result(sql, psql_options = '')
-  command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
-  Facter::Core::Execution.execute(command)
-end
+    command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
+    Facter::Core::Execution.execute(command)
+  end
 
-def self.max_connections
-  sql = %Q(
+  def self.max_connections
+    sql = %(
     select count(*) used from pg_stat_activity;
   )
-  psql_options = '-qtAX'
-  psql_return_result(sql, psql_options)
-end
+    psql_options = '-qtAX'
+    psql_return_result(sql, psql_options)
+  end
 
-
-def self.cur_connections
-  sql = %Q(
+  def self.cur_connections
+    sql = %(
     select count(*) used from pg_stat_activity;
   )
-  psql_options = '-qtAX'
-  psql_return_result(sql, psql_options)
-end
+    psql_options = '-qtAX'
+    psql_return_result(sql, psql_options)
+  end
 end
