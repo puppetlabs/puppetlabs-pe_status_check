@@ -273,7 +273,7 @@ Facter.add('approaching_limit') do
   maximum = PuppetSelfService.max_connections.to_i
   current = PuppetSelfService.cur_connections.to_i
   percent_used = current / maximum * 100
-  if percent_used <= 90
+  if percent_used >= 90
     approaching_limit = true
   end
 

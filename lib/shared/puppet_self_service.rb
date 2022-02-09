@@ -133,7 +133,7 @@ module PuppetSelfService
 
   def self.max_connections
     sql = %(
-    select count(*) used from pg_stat_activity;
+    SELECT current_setting('max_connections');
   )
     psql_options = '-qtAX'
     psql_return_result(sql, psql_options)
