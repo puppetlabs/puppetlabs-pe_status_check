@@ -30,16 +30,15 @@ Facter.add(:pe_status_check, type: :aggregate) do
     next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
 
     response = PEStatusCheck.http_get('/status/v1/services', 8140)
-    if !response
-      { S0004: false }
-    else
+    if response
       # In the reponse, keys are the names of the services and values are a hash of its properties
       # We can check that all are in 'running' state to see if all are ok
       all_running = response.values.all? do |service|
         service['state'] == 'running'
       end
-
       { S0004: all_running }
+    else
+      { S0004: false }
     end
   end
 

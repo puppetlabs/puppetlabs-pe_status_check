@@ -100,7 +100,9 @@ module PEStatusCheck
       false
     end
   rescue StandardError => e
-    Facter.warn("Error in fact 'self_service': #{e.backtrace}")
+    Facter.warn("Error in fact 'pe_status_check' when querying #{path}: #{e.message}")
+    Facter.debug(e.backtrace)
+    false
   end
 
   # Check if Primary node
