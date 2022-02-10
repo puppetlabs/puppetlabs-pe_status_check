@@ -1,4 +1,7 @@
 require 'puppet'
+require 'json'
+require 'net/http'
+require 'openssl'
 
 # PEStatusCheck - Shared code for pe_status_check facts
 module PEStatusCheck
@@ -66,28 +69,40 @@ module PEStatusCheck
     File.exist?("#{configdir}/#{configfile}")
   end
 
-  # Queries the passed port and endpoint for the status API
+  # Module method to make a GET request to an api specified by path and port params
   # @return [Hash] Response body of the API call
-  # param port [Integer] The status API port to query
-  # @param endpoint [String] The status API endpoint to query
-  def self.status_check(port, endpoint)
-    require 'json'
+  # @param path [String] The API path to query.  Should include a '/' prefix and query parameters
+  # @param port [Integer] The port to use
+  # @param host [String] The FQDN to use in making the connection.  Defaults to the Puppet certname
+  def self.http_get(path, port, host = Puppet[:certname])
+    # Use an instance variable to only create an SSLContext once
+    @ssl_context ||= Puppet::SSL::SSLContext.new(
+      cacerts: Puppet[:localcacert],
+      private_key: OpenSSL::PKey::RSA.new(File.read(Puppet[:hostprivkey])),
+      client_cert: OpenSSL::X509::Certificate.new(File.open(Puppet[:hostcert])),
+    )
 
-    host     = Puppet[:certname]
-    client   = Puppet.runtime[:http]
-    response = client.get(URI(Puppet::Util.uri_encode("https://#{host}:#{port}/status/v1/services/#{endpoint}")))
-    status   = JSON.parse(response.body)
-    status
-  rescue Puppet::HTTP::ResponseError => e
-    Facter.debug("fact 'self_service' - HTTP: #{e.response.code} #{e.response.reason}")
-  rescue Puppet::HTTP::ConnectionError => e
-    Facter.debug("fact 'self_service' - Connection error: #{e.message}")
-  rescue Puppet::SSL::SSLError => e
-    Facter.debug("fact 'self_service' - SSL error: #{e.message}")
-  rescue Puppet::HTTP::HTTPError => e
-    Facter.debug("fact 'self_service' - General HTTP error: #{e.message}")
-  rescue JSON::ParserError => e
-    Facter.debug("fact 'self_service' - Could not parse body for JSON: #{e}")
+    client = Net::HTTP.new(host, port)
+    # The main reason to use this approach is to set open and read timeouts to a small value
+    # Puppet's HTTP client does not allow access to these
+    client.open_timeout = 2
+    client.read_timeout = 2
+    client.use_ssl = true
+    client.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    client.cert = @ssl_context.client_cert
+    client.key = @ssl_context.private_key
+    client.ca_file = @ssl_context.cacerts
+
+    response = client.request_get(Puppet::Util.uri_encode(path))
+    if response.is_a? Net::HTTPSuccess
+      JSON.parse(response.body)
+    else
+      false
+    end
+  rescue StandardError => e
+    Facter.warn("Error in fact 'pe_status_check' when querying #{path}: #{e.message}")
+    Facter.debug(e.backtrace)
+    false
   end
 
   # Check if Primary node
@@ -144,39 +159,5 @@ module PEStatusCheck
 
     stat = Sys::Filesystem.stat(path)
     (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
-  end
-
-  # This is a generic NET::HTTP function that can be reusable across different API requests
-  def self.nethttp_puppet_api(puppetendpoint)
-    uri = URI.parse(puppetendpoint.to_s)
-    request = Net::HTTP::Get.new(uri)
-    request.content_type = 'application/json'
-    request.body = JSON.dump({
-                               'level' => 'info',
-      'timeout' => '2'
-                             })
-
-    req_options = {
-      use_ssl: uri.scheme == 'https',
-      verify_mode: OpenSSL::SSL::VERIFY_NONE,
-      # waiting for a max of 2 secs to open connection
-      open_timeout: 2,
-      # waiting for a max of 2 secs to read response from socket
-      read_timeout: 2,
-    }
-
-    begin
-      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-        http.request(request)
-      end
-
-      # returns the body of the response
-
-      response.body
-    rescue StandardError
-      # returns a connection error
-
-      'error'
-    end
   end
 end
