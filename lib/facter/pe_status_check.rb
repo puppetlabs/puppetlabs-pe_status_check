@@ -300,11 +300,11 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   Facter.add('approaching_limit') do
-  require_relative '../shared/puppet_self_service'
+  require_relative '../shared/pe_status_check'
   approaching_limit = false
-  maximum = PuppetSelfService.max_connections.to_i
-  current = PuppetSelfService.cur_connections.to_i
-  percent_used = current / maximum * 100
+  maximum = PEStatusCheck.max_connections.to_i
+  current = PEStatusCheck.cur_connections.to_i
+  percent_used = (current / maximum) * 100
   if percent_used >= 90
     approaching_limit = true
   end
