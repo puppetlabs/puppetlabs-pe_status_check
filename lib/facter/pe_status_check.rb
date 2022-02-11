@@ -203,17 +203,17 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0029) do
     next unless PEStatusCheck.replica? || PEStatusCheck.postgres? || PEStatusCheck.primary?
-    # check if concurrnet connections to Postgres approaching 90% defined
+    # check if concurent connections to Postgres approaching 90% defined
     approaching_limit = false
     maximum = PEStatusCheck.max_connections.to_i
     current = PEStatusCheck.cur_connections.to_i
-#    if maximum > 1
+   if maximum > 1
     percent_used = (current / maximum) * 100
       if percent_used >= 90
         approaching_limit = true
         { S0029: approaching_limit }
       end
- #   end
+   end
   end
 
   chunk(:S0030) do

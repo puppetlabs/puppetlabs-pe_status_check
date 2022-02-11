@@ -150,7 +150,7 @@ module PEStatusCheck
     (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
   end
 
-  #Get the maximum and current concurrent connections to Postgres
+  #Get the maximum defined and current concurrent connections to Postgres
   def self.psql_return_result(sql, psql_options = '')
     command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
     Facter::Core::Execution.execute(command)
