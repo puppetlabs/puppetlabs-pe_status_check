@@ -299,18 +299,4 @@ Facter.add(:pe_status_check, type: :aggregate) do
     { S0039: !has_503 }
   end
 
-  Facter.add('approaching_limit') do
-  require_relative '../shared/pe_status_check'
-  approaching_limit = false
-  maximum = PEStatusCheck.max_connections.to_i
-  current = PEStatusCheck.cur_connections.to_i
-  percent_used = (current / maximum) * 100
-  if percent_used >= 90
-    approaching_limit = true
-  end
-
-  setcode do
-    approaching_limit
-  end
-end
 end
