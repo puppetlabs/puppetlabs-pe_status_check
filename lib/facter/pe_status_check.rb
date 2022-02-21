@@ -202,6 +202,19 @@ Facter.add(:pe_status_check, type: :aggregate) do
     end
     { S0022: validity }
   end
+  
+  chunk(:S0029) do
+    next unless PEStatusCheck.replica? || PEStatusCheck.postgres? || PEStatusCheck.primary?
+    # check if concurrnet connections to Postgres approaching 90% defined
+
+    maximum = PEStatusCheck.max_connections.to_i
+    current = PEStatusCheck.cur_connections.to_i
+    percent_used = (current / maximum) * 100
+    { S0029: percent_used >= 90 }
+    rescue ZeroDivisionError
+      Facter.debug('pe_status_check.S0029 failed to get max_connections')
+      { S0029: false }
+  end
 
   chunk(:S0030) do
     # check for use_cached_catalog logic flip as false is the desired state

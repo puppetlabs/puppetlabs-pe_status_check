@@ -5,6 +5,10 @@ require 'openssl'
 
 # PEStatusCheck - Shared code for pe_status_check facts
 module PEStatusCheck
+  PUP_PATHS = { puppetlabs_bin: '/opt/puppetlabs/bin',
+    puppet_bin:     '/opt/puppetlabs/puppet/bin',
+    server_bin:     '/opt/puppetlabs/server/bin',
+    server_data:    '/opt/puppetlabs/server/data' }.freeze
   # Gets the resource object by name
   # @param resource [String] The resource type to get
   # @param name [String] The name of the resource
@@ -149,6 +153,28 @@ module PEStatusCheck
       !service_file_exist?('pe-console-services') &&
       !service_file_exist?('pe-puppetdb') &&
       service_file_exist?('pe-pgsql/pe-postgresql')
+  end
+
+  #Get the maximum defined and current concurrent connections to Postgres
+  def self.psql_return_result(sql, psql_options = '')
+    command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
+    Facter::Core::Execution.execute(command)
+  end
+
+  def self.max_connections
+    sql = %(
+    SELECT current_setting('max_connections');
+  )
+    psql_options = '-qtAX'
+    psql_return_result(sql, psql_options)
+  end
+
+  def self.cur_connections
+    sql = %(
+    select count(*) used from pg_stat_activity;
+  )
+    psql_options = '-qtAX'
+    psql_return_result(sql, psql_options)
   end
 
   # Get the free disk percentage from a path
