@@ -7,11 +7,11 @@
     - [Setup requirements](#setup-requirements)
     - [Beginning with pe_status_check](#beginning-with-pe_status_check)
   - [Usage](#usage)
-    - [Class declaration (Optional)](#class-declaration-optional)
+    - [Class declaration (optional)](#class-declaration-optional)
   - [Reference](#reference)
   - [Fact: pe_status_check](#fact-pe_status_check)
   - [Fact: agent_status_check](#fact-agent_status_check)
-  - [How to Report an issue or contribute to the module](#how-to-report-an-issue-or-contribute-to-the-module)
+  - [How to report an issue or contribute to the module](#how-to-report-an-issue-or-contribute-to-the-module)
 
 ## Description
 
@@ -102,9 +102,7 @@ Refer to this section for next steps when any indicator reports a `false`.
 
 | Indicator ID | Description                                                                        | Self-service steps                                                                                                                                                                                                                                                                                                                                                                                                                                                          | What to include in a Support ticket                                                                                                                                                                                                   |
 |--------------|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| AS001        | Determines if the agent host certificate is expiring in the next 90 days.                                     | Puppet Enterprise has a plan built into extend agent certificates.
-
-Uses a puppet query to find expiring host certificates and pass the node ID to this plan:   `puppet plan run enterprise_tasks::agent_cert_regen agent=$(puppet query 'inventory[certname] { facts.agent_self_service.AS001 = false }' \| jq  -r '.[].certname' \|  paste -sd, -) master=$(puppet config print certname)`                                                                                   | If the plan fails to run, open a support ticket referencing AS001 and provide the error message recieved when running the plan.
+| AS001        | Determines if the agent host certificate is expiring in the next 90 days.                                     | Puppet Enterprise has a plan built into extend agent certificates.|Uses a puppet query to find expiring host certificates and pass the node ID to this plan:   `puppet plan run enterprise_tasks::agent_cert_regen agent=$(puppet query 'inventory[certname] { facts.agent_status_check.AS001 = false }' \| jq  -r '.[].certname' \|  paste -sd, -) master=$(puppet config print certname)`                                                                                   | If the plan fails to run, open a support ticket referencing AS001 and provide the error message recieved when running the plan.
 
 ## How to report an issue or contribute to the module
 
