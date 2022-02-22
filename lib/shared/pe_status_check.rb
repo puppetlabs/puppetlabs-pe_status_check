@@ -5,11 +5,13 @@ require 'openssl'
 
 # PEStatusCheck - Shared code for pe_status_check facts
 module PEStatusCheck
+  module_function
+
   # Gets the resource object by name
   # @param resource [String] The resource type to get
   # @param name [String] The name of the resource
   # @return [Puppet::Resource] The instance of the resource or nil
-  def self.get_resource(resource, name)
+  def get_resource(resource, name)
     name += '.service' if (resource == 'service') && !name.include?('.')
     Puppet::Indirector::Indirection.instance(:resource).find("#{resource}/#{name}")
   end
@@ -18,7 +20,7 @@ module PEStatusCheck
   # @param name [String] The name of the service
   # @param service [Puppet::Resource] An optional service resource to use
   # @return [Boolean] True if the service is running
-  def self.service_running(name, service = nil)
+  def service_running(name, service = nil)
     service ||= get_resource('service', name)
     return false if service.nil?
 
@@ -29,7 +31,7 @@ module PEStatusCheck
   # @param name [String] The name of the service
   # @param service [Puppet::Resource] An optional service resource to use
   # @return [Boolean] True if the service is enabled
-  def self.service_enabled(name, service = nil)
+  def service_enabled(name, service = nil)
     service ||= get_resource('service', name)
     return false if service.nil?
 
@@ -40,7 +42,7 @@ module PEStatusCheck
   # @param name [String] The name of the service
   # @param service [Puppet::Resource] An optional service resource to use
   # @return [Boolean] True if the service is running and enabled
-  def self.service_running_enabled(name, service = nil)
+  def service_running_enabled(name, service = nil)
     service ||= get_resource('service', name)
     return false if service.nil?
 
@@ -49,7 +51,7 @@ module PEStatusCheck
 
   # Return the name of the pe-postgresql service for the current OS
   # @return [String] The name of the pe-postgresql service
-  def self.pe_postgres_service_name
+  def pe_postgres_service_name
     if Facter.value(:os)['family'].eql?('Debian')
       "pe-postgresql#{Facter.value(:pe_postgresql_info)['installed_server_version']}"
     else
@@ -60,7 +62,7 @@ module PEStatusCheck
   # Checks if passed service file exists in correct directory for the OS
   # @return [Boolean] true if file exists
   # @param configfile [String] The name of the pe service to be tested
-  def self.service_file_exist?(configfile)
+  def service_file_exist?(configfile)
     configdir = if Facter.value(:os)['family'].eql?('RedHat') || Facter.value(:os)['family'].eql?('Suse')
                   '/etc/sysconfig'
                 else
@@ -74,7 +76,7 @@ module PEStatusCheck
   # @param path [String] The API path to query.  Should include a '/' prefix and query parameters
   # @param port [Integer] The port to use
   # @param host [String] The FQDN to use in making the connection.  Defaults to the Puppet certname
-  def self.http_get(path, port, host = Puppet[:certname])
+  def http_get(path, port, host = Puppet[:certname])
     # Use an instance variable to only create an SSLContext once
     @ssl_context ||= Puppet::SSL::SSLContext.new(
       cacerts: Puppet[:localcacert],
@@ -107,7 +109,7 @@ module PEStatusCheck
 
   # Check if Primary node
   # @return [Boolean] true is primary node
-  def self.primary?
+  def primary?
     service_file_exist?('pe-puppetserver') &&
       service_file_exist?('pe-orchestration-services') &&
       service_file_exist?('pe-console-services') &&
@@ -116,7 +118,7 @@ module PEStatusCheck
 
   # Check if replica node
   # @return [Boolean]
-  def self.replica?
+  def replica?
     service_file_exist?('pe-puppetserver') &&
       !service_file_exist?('pe-orchestration-services') &&
       service_file_exist?('pe-console-services') &&
@@ -125,7 +127,7 @@ module PEStatusCheck
 
   # Check if Compiler node
   # @return [Boolean]
-  def self.compiler?
+  def compiler?
     service_file_exist?('pe-puppetserver') &&
       !service_file_exist?('pe-orchestration-services') &&
       !service_file_exist?('pe-console-services') &&
@@ -134,7 +136,7 @@ module PEStatusCheck
 
   # Check if lagacy compiler node
   # @return [Boolean] true
-  def self.legacy_compiler?
+  def legacy_compiler?
     service_file_exist?('pe-puppetserver') &&
       !service_file_exist?('pe-orchestration-services') &&
       !service_file_exist?('pe-console-services') &&
@@ -143,7 +145,7 @@ module PEStatusCheck
 
   # Check if Pe postgres  node
   # @return [Boolean]
-  def self.postgres?
+  def postgres?
     !service_file_exist?('pe-puppetserver') &&
       !service_file_exist?('pe-orchestration-services') &&
       !service_file_exist?('pe-console-services') &&
@@ -154,7 +156,7 @@ module PEStatusCheck
   # Get the free disk percentage from a path
   # @param name [String] The path on the file system
   # @return [Integer] The percentage of free disk space on the mount
-  def self.filesystem_free(path)
+  def filesystem_free(path)
     require 'sys/filesystem'
 
     stat = Sys::Filesystem.stat(path)
