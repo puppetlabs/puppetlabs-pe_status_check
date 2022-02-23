@@ -5,6 +5,8 @@ require 'openssl'
 
 # PEStatusCheck - Shared code for pe_status_check facts
 module PEStatusCheck
+  PUP_PATHS = { server_data: '/opt/puppetlabs/server/data' }.freeze
+
   module_function
 
   # Gets the resource object by name
@@ -69,6 +71,28 @@ module PEStatusCheck
                   '/etc/default'
                 end
     File.exist?("#{configdir}/#{configfile}")
+  end
+
+  # Get the maximum defined and current concurrent connections to Postgres
+  def self.psql_return_result(sql, psql_options = '')
+    command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
+    Facter::Core::Execution.execute(command)
+  end
+
+  def self.max_connections
+    sql = %(
+    SELECT current_setting('max_connections');
+  )
+    psql_options = '-qtAX'
+    psql_return_result(sql, psql_options)
+  end
+
+  def self.cur_connections
+    sql = %(
+    select count(*) used from pg_stat_activity;
+  )
+    psql_options = '-qtAX'
+    psql_return_result(sql, psql_options)
   end
 
   # Module method to make a GET request to an api specified by path and port params
