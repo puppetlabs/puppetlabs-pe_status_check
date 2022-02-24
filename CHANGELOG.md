@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v1.1.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.1.0) (2022-02-24)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v1.0.0...v1.1.0)
+
+### Added
+
+- Change to Use 'module\_function' instead of `self` [\#83](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/83) ([m0dular](https://github.com/m0dular))
+- Standardize net http [\#82](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/82) ([m0dular](https://github.com/m0dular))
+
 ## [v1.0.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.0.0) (2022-02-08)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v0.2.0...v1.0.0)
