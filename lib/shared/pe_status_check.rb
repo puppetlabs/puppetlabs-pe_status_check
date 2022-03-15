@@ -155,7 +155,7 @@ module PEStatusCheck
       service_file_exist?('pe-pgsql/pe-postgresql')
   end
 
-   # Get the maximum defined and current concurrent connections to Postgres
+  # Get the maximum defined and current concurrent connections to Postgres
   def self.psql_return_result(sql, psql_options = '')
     command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
     Facter::Core::Execution.execute(command)

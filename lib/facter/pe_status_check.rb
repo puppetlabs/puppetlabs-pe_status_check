@@ -203,7 +203,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
     { S0022: validity }
   end
 
-   chunk(:S0029) do
+  chunk(:S0029) do
     next unless PEStatusCheck.replica? || PEStatusCheck.postgres? || PEStatusCheck.primary?
     # check if concurrnet connections to Postgres approaching 90% defined
 
