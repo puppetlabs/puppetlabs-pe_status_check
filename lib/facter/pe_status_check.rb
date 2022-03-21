@@ -276,11 +276,14 @@ Facter.add(:pe_status_check, type: :aggregate) do
     # PuppetServer
     next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
     logfile = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver-access.log'
-    apache_regex = %r{^(\S+) \S+ (\S+) \[([^\]]+)\] "([A-Z]+) ([^ "]+)? HTTP/[0-9.]+" (?<status>[0-9]{3})}
+    apache_regex = %r{^(\S+) \S+ (\S+) (?<time>\[([^\]]+)\]) "([A-Z]+) ([^ "]+)? HTTP/[0-9.]+" (?<status>[0-9]{3})}
 
     has_503 = File.foreach(logfile).any? do |line|
       match = line.match(apache_regex)
-      match and match[:status] == '503'
+      time  = Time.strptime(match[:time], '[%d/%b/%Y:%H:%M:%S %Z]')
+      since_lastrun = Time.now - time
+      current = since_lastrun.to_i <= Puppet.settings['runinterval']
+      match and match[:status] == '503' and current
     end
 
     { S0039: !has_503 }
