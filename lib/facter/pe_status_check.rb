@@ -203,6 +203,22 @@ Facter.add(:pe_status_check, type: :aggregate) do
     { S0022: validity }
   end
 
+  chunk(:S0024) do
+    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler?
+
+    # Check discard directory. Newest file should not be less than a run interval old. Recent files indicate an issue that causes PuppetDB to reject incoming data.
+    newestfile = Dir.glob('/opt/puppetlabs/server/data/puppetdb/stockpile/discard/*.*').max_by { |f| File.mtime(f) }
+    # get the timestamp for the most recent file
+    if newestfile
+      newestfile_time = File.mtime(newestfile)
+      #  Newest file should be older than 2 run intervals
+      { S0024: newestfile_time <= (Time.now - (Puppet.settings['runinterval'] * 2)).utc }
+    #  Should return true if the file is older than two runintervals, or folder is empty, and false if sooner than two run intervals
+    else
+      { S0024: true }
+    end
+  end
+
   chunk(:S0030) do
     # check for use_cached_catalog logic flip as false is the desired state
     { S0030: !Puppet.settings['use_cached_catalog'] }
