@@ -15,7 +15,7 @@ describe 'pe_status_check class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no pe_status_check fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['pe_status_check'].size).to eq(27)
+        expect(host_inventory['facter']['pe_status_check'].size).to eq(28)
         expect(host_inventory['facter']['pe_status_check'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -203,6 +203,12 @@ describe 'pe_status_check class' do
         result = run_shell('facter -p pe_status_check.S0022')
         expect(result.stdout).to match(%r{false})
         run_shell('mv /tmp/license.key /etc/puppetlabs/license.key')
+      end
+      it 'if S0024 conditions for false are met' do
+        run_shell('touch -d "30 minutes ago"  /opt/puppetlabs/server/data/puppetdb/stockpile/discard/test.file')
+        result = run_shell('facter -p pe_status_check.S0024')
+        expect(result.stdout).to match(%r{false})
+        run_shell('touch -d "2 days ago"  /opt/puppetlabs/server/data/puppetdb/stockpile/discard/test.file')
       end
       it 'if S0030 conditions for false are met' do
         run_shell('puppet config set use_cached_catalog true', expect_failures: false)
