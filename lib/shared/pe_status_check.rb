@@ -16,6 +16,11 @@ module PEStatusCheck
     Puppet::Indirector::Indirection.instance(:resource).find("#{resource}/#{name}")
   end
 
+  # checks puppetlabs.services.ca.certificate-authority-service/certificate-authority-service  exists in puppetserver bootstrap
+  def ca_bootstrap?
+    return true if File.exist?('/etc/puppetlabs/puppetserver/bootstrap.cfg') && File.foreach('/etc/puppetlabs/puppetserver/bootstrap.cfg').grep(%r{certificate-authority-service}).any?
+  end
+
   # Check if the service is running
   # @param name [String] The name of the service
   # @param service [Puppet::Resource] An optional service resource to use
@@ -113,16 +118,17 @@ module PEStatusCheck
     service_file_exist?('pe-puppetserver') &&
       service_file_exist?('pe-orchestration-services') &&
       service_file_exist?('pe-console-services') &&
-      service_file_exist?('pe-puppetdb')
+      service_file_exist?('pe-puppetdb') &&
+      ca_bootstrap?
   end
 
   # Check if replica node
   # @return [Boolean]
   def replica?
     service_file_exist?('pe-puppetserver') &&
-      !service_file_exist?('pe-orchestration-services') &&
       service_file_exist?('pe-console-services') &&
-      service_file_exist?('pe-puppetdb')
+      service_file_exist?('pe-puppetdb') &&
+      !ca_bootstrap?
   end
 
   # Check if Compiler node
