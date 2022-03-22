@@ -223,10 +223,8 @@ describe 'pe_status_check class' do
         run_shell('rm -rf /opt/puppetlabs/server/data/packages/public/2018.1.5')
       end
       it 'if S0039 conditions for false are met' do
-        # rubocop:disable Layout/LineLength
         run_shell('export logdir=$(puppet config print logdir) &&
-         cp $logdir/../puppetserver/puppetserver-access.log $logdir/../puppetserver/puppetserver-access.log.bk &&
-         echo "0.0.0.0 - - [04/Feb/2022:17:04:09 +0000] \"PUT /puppet/v3/report/foo.bar.com?environment=production HTTP/1.1\" 503 12 \"-\" \"Agent String\" 91 16051 85" >> $logdir/../puppetserver/puppetserver-access.log')
+         cp $logdir/../puppetserver/puppetserver-access.log $logdir/../puppetserver/puppetserver-access.log.bk && sed -i \'s/ 200 / 503 /\' /var/log/puppetlabs/puppetserver/puppetserver-access.log')
         # rubocop:enable Layout/LineLength
         result = run_shell('facter -p pe_status_check.S0039')
         expect(result.stdout).to match(%r{false})
