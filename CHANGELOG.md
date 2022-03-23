@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v1.2.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.2.0) (2022-03-23)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v1.1.0...v1.2.0)
+
+### Added
+
+- \(SUP-2903\) Check for new items in discard Directory [\#92](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/92) ([MartyEwings](https://github.com/MartyEwings))
+
+### Fixed
+
+- Check for non-nil match in S0039 [\#94](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/94) ([m0dular](https://github.com/m0dular))
+- \(SUP-3116\) Fix replica Detection in 2021.5 [\#93](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/93) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-3099\) Only Alert on 503 messages sent in last run interval [\#91](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/91) ([elainemccloskey](https://github.com/elainemccloskey))
+
 ## [v1.1.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.1.0) (2022-02-24)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v1.0.0...v1.1.0)
