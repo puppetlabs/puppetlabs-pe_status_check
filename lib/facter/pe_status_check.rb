@@ -201,7 +201,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0022) do
     # Is there a valid license present, which does not expire in 90 days
     # Also takes into account if the license type is Perpetual
-    next unless PEStatusCheck.primary?
+    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+
     license_file = '/etc/puppetlabs/license.key'
     if File.exist?(license_file)
       begin
