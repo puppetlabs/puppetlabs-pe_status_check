@@ -5,7 +5,21 @@ require 'openssl'
 
 # PEStatusCheck - Shared code for pe_status_check facts
 module PEStatusCheck
-  PUP_PATHS ||= { server_bin: '/opt/puppetlabs/server/bin' }.freeze
+  class << self
+    attr_accessor :infra_profiles, :PUP_PATHS
+  end
+
+  self.PUP_PATHS ||= { server_bin: '/opt/puppetlabs/server/bin' }.freeze
+
+  # List of profiles classes applied to PE nodes we can use to determine a node's role
+  self.infra_profiles = [
+    'master',
+    'database',
+    'puppetdb',
+    'certificate_authority',
+    'primary_master_replica',
+  ]
+
 
   module_function
 
@@ -114,59 +128,13 @@ module PEStatusCheck
     false
   end
 
-  # Check if Primary node
-  # @return [Boolean] true is primary node
-  def primary?
-    service_file_exist?('pe-puppetserver') &&
-      service_file_exist?('pe-orchestration-services') &&
-      service_file_exist?('pe-console-services') &&
-      service_file_exist?('pe-puppetdb') &&
-      ca_bootstrap?
-  end
-
-  # Check if replica node
-  # @return [Boolean]
-  def replica?
-    service_file_exist?('pe-puppetserver') &&
-      service_file_exist?('pe-console-services') &&
-      service_file_exist?('pe-puppetdb') &&
-      !ca_bootstrap?
-  end
-
-  # Check if Compiler node
-  # @return [Boolean]
-  def compiler?
-    service_file_exist?('pe-puppetserver') &&
-      !service_file_exist?('pe-orchestration-services') &&
-      !service_file_exist?('pe-console-services') &&
-      service_file_exist?('pe-puppetdb')
-  end
-
-  # Check if lagacy compiler node
-  # @return [Boolean] true
-  def legacy_compiler?
-    service_file_exist?('pe-puppetserver') &&
-      !service_file_exist?('pe-orchestration-services') &&
-      !service_file_exist?('pe-console-services') &&
-      !service_file_exist?('pe-puppetdb')
-  end
-
-  # Check if Pe postgres  node
-  # @return [Boolean]
-  def postgres?
-    !service_file_exist?('pe-puppetserver') &&
-      !service_file_exist?('pe-orchestration-services') &&
-      !service_file_exist?('pe-console-services') &&
-      !service_file_exist?('pe-puppetdb')
-  end
-
   # Get the maximum defined and current connections to Postgres
-  def self.psql_return_result(sql, psql_options = '')
+  def psql_return_result(sql, psql_options = '')
     command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
     Facter::Core::Execution.execute(command)
   end
 
-  def self.max_connections
+  def max_connections
     sql = %(
     SELECT current_setting('max_connections');
   )
@@ -174,13 +142,14 @@ module PEStatusCheck
     psql_return_result(sql, psql_options)
   end
 
-  def self.cur_connections
+  def cur_connections
     sql = %(
     select count(*) used from pg_stat_activity;
   )
     psql_options = '-qtAX'
     psql_return_result(sql, psql_options)
   end
+
 
   # Get the free disk percentage from a path
   # @param name [String] The path on the file system
