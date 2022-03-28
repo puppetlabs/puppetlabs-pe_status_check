@@ -157,8 +157,7 @@ module PEStatusCheck
     !service_file_exist?('pe-puppetserver') &&
       !service_file_exist?('pe-orchestration-services') &&
       !service_file_exist?('pe-console-services') &&
-      !service_file_exist?('pe-puppetdb') &&
-      service_file_exist?('pe-pgsql/pe-postgresql')
+      !service_file_exist?('pe-puppetdb')
   end
 
   # Get the maximum defined and current concurrent connections to Postgres
