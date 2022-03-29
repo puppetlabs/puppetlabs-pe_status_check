@@ -274,6 +274,21 @@ Facter.add(:pe_status_check, type: :aggregate) do
     { S0040: PEStatusCheck.service_running_enabled('puppet_system_processes-metrics.timer') }
   end
 
+  chunk(:S0041) do
+    next unless PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    # Is pcp broker connected to another broker
+    result = `netstat -tunp | grep ESTABLISHED | grep 8143 | grep java`
+
+    { S0041: !result.empty? }
+  end
+
+  chunk(:S0042) do
+    # Is pxp agent connected to a broker
+    result = `netstat -tunp | grep ESTABLISHED | grep 8142 | grep pxp-agent`
+
+    { S0042: !result.empty? }
+  end
+
   chunk(:S0034) do
     next unless PEStatusCheck.primary?
     # PE has not been upgraded / updated in 1 year
