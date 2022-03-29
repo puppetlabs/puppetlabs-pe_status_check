@@ -15,7 +15,7 @@ describe 'pe_status_check class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no pe_status_check fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['pe_status_check'].size).to eq(28)
+        expect(host_inventory['facter']['pe_status_check'].size).to eq(29)
         expect(host_inventory['facter']['pe_status_check'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -302,6 +302,14 @@ hierarchy:
         expect(result.stdout).to match(%r{false})
         apply_manifest(absent)
       end
+
+      it 'if S0038 conditions for false are met' do
+        run_shell('for i in $(seq 100); do mkdir /etc/puppetlabs/code/environments/pe_status_check_test_env$i; done')
+        result = run_shell('facter -p pe_status_check.S0038')
+        expect(result.stdout).to match(%r{false})
+        run_shell('rmdir /etc/puppetlabs/code/environments/pe_status_check_test_env*')
+      end
+
       it 'if S0040 conditions for false are met' do
         run_shell('systemctl stop puppet_system_processes-metrics.timer')
         result = run_shell('facter -p pe_status_check.S0040')
