@@ -14,4 +14,12 @@ Facter.add(:agent_status_check, type: :aggregate) do
 
     { AS001: result > 7_776_000 }
   end
+
+  chunk(:AS002) do
+    # Has the PXP agent establish a connection with a remote Broker
+    #
+    result = `netstat -tunp | grep ESTABLISHED | grep 8142 | grep pxp-agent`
+
+    { AS002: !result.empty? }
+  end
 end
