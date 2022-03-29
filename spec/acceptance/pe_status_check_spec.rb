@@ -200,9 +200,12 @@ describe 'pe_status_check class' do
       end
       it 'if S0022 conditions for false are met' do
         run_shell('mv /etc/puppetlabs/license.key /tmp/license.key')
+        run_shell('echo -e "#######################\n#  Begin License File #\n#######################\n \n# PUPPET ENTERPRISE LICENSE - test
+          \nuuid: test\n \nto: test\n \nnodes: 100\n \nlicense_type: Subscription\n \nsupport_type: PE Premium\n \nstart: 2022-01-01\n \nend: 2022-03-29
+          \n#####################\n#  End License File #\n#####################" > /etc/puppetlabs/license.key')
         result = run_shell('facter -p pe_status_check.S0022')
         expect(result.stdout).to match(%r{false})
-        run_shell('mv /tmp/license.key /etc/puppetlabs/license.key')
+        run_shell('mv -f /tmp/license.key /etc/puppetlabs/license.key')
       end
       it 'if S0024 conditions for false are met' do
         run_shell('touch -d "30 minutes ago"  /opt/puppetlabs/server/data/puppetdb/stockpile/discard/test.file')
