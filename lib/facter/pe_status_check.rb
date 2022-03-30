@@ -226,9 +226,9 @@ Facter.add(:pe_status_check, type: :aggregate) do
     maximum = PEStatusCheck.max_connections.to_i
     current = PEStatusCheck.cur_connections.to_i
     percent_used = (current / maximum.to_f) * 100
-    { S0029: percent_used >= 90 }
+    { S0029: percent_used <= 90 }
   rescue ZeroDivisionError
-    Facter.debug('pe_status_check.S0029 failed to get max_connections')
+    Facter.warn('pe_status_check.S0029 failed to get max_connections')
     { S0029: false }
   end
 
