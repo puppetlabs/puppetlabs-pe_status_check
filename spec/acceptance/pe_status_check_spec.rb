@@ -302,6 +302,14 @@ hierarchy:
         expect(result.stdout).to match(%r{false})
         apply_manifest(absent)
       end
+
+      it 'if S0038 conditions for false are met' do
+        run_shell('for i in $(seq 100); do mkdir /etc/puppetlabs/code/environments/pe_status_check_test_env$i; done')
+        result = run_shell('facter -p pe_status_check.S0038')
+        expect(result.stdout).to match(%r{false})
+        run_shell('rmdir /etc/puppetlabs/code/environments/pe_status_check_test_env*')
+      end
+
       it 'if S0040 conditions for false are met' do
         run_shell('systemctl stop puppet_system_processes-metrics.timer')
         result = run_shell('facter -p pe_status_check.S0040')

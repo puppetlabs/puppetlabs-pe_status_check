@@ -320,4 +320,15 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
     { S0039: !has_503 }
   end
+
+  chunk(:S0038) do
+    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
+    response = PEStatusCheck.http_get('/puppet/v3/environments', 8140)
+    if response
+      envs_count = response.dig('environments').length
+      { S0038: (envs_count < 100) }
+    else
+      { S0038: false }
+    end
+  end
 end
