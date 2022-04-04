@@ -19,11 +19,13 @@ Facter.add(:agent_status_check, type: :aggregate) do
     #
     next unless Facter.value(:os)['family'] == 'windows' || Facter.value(:os)['family'] == 'Debian' || Facter.value(:os)['family'] == 'RedHat'
     result = if Facter.value(:os)['family'] == 'windows'
-               `netstat -n | findstr /c:"8142"  | findstr /c:"TCP"  | findstr /c:"ESTABLISHED"`
+               Facter::Core::Execution.execute('netstat -n | findstr /c:"8142"  | findstr /c:"TCP"  | findstr /c:"ESTABLISHED"')
              else
-               `ss -tunp | grep ESTAB | grep 8142 | grep pxp-agent`
+               Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8142 | grep pxp-agent')
              end
-
     { AS002: !result.empty? }
+  rescue Facter::Core::Execution::ExecutionFailure
+    Facter.warn('pe_status_check.AS002 failed to get socket status')
+    { AS002: false }
   end
 end
