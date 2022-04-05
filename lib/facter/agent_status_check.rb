@@ -14,4 +14,18 @@ Facter.add(:agent_status_check, type: :aggregate) do
 
     { AS001: result > 7_776_000 }
   end
+  chunk(:AS002) do
+    # Has the PXP agent establish a connection with a remote Broker
+    #
+    next unless Facter.value(:os)['family'] == 'windows' || Facter.value(:os)['family'] == 'Debian' || Facter.value(:os)['family'] == 'RedHat'
+    result = if Facter.value(:os)['family'] == 'windows'
+               Facter::Core::Execution.execute('netstat -n | findstr /c:"8142"  | findstr /c:"TCP"  | findstr /c:"ESTABLISHED"')
+             else
+               Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8142 | grep pxp-agent')
+             end
+    { AS002: !result.empty? }
+  rescue Facter::Core::Execution::ExecutionFailure
+    Facter.warn('pe_status_check.AS002 failed to get socket status')
+    { AS002: false }
+  end
 end
