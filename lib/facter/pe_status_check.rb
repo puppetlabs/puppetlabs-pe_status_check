@@ -287,6 +287,28 @@ Facter.add(:pe_status_check, type: :aggregate) do
     { S0040: PEStatusCheck.service_running_enabled('puppet_system_processes-metrics.timer') }
   end
 
+  chunk(:S0041) do
+    next unless PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    # Is pcp broker connected to another broker
+    result = Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8143 | grep java').strip
+    { S0041: !result.empty? }
+  rescue Facter::Core::Execution::ExecutionFailure => e
+    Facter.warn('pe_status_check.S0041 failed to get socket status from SS')
+    Facter.debug(e)
+    { S0041: false }
+  end
+
+  chunk(:S0042) do
+    # Has the PXP agent establish a connection with a remote Broker
+    #
+    result = Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8142 | grep pxp-agent')
+    { S0042: !result.empty? }
+  rescue Facter::Core::Execution::ExecutionFailure => e
+    Facter.warn('pe_status_check.S0042 failed to get socket status from SS')
+    Facter.debug(e)
+    { S0042: false }
+  end
+
   chunk(:S0034) do
     next unless PEStatusCheck.primary?
     # PE has not been upgraded / updated in 1 year
