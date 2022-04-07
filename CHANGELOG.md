@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v1.3.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.3.0) (2022-04-07)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v1.2.0...v1.3.0)
+
+### Added
+
+- \(SUP-3150\) Broker TCP Checks for infra components [\#109](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/109) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-3121\) Agent connection to pxp broker [\#106](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/106) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-2917\) Add indicator S0038 to check number of environments that are present in $codedir/environments [\#105](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/105) ([taikaa](https://github.com/taikaa))
+- \(SUP-2908\) check current connections to Postgres less than 90% defined maximum [\#104](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/104) ([sandrajiang](https://github.com/sandrajiang))
+
+### Fixed
+
+- \(SUP-3180\) Rescue a loaderror when checking filesystem [\#111](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/111) ([jarretlavallee](https://github.com/jarretlavallee))
+- \(SUP-3101\) Add exception handling and Facter warnings for license\_type and end date that do not exist or are invalid. Fact no longer resolves to true as a catchall. Change license\_type and end\_date variable assignments to first item of array rather than converting entire array to a string. Update spec test. [\#103](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/103) ([taikaa](https://github.com/taikaa))
+- \(SUP-3122\) Fix PSQL node detection in 2021.5 [\#98](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/98) ([MartyEwings](https://github.com/MartyEwings))
+
 ## [v1.2.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.2.0) (2022-03-23)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v1.1.0...v1.2.0)
