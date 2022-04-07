@@ -190,5 +190,9 @@ module PEStatusCheck
 
     stat = Sys::Filesystem.stat(path)
     (stat.blocks_available.to_f / stat.blocks.to_f * 100).to_i
+  rescue LoadError => e
+    Facter.warn("Error in fact 'pe_status_check': #{e.message}")
+    Facter.debug(e.backtrace)
+    0
   end
 end
