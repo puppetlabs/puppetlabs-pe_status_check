@@ -24,8 +24,9 @@ Facter.add(:agent_status_check, type: :aggregate) do
                Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8142 | grep pxp-agent')
              end
     { AS002: !result.empty? }
-  rescue Facter::Core::Execution::ExecutionFailure
-    Facter.warn('pe_status_check.AS002 failed to get socket status')
+  rescue Facter::Core::Execution::ExecutionFailure => e
+    Facter.warn('agent_status_check.A0002 failed to get socket status')
+    Facter.debug(e)
     { AS002: false }
   end
 end
