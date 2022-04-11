@@ -7,7 +7,9 @@
     - [Setup requirements](#setup-requirements)
     - [Beginning with pe_status_check](#beginning-with-pe_status_check)
   - [Usage](#usage)
+  - [Reporting options](#reporting-options)
     - [Class declaration (optional)](#class-declaration-optional)
+    - [Ad-hoc Report (Plan)](#ad-hoc-report-plan)
   - [Reference](#reference)
   - [Fact: pe_status_check](#fact-pe_status_check)
   - [Fact: agent_status_check](#fact-agent_status_check)
@@ -39,6 +41,10 @@ The facts in this module can be directly consumed by monitoring tools such as Sp
 
 Alternatively, assigning the `class pe_status_check` to the infrastructure notifies on each Puppet run if any indicator is reporting as `false`.
 
+
+## Reporting Options
+
+
 ### Class declaration (optional)
 
 To activate the notification functions of this module, classify your Puppet Infrastructure  with the `pe_status_check` class using [your preferred classification method](https://puppet.com/docs/pe/latest/grouping_and_classifying_nodes.html#enable_console_configuration_data). Below is an example using `site.pp`.
@@ -58,6 +64,41 @@ class { 'pe_status_check':
   indicator_exclusions             => ['S0001','S0003','S0003','S0004'],
 }
 ```
+
+### Ad-hoc Report (Plan)
+
+The plan pe_status_check::infra_summary, summarises the status of each of the checks on target nodes that have the pe_status_check fact, sample output can be seen below:
+
+
+```
+    {
+        "pe-server-c960c9-0.us-west1-a.c.customer-support-scratchpad.internal": {
+            "Failed Test Count": 2,
+            "Failed Test Details": [
+                "S0022 Determines if there is a valid Puppet Enterprise license in place at /etc/puppetlabs/license.key on your primary which is not going to expire in the next 90 days",
+                "S0001 Determines if Puppet agent Service is running"
+            ],
+            "Passing Tests Count": 29
+        }
+    }
+```
+#### Setup Requirements
+
+pe_status_check::infra_summary utlizes hiera to lookup test definitions, this requires placing a static hierarchy in your environment level hiera.yaml
+
+```
+plan_hierarchy:
+  - name: "Static data"
+    data_hash: yaml_data
+    path: "static.yaml"
+```
+
+Example call:
+```
+ puppet plan run pe_status_check::infra_summary targets=pe-compiler-c960c9-0.us-west1-a.c.customer-support-scratchpad.internal,pe-psql-c960c9-0.us-west1-a.c.customer-support-scratchpad.internal
+```
+
+See the following [documentation](https://puppet.com/docs/bolt/latest/hiera.html#outside-apply-blocks) for further explanation.
 
 ## Reference
 

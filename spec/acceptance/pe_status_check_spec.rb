@@ -31,7 +31,7 @@ describe 'pe_status_check class' do
         run_shell('puppet resource service puppet ensure=stopped')
         result = run_shell('facter -p pe_status_check.S0001')
         output = apply_manifest(pp).stdout
-        expect(output).to match('S0001 is at fault. The indicator Determines if Puppet agent Service is running, refer to documentation for required action')
+        expect(output).to match('S0001 is at fault. The indicator S0001 Determines if Puppet agent Service is running, refer to documentation for required action')
         expect(result.stdout).to match(%r{false})
       end
       it 'if in the exclude list a parameter should not notify' do
