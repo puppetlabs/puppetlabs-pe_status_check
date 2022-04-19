@@ -21,9 +21,23 @@ RSpec.configure do |c|
     # Download the plugins to ensure up-to-date facts
     PuppetLitmus::PuppetHelpers.run_shell('/opt/puppetlabs/bin/puppet plugin download')
     # Put a test PE license in place, set its ownership and permissions
-    PuppetLitmus::PuppetHelpers.run_shell('echo -e "#######################\n#  Begin License File #\n#######################\n \n# PUPPET ENTERPRISE LICENSE - test
-            \nuuid: test\n \nto: test\n \nnodes: 100\n \nlicense_type: Subscription\n \nsupport_type: PE Premium\n \nstart: 2022-01-01\n \nend: 2025-12-31
-            \n#####################\n#  End License File #\n#####################" >> /etc/puppetlabs/license.key')
+    mylicensefile = <<~EOF
+      #######################
+      #  Begin License File #
+      #######################
+      # PUPPET ENTERPRISE LICENSE - Puppet Labs
+      to: test
+      nodes: 100
+      license_type: Subscription
+      support_type: PE Premium
+      start: 2014-02-10
+      end: 2028-06-13
+      #####################
+      #  End License File #
+      #####################
+      EOF
+
+    PuppetLitmus::PuppetHelpers.write_file(mylicensefile, '/etc/puppetlabs/license.key')
     PuppetLitmus::PuppetHelpers.run_shell('sudo chown root:root /etc/puppetlabs/license.key')
     PuppetLitmus::PuppetHelpers.run_shell('sudo chmod 644 /etc/puppetlabs/license.key')
     # restarting puppet server to clear jruby stats for S0019
