@@ -340,6 +340,14 @@ Facter.add(:pe_status_check, type: :aggregate) do
     # last upgrade was sooner than 1 year ago
     { S0034: last_upgrade_time >= (Time.now - 31_536_000).utc }
   end
+
+  chunk(:S0035) do
+    # restrict to primary/replica/compiler
+    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    # return false if any Warnings appear in the 'puppet module list...'
+    { S0035: !`/opt/puppetlabs/bin/puppet module list --tree 2>&1`.encode('ASCII', 'UTF-8', undef: :replace).match?(%r{Warning:\s+}) }
+  end
+
   chunk(:S0039) do
     # PuppetServer
     next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper_acceptance'
+require 'fileutils'
 
 # Tests pe_status_check class for default behaviours, no notification on all facts passing
 # Ensures default PE deployment passes all test cases
@@ -15,7 +16,7 @@ describe 'pe_status_check class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no pe_status_check fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['pe_status_check'].size).to eq(31)
+        expect(host_inventory['facter']['pe_status_check'].size).to eq(32)
         expect(host_inventory['facter']['pe_status_check'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -296,6 +297,12 @@ hierarchy:
         result = run_shell('facter -p pe_status_check.S0034')
         expect(result.stdout).to match(%r{false})
         run_shell('touch -d "1 day ago"  /opt/puppetlabs/server/pe_build')
+      end
+      it 'S0035 conditions for false are met' do
+        run_shell('puppet module install puppetlabs-ntp --version 9.1.0; puppet module install puppetlabs-stdlib --version 0.1.5 --force')
+        result = run_shell('facter -p pe_status_check.S0035')
+        expect(result.stdout).to match(%r{false})
+        run_shell('puppet module uninstall puppetlabs-ntp --version 9.1.0 --force; puppet module uninstall puppetlabs-stdlib --version 0.1.5 --force')
       end
       it 'if S0036 conditions for false are met' do
         present = <<-PUPPETCODE
