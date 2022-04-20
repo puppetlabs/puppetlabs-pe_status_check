@@ -34,10 +34,14 @@ spec/spec_helper.rb:
   coverage_report: true
 Rakefile:
   changelog_user: "puppetlabs"
+  extra_disabled_lint_checks:
+    - unquoted_string_in_case
+    - strict_indent
+    - manifest_whitespace_opening_brace_befor
 spec/default_facts.yml:
   extra_facts:
     pe_build: '2021.4.0'
-    
+
 Gemfile:
   optional:
     ":development":

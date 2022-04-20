@@ -7,7 +7,7 @@
     - [Setup requirements](#setup-requirements)
     - [Beginning with pe_status_check](#beginning-with-pe_status_check)
   - [Usage](#usage)
-  - [Reporting options](#reporting-options)
+  - [Reporting Options](#reporting-options)
     - [Class declaration (optional)](#class-declaration-optional)
     - [Ad-hoc Report (Plan)](#ad-hoc-report-plan)
   - [Reference](#reference)
@@ -41,9 +41,7 @@ The facts in this module can be directly consumed by monitoring tools such as Sp
 
 Alternatively, assigning the `class pe_status_check` to the infrastructure notifies on each Puppet run if any indicator is reporting as `false`.
 
-
 ## Reporting Options
-
 
 ### Class declaration (optional)
 
@@ -67,46 +65,92 @@ class { 'pe_status_check':
 
 ### Ad-hoc Report (Plan)
 
-The plan pe_status_check::infra_summary, summarises the status of each of the checks on target nodes that have the pe_status_check fact, sample output can be seen below:
+The plan, `pe_status_check::infra_summary`, summarizes the status of each of the checks on target nodes that have the `pe_status_check` fact, sample output can be seen below:
 
+```json
+{
+    "nodes": {
+        "details": {
+            "pe-psql-70aefa-0.region-a.domain.com": {
+                "failed_tests_count": 0,
+                "passing_tests_count": 13,
+                "failed_tests_details": []
+            },
+            "pe-server-70aefa-0.region-a.domain.com": {
+                "failed_tests_count": 1,
+                "passing_tests_count": 30,
+                "failed_tests_details": [
+                    "S0022 Determines if there is a valid Puppet Enterprise license in place at /etc/puppetlabs/license.key on your primary which is not going to expire in the next 90 days"
+                ]
+            },
+            "pe-compiler-70aefa-0.region-a.domain.com": {
+                "failed_tests_count": 0,
+                "passing_tests_count": 23,
+                "failed_tests_details": []
+            },
+            "pe-compiler-70aefa-1.region-b.domain.com": {
+                "failed_tests_count": 0,
+                "passing_tests_count": 23,
+                "failed_tests_details": []
+            }
+        },
+        "failing": [
+            "pe-server-70aefa-0.region-a.domain.com"
+        ],
+        "passing": [
+            "pe-compiler-70aefa-1.region-b.domain.com",
+            "pe-compiler-70aefa-0.region-a.domain.com",
+            "pe-psql-70aefa-0.region-a.domain.com"
+        ]
+    },
+    "errors": {},
+    "status": "failing",
+    "failing_node_count": 1,
+    "passing_node_count": 3
+}
+```
 
-```
-    {
-        "pe-server-c960c9-0.us-west1-a.c.customer-support-scratchpad.internal": {
-            "Failed Test Count": 2,
-            "Failed Test Details": [
-                "S0022 Determines if there is a valid Puppet Enterprise license in place at /etc/puppetlabs/license.key on your primary which is not going to expire in the next 90 days",
-                "S0001 Determines if Puppet agent Service is running"
-            ],
-            "Passing Tests Count": 29
-        }
-    }
-```
 #### Setup Requirements
 
-pe_status_check::infra_summary utlizes hiera to lookup test definitions, this requires placing a static hierarchy in your environment level hiera.yaml
+`pe_status_check::infra_summary` utilizes [hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html) to lookup test definitions, this requires placing a static hierarchy in your **environment level** [hiera.yaml](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html).
 
-```
+```yaml
 plan_hierarchy:
   - name: "Static data"
-    data_hash: yaml_data
     path: "static.yaml"
-```
-
-Example call:
-```
- puppet plan run pe_status_check::infra_summary targets=pe-compiler-c960c9-0.us-west1-a.c.customer-support-scratchpad.internal,pe-psql-c960c9-0.us-west1-a.c.customer-support-scratchpad.internal
+    data_hash: yaml_data
 ```
 
 See the following [documentation](https://puppet.com/docs/bolt/latest/hiera.html#outside-apply-blocks) for further explanation.
+
+#### Running the plan
+
+The `pe_status_check::infra_summary` plan can be run from the [PE console](https://puppet.com/docs/pe/latest/running_plans_from_the_console_.html) or from [the command line](https://puppet.com/docs/pe/latest/running_plans_from_the_command_line.html). Below are some examples of running the plan from the command line. More information on the parameters in the plan can be seen in the [REFERENCE.md](REFERENCE.md).
+
+Example call from the command line to run against all infrastructure nodes:
+
+```shell
+puppet plan run pe_status_check::infra_summary
+```
+
+Example call from the command line to run against a set of infrastructure nodes:
+
+```shell
+puppet plan run pe_status_check::infra_summary targets=pe-server-70aefa-0.region-a.domain.com,pe-psql-70aefa-0.region-a.domain.com
+```
+
+Example call from the command line to exclude indicators :
+
+```shell
+puppet plan run pe_status_check::infra_summary -p '{"indicator_exclusions": ["S0001","S0021"]}'
+```
+
 
 ## Reference
 
 Refer to this section for next steps when any indicator reports a `false`.
 
-
 ## Fact: pe_status_check
-
 
 | Indicator ID | Description                                                                        | Self-service steps                                                                                                                                                                                                                                                                                                                                                                                                                                                          | What to include in a Support ticket                                                                                                                                                                                                   |
 |--------------|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -142,7 +186,6 @@ Refer to this section for next steps when any indicator reports a `false`.
 | S0040        | Determines if PE is collecting system metrics.                    | If system metrics are not collected by default, the sysstat package is not installed on the impacted PE infrastructure component. Install the package and set the parameter `puppet_enterprise::enable_system_metrics_collection` to true. [See the documentation.](https://puppet.com/docs/pe/latest/getting_support_for_pe.html#puppet_metrics_collector)                                                                   | After system metrics are configured, you do not see any files in `/var/log/sa` or if the `/var/log/sa` directory does not exist, open a Support ticket.                                                 |
 | S0041        | Determines if the pxp broker on a compiler  has an established connection to another pxp broker  | To resolve a connection issue from a compiler to a pcp broker examine the following log `/var/log/puppetlabs/puppetserver/pcp-broker.log` for an explanation, Compilers should be attempting to make a connection to port 8143 on the primary server, ssl can not be terminated on a network appliance and must passthrough directly to the primary server. Ensure the connnection attempt is not to another compiler in the pool            | If unable to make a connection to a broker, raise a ticket with the support team quoting S0041 and attaching the file `/var/log/puppetlabs/puppetserver/pcp-broker.log` along with the conclusions of your investigation so far            |
 | S0042        |Determines if the pxp-agent has an established connection to a pxp broker                   | Ensure the pxp-agent service is running. Check S0002 can make that determination. if running check `/var/log/puppetlabs/pxp-agent/pxp-agent.log` for connection issues, first ensuring the agent is connecting to the proper endpoint, for example, a compiler and not the primary. This fact can also be used as a target filter for running tasks, ensuring time is not wasted sending instructions to agents not connected to a broker                   | If unable to make a connection to a broker, raise a ticket with the support team quoting S0042 and attaching the file `/var/log/puppetlabs/pxp-agent/pxp-agent.log` along with the conclusions of your investigation so far             |
-
 
 ## Fact: agent_status_check
 
