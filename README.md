@@ -65,7 +65,7 @@ class { 'pe_status_check':
 
 ### Ad-hoc Report (Plan)
 
-The plan, `pe_status_check::infra_summary`, summarizes the status of each of the checks on target nodes that have the pe_status_check fact, sample output can be seen below:
+The plan, `pe_status_check::infra_summary`, summarizes the status of each of the checks on target nodes that have the `pe_status_check` fact, sample output can be seen below:
 
 ```json
 {
@@ -112,7 +112,7 @@ The plan, `pe_status_check::infra_summary`, summarizes the status of each of the
 
 #### Setup Requirements
 
-`pe_status_check::infra_summary` utilizes [hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html) to lookup test definitions, this requires placing a static hierarchy in your **environment level** [hiera.yaml](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html). Refer to the [bolt with hiera documentation](https://puppet.com/docs/bolt/latest/hiera.html) for more information.
+`pe_status_check::infra_summary` utilizes [hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html) to lookup test definitions, this requires placing a static hierarchy in your **environment level** [hiera.yaml](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html).
 
 ```yaml
 plan_hierarchy:
@@ -121,13 +121,30 @@ plan_hierarchy:
     data_hash: yaml_data
 ```
 
-Example call from the command line:
+See the following [documentation](https://puppet.com/docs/bolt/latest/hiera.html#outside-apply-blocks) for further explanation.
+
+#### Running the plan
+
+The `pe_status_check::infra_summary` plan can be run from the [PE console](https://puppet.com/docs/pe/latest/running_plans_from_the_console_.html) or from [the command line](https://puppet.com/docs/pe/latest/running_plans_from_the_command_line.html). Below are some examples of running the plan from the command line. More information on the parameters in the plan can be seen in the [REFERENCE.md](REFERENCE.md).
+
+Example call from the command line to run against all infrastructure nodes:
 
 ```shell
- puppet plan run pe_status_check::infra_summary targets=pe-compiler-c960c9-0.region-a.domain.com,pe-psql-c960c9-0.region-a.domain.com
+puppet plan run pe_status_check::infra_summary
 ```
 
-See the following [documentation](https://puppet.com/docs/bolt/latest/hiera.html#outside-apply-blocks) for further explanation.
+Example call from the command line to run against a set of infrastructure nodes:
+
+```shell
+puppet plan run pe_status_check::infra_summary targets=pe-server-70aefa-0.region-a.domain.com,pe-psql-70aefa-0.region-a.domain.com
+```
+
+Example call from the command line to exclude indicators :
+
+```shell
+puppet plan run pe_status_check::infra_summary -p '{"indicator_exclusions": ["S0001","S0021"]}'
+```
+
 
 ## Reference
 

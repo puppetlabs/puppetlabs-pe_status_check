@@ -3,12 +3,27 @@
 #   and produces a summary report in JSON
 # @param targets
 #   A comma seprated list of FQDN's of Puppet infrastructure agent nodes
+#   Defaults to using a PuppetDB query to identify nodes
 # @param indicator_exclusions
-#  List of disabled indicators, place any indicator ids you do not wish to report on in this list
+#   List of disabled indicators, place any indicator ids you do not wish to report on in this list
 plan pe_status_check::infra_summary(
-  TargetSpec $targets,
   Array[String[1]] $indicator_exclusions = [],
+  Optional[TargetSpec] $targets          = undef,
 ) {
+  # Query PuppetDB if $targets is not unspecified
+  $_targets = if $targets =~ Undef {
+    $certnames_or_error = catch_errors() || {
+      # NOTE: We use `pe_build` to identify all infra nodes that could have `pe_status_check`
+      #       This could be changed to `facts.pe_status_check` instead, but could miss some potential failure states
+      puppetdb_query('inventory[certname]{ facts.pe_build is not null }').map |$r| { $r['certname'] }
+    }
+    if $certnames_or_error =~ Error {
+      fail_plan("PuppetDB query failed: ${certnames_or_error}")
+    }
+    get_targets($certnames_or_error)
+  } else {
+    get_targets($targets)
+  }
   # Validate that hiera lookups are functional
   $hiera_result_or_error = catch_errors() || {
     lookup('pe_status_check::S0001', String)
@@ -19,7 +34,7 @@ plan pe_status_check::infra_summary(
 
   # Get the facts from the Targets to use for processing
   $results = without_default_logging() || {
-    run_task('facts', $targets, '_catch_errors' => true)
+    run_task('facts', $_targets, '_catch_errors' => true)
   }
 
   # Report on failures while collecting facts
