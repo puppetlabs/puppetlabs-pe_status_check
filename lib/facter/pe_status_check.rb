@@ -121,6 +121,16 @@ Facter.add(:pe_status_check, type: :aggregate) do
     { S0014: res.nil? }
   end
 
+  chunk(:S0015) do
+    # Is the hostcert expiring within 90 days
+    #
+    raw_hostcert = File.read(Puppet.settings['hostcert'])
+    certificate = OpenSSL::X509::Certificate.new raw_hostcert
+    result = certificate.not_after - Time.now
+
+    { S0015: result > 7_776_000 }
+  end
+
   chunk(:S0016) do
     # Puppetserver
     next unless PEStatusCheck.primary? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.replica?
