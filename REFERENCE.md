@@ -10,6 +10,9 @@
 
 ### Plans
 
+* [`pe_status_check::agent_summary`](#pe_status_checkagent_summary): Summary report if the state of agent_status_check on each node
+Uses the facts task to get the current status from each node
+and produces a summary report in JSON
 * [`pe_status_check::infra_summary`](#pe_status_checkinfra_summary): Summary report if the state of pe_status check on each node
 Uses the facts task to get the current status from each node
 and produces a summary report in JSON
@@ -44,6 +47,36 @@ List of disabled indicators, place any indicator ids you do not wish to report o
 Default value: `[]`
 
 ## Plans
+
+### <a name="pe_status_checkagent_summary"></a>`pe_status_check::agent_summary`
+
+Summary report if the state of agent_status_check on each node
+Uses the facts task to get the current status from each node
+and produces a summary report in JSON
+
+#### Parameters
+
+The following parameters are available in the `pe_status_check::agent_summary` plan:
+
+* [`targets`](#targets)
+* [`indicator_exclusions`](#indicator_exclusions)
+
+##### <a name="targets"></a>`targets`
+
+Data type: `Optional[TargetSpec]`
+
+A comma seprated list of FQDN's of Puppet agent nodes
+Defaults to using a PuppetDB query to identify nodes
+
+Default value: ``undef``
+
+##### <a name="indicator_exclusions"></a>`indicator_exclusions`
+
+Data type: `Array[String[1]]`
+
+List of disabled indicators, place any indicator ids you do not wish to report on in this list
+
+Default value: `[]`
 
 ### <a name="pe_status_checkinfra_summary"></a>`pe_status_check::infra_summary`
 

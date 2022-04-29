@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v1.4.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.4.0) (2022-04-29)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v1.3.0...v1.4.0)
+
+### Added
+
+- \(SUP-3230\) Check for the expiry date of the host cert on infrastructure [\#123](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/123) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-3229\) Summary Plan for agents [\#122](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/122) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-3005\) Update plan output format [\#117](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/117) ([jarretlavallee](https://github.com/jarretlavallee))
+- Add Suse support to AS002 [\#115](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/115) ([seanmil](https://github.com/seanmil))
+- \(SUP-3005\) Add Plan for Reporting on Infrastructure [\#114](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/114) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-2914\) Verify that 'puppet module list' output is without Warnings  [\#43](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/43) ([gavindidrichsen](https://github.com/gavindidrichsen))
+
 ## [v1.3.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.3.0) (2022-04-07)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v1.2.0...v1.3.0)
