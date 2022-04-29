@@ -9,9 +9,9 @@
   - [Usage](#usage)
   - [Reporting Options](#reporting-options)
     - [Class declaration (optional)](#class-declaration-optional)
-    - [Ad-hoc Report (Plan)](#ad-hoc-report-plan)
+    - [Ad-hoc Report (Plans)](#ad-hoc-report-plans)
       - [Setup Requirements](#setup-requirements-1)
-      - [Running the plan](#running-the-plan)
+      - [Running the plans](#running-the-plans)
   - [Reference](#reference)
   - [Fact: pe_status_check](#fact-pe_status_check)
   - [Fact: agent_status_check](#fact-agent_status_check)
@@ -65,9 +65,9 @@ class { 'pe_status_check':
 }
 ```
 
-### Ad-hoc Report (Plan)
+### Ad-hoc Report (Plans)
 
-The plan, `pe_status_check::infra_summary`, summarizes the status of each of the checks on target nodes that have the `pe_status_check` fact, sample output can be seen below:
+The plans, `pe_status_check::infra_summary` and `pe_status_check::agent_summary` summarize the status of each of the checks on target nodes that have the `pe_status_check` or `agent_status_check` fact respectivly, sample output can be seen below:
 
 ```json
 {
@@ -114,7 +114,7 @@ The plan, `pe_status_check::infra_summary`, summarizes the status of each of the
 
 #### Setup Requirements
 
-`pe_status_check::infra_summary` utilizes [hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html) to lookup test definitions, this requires placing a static hierarchy in your **environment level** [hiera.yaml](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html).
+`pe_status_check::infra_summary` and `pe_status_check::agent_summary` utilize [hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html) to lookup test definitions, this requires placing a static hierarchy in your **environment level** [hiera.yaml](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html).
 
 ```yaml
 plan_hierarchy:
@@ -125,14 +125,19 @@ plan_hierarchy:
 
 See the following [documentation](https://puppet.com/docs/bolt/latest/hiera.html#outside-apply-blocks) for further explanation.
 
-#### Running the plan
+#### Running the plans
 
-The `pe_status_check::infra_summary` plan can be run from the [PE console](https://puppet.com/docs/pe/latest/running_plans_from_the_console_.html) or from [the command line](https://puppet.com/docs/pe/latest/running_plans_from_the_command_line.html). Below are some examples of running the plan from the command line. More information on the parameters in the plan can be seen in the [REFERENCE.md](REFERENCE.md).
+The `pe_status_check::infra_summary` and `pe_status_check::agent_summary` plans can be run from the [PE console](https://puppet.com/docs/pe/latest/running_plans_from_the_console_.html) or from [the command line](https://puppet.com/docs/pe/latest/running_plans_from_the_command_line.html). Below are some examples of running the plans from the command line. More information on the parameters in the plan can be seen in the [REFERENCE.md](REFERENCE.md).
 
-Example call from the command line to run against all infrastructure nodes:
+Example call from the command line to run `pe_status_check::infra_summary` against all infrastructure nodes:
 
 ```shell
 puppet plan run pe_status_check::infra_summary
+```
+Example call from the command line to run `pe_status_check::agent_summary` against all regular agent nodes:
+
+```shell
+puppet plan run pe_status_check::agent_summary
 ```
 
 Example call from the command line to run against a set of infrastructure nodes:
@@ -141,12 +146,16 @@ Example call from the command line to run against a set of infrastructure nodes:
 puppet plan run pe_status_check::infra_summary targets=pe-server-70aefa-0.region-a.domain.com,pe-psql-70aefa-0.region-a.domain.com
 ```
 
-Example call from the command line to exclude indicators :
+Example call from the command line to exclude indicators for `pe_status_check::infra_summary`:
 
 ```shell
 puppet plan run pe_status_check::infra_summary -p '{"indicator_exclusions": ["S0001","S0021"]}'
 ```
+Example call from the command line to exclude indicators for `pe_status_check::agent_summary`:
 
+```shell
+puppet plan run pe_status_check::agent_summary -p '{"indicator_exclusions": ["AS001","AS002"]}'
+```
 
 ## Reference
 
