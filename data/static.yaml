@@ -14,7 +14,7 @@ pe_status_check::S0011: "S0011 Determines if Pe-postgres Service is Running and 
 pe_status_check::S0012: "S0012 Determines if Puppet produced a report within the last run interval"
 pe_status_check::S0013: "S0013 Determines if a catalog successfully applied on Puppet Agent Last run"
 pe_status_check::S0014: "S0014 Determines if anything in the command queue is older than a Puppet Run Interval"
-pe_status_check::S0015: "S0015 Determines "
+pe_status_check::S0015: "S0015 Determines if the infrastructure agent host certificate is expiring within 90 days"
 pe_status_check::S0016: "S0016 Determines if there are any OutOfMemory errors in the Puppetserver JVM"
 pe_status_check::S0017: "S0017 Determines if there are any OutOfMemory errors in the Puppetdb JVM"
 pe_status_check::S0018: "S0018 Determines if there are any OutOfMemory errors in the Orchestrator JVM"
