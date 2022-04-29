@@ -24,9 +24,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0004) do
-    # Is PE and has clienttools covers pe-psql and compilers
-    # Check for service status that is not green, potentially need a better way of doing this, or perhaps calling the api directly for each service
-
+    # Are All Services running
     next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
 
     response = PEStatusCheck.http_get('/status/v1/services', 8140)
@@ -43,6 +41,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0005) do
+    # Is the CA expiring in the next 90 days
     next unless File.exist?('/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem') || File.exist?('/etc/puppetlabs/puppetserver/ca/ca_crt.pem')
     raw_ca_cert = if File.exist? '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
                     File.read '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
@@ -123,7 +122,6 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0015) do
     # Is the hostcert expiring within 90 days
-    #
     raw_hostcert = File.read(Puppet.settings['hostcert'])
     certificate = OpenSSL::X509::Certificate.new raw_hostcert
     result = certificate.not_after - Time.now
@@ -298,6 +296,28 @@ Facter.add(:pe_status_check, type: :aggregate) do
     { S0033: hiera_config_file.dig('version') == 5 }
   end
 
+  chunk(:S0034) do
+    next unless PEStatusCheck.primary?
+    # PE has not been upgraded / updated in 1 year
+    # It was decided not to include infra components as this was deemed unecessary as they should align with the primary.
+
+    # gets the file for the most recent upgrade output
+    last_upgrade_file = '/opt/puppetlabs/server/pe_build'
+    next unless File.exist?(last_upgrade_file)
+    # get the timestamp for the most recent upgrade
+    last_upgrade_time = File.mtime(last_upgrade_file)
+
+    # last upgrade was sooner than 1 year ago
+    { S0034: last_upgrade_time >= (Time.now - 31_536_000).utc }
+  end
+
+  chunk(:S0035) do
+    # restrict to primary/replica/compiler
+    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    # return false if any Warnings appear in the 'puppet module list...'
+    { S0035: !`/opt/puppetlabs/bin/puppet module list --tree 2>&1`.encode('ASCII', 'UTF-8', undef: :replace).match?(%r{Warning:\s+}) }
+  end
+
   chunk(:S0036) do
     next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
@@ -307,6 +327,37 @@ Facter.add(:pe_status_check, type: :aggregate) do
     else
       { S0036: max_queued_requests[1].to_i < 150 }
     end
+  end
+
+  chunk(:S0038) do
+    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
+    response = PEStatusCheck.http_get('/puppet/v3/environments', 8140)
+    if response
+      envs_count = response.dig('environments').length
+      { S0038: (envs_count < 100) }
+    else
+      { S0038: false }
+    end
+  end
+
+  chunk(:S0039) do
+    # PuppetServer
+    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    logfile = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver-access.log'
+    apache_regex = %r{^(\S+) \S+ (\S+) (?<time>\[([^\]]+)\]) "([A-Z]+) ([^ "]+)? HTTP/[0-9.]+" (?<status>[0-9]{3})}
+
+    has_503 = File.foreach(logfile).any? do |line|
+      match = line.match(apache_regex)
+      next unless match && match[:time] && match[:status]
+
+      time = Time.strptime(match[:time], '[%d/%b/%Y:%H:%M:%S %Z]')
+      since_lastrun = Time.now - time
+      current = since_lastrun.to_i <= Puppet.settings['runinterval']
+
+      match[:status] == '503' and current
+    end
+
+    { S0039: !has_503 }
   end
 
   chunk(:S0040) do
@@ -334,58 +385,5 @@ Facter.add(:pe_status_check, type: :aggregate) do
     Facter.warn('pe_status_check.S0042 failed to get socket status from SS')
     Facter.debug(e)
     { S0042: false }
-  end
-
-  chunk(:S0034) do
-    next unless PEStatusCheck.primary?
-    # PE has not been upgraded / updated in 1 year
-    # It was decided not to include infra components as this was deemed unecessary as they should align with the primary.
-
-    # gets the file for the most recent upgrade output
-    last_upgrade_file = '/opt/puppetlabs/server/pe_build'
-    next unless File.exist?(last_upgrade_file)
-    # get the timestamp for the most recent upgrade
-    last_upgrade_time = File.mtime(last_upgrade_file)
-
-    # last upgrade was sooner than 1 year ago
-    { S0034: last_upgrade_time >= (Time.now - 31_536_000).utc }
-  end
-
-  chunk(:S0035) do
-    # restrict to primary/replica/compiler
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
-    # return false if any Warnings appear in the 'puppet module list...'
-    { S0035: !`/opt/puppetlabs/bin/puppet module list --tree 2>&1`.encode('ASCII', 'UTF-8', undef: :replace).match?(%r{Warning:\s+}) }
-  end
-
-  chunk(:S0039) do
-    # PuppetServer
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
-    logfile = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver-access.log'
-    apache_regex = %r{^(\S+) \S+ (\S+) (?<time>\[([^\]]+)\]) "([A-Z]+) ([^ "]+)? HTTP/[0-9.]+" (?<status>[0-9]{3})}
-
-    has_503 = File.foreach(logfile).any? do |line|
-      match = line.match(apache_regex)
-      next unless match && match[:time] && match[:status]
-
-      time = Time.strptime(match[:time], '[%d/%b/%Y:%H:%M:%S %Z]')
-      since_lastrun = Time.now - time
-      current = since_lastrun.to_i <= Puppet.settings['runinterval']
-
-      match[:status] == '503' and current
-    end
-
-    { S0039: !has_503 }
-  end
-
-  chunk(:S0038) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
-    response = PEStatusCheck.http_get('/puppet/v3/environments', 8140)
-    if response
-      envs_count = response.dig('environments').length
-      { S0038: (envs_count < 100) }
-    else
-      { S0038: false }
-    end
   end
 end
