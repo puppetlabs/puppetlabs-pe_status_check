@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v1.5.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.5.0) (2022-05-27)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v1.4.0...v1.5.0)
+
+### Added
+
+- \(SUP-3285\) Update readme for S0035 [\#129](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/129) ([elainemccloskey](https://github.com/elainemccloskey))
+
 ## [v1.4.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v1.4.0) (2022-04-29)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v1.3.0...v1.4.0)
