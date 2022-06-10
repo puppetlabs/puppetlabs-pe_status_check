@@ -210,19 +210,19 @@ Facter.add(:pe_status_check, type: :aggregate) do
         if license_type.include? 'Perpetual'
           validity = true
         elsif license_type.include? 'Subscription'
-        require 'date'
+          require 'date'
           begin
-            end_date = Date.parse(File.readlines(license_file).grep(%r{end:}).first)
+        end_date = Date.parse(File.readlines(license_file).grep(%r{end:}).first)
         today_date = Date.today
         daysexp = (end_date - today_date).to_i
-            validity = (today_date <= end_date) && (daysexp >= 90) ? true : false
+        validity = (today_date <= end_date) && (daysexp >= 90) ? true : false
           rescue StandardError => e
             Facter.warn("Error in fact 'pe_status_check.S0022' when checking license end date: #{e.message}")
             Facter.debug(e.backtrace)
             # license file has missing or invalid end date
             validity = false
       end
-    else
+        else
           # license file has invalid license_type
           validity = false
         end
@@ -254,7 +254,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0029) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.postgres? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'postgres'].include?(Facter.value('pe_status_check_role'))
     # check if concurrnet connections to Postgres approaching 90% defined
 
     maximum = PEStatusCheck.max_connections.to_i
@@ -342,13 +342,13 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0035) do
     # restrict to primary/replica/compiler
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
     # return false if any Warnings appear in the 'puppet module list...'
     { S0035: !`/opt/puppetlabs/bin/puppet module list --tree 2>&1`.encode('ASCII', 'UTF-8', undef: :replace).match?(%r{Warning:\s+}) }
   end
 
   chunk(:S0036) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
     max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
     if max_queued_requests.nil?
@@ -359,7 +359,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0038) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
     response = PEStatusCheck.http_get('/puppet/v3/environments', 8140)
     if response
       envs_count = response.dig('environments').length
@@ -396,7 +396,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0041) do
-    next unless PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    next unless ['pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+
     # Is pcp broker connected to another broker
     result = Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8143 | grep java').strip
     { S0041: !result.empty? }

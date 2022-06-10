@@ -6,10 +6,10 @@ require 'openssl'
 # PEStatusCheck - Shared code for pe_status_check facts
 module PEStatusCheck
   class << self
-    attr_accessor :infra_profiles, :PUP_PATHS
+    attr_accessor :infra_profiles, :pup_paths
   end
 
-  self.PUP_PATHS ||= { server_bin: '/opt/puppetlabs/server/bin' }.freeze
+  self.pup_paths ||= { server_bin: '/opt/puppetlabs/server/bin' }.freeze
 
   # List of profiles classes applied to PE nodes we can use to determine a node's role
   self.infra_profiles = [
@@ -19,7 +19,6 @@ module PEStatusCheck
     'certificate_authority',
     'primary_master_replica',
   ]
-
 
   module_function
 
@@ -130,7 +129,7 @@ module PEStatusCheck
 
   # Get the maximum defined and current connections to Postgres
   def psql_return_result(sql, psql_options = '')
-    command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{PUP_PATHS[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
+    command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{pup_paths[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
     Facter::Core::Execution.execute(command)
   end
 
@@ -149,7 +148,6 @@ module PEStatusCheck
     psql_options = '-qtAX'
     psql_return_result(sql, psql_options)
   end
-
 
   # Get the free disk percentage from a path
   # @param name [String] The path on the file system
