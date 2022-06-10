@@ -59,11 +59,19 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0007) do
     next unless ['primary', 'replica', 'postgres'].include?(Facter.value('pe_status_check_role'))
 
-    # check postgres data mount has at least 20% free
-    pg_version = Facter.value(:pe_postgresql_info)['installed_server_version']
-    data_dir = Facter.value(:pe_postgresql_info)['versions'][pg_version].fetch('data_dir', '/opt/puppetlabs/server/data/postgresql')
+    begin
+      # check postgres data mount has at least 20% free
+      postgres_info = Facter.value(:pe_postgresql_info)
+      pg_version = postgres_info['installed_server_version']
+      data_dir = postgres_info['versions'][pg_version].fetch('data_dir', '/opt/puppetlabs/server/data/postgresql')
 
-    { S0007: PEStatusCheck.filesystem_free(data_dir) >= 20 }
+      { S0007: PEStatusCheck.filesystem_free(data_dir) >= 20 }
+    rescue StandardError => e
+      Facter.warn("Error in fact 'pe_status_check.:S0007' when checking postgres info: #{e.message}")
+      Facter.debug(e.backtrace)
+
+      next
+    end
   end
 
   chunk(:S0008) do
