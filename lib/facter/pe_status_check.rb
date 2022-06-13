@@ -4,6 +4,9 @@
 Facter.add(:pe_status_check, type: :aggregate) do
   confine kernel: 'Linux'
   confine { Facter.value(:pe_build) }
+  confine 'pe_status_check_role' do |pe_status_check_role|
+    pe_status_check_role != 'unknown'
+  end
   require 'puppet'
   require 'yaml'
   require_relative '../shared/pe_status_check'
@@ -25,7 +28,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0004) do
     # Are All Services running
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     response = PEStatusCheck.http_get('/status/v1/services', 8140)
     if response
@@ -42,52 +45,62 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0005) do
     # Is the CA expiring in the next 90 days
-    next unless File.exist?('/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem') || File.exist?('/etc/puppetlabs/puppetserver/ca/ca_crt.pem')
-    raw_ca_cert = if File.exist? '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
-                    File.read '/etc/puppetlabs/puppetserver/ca/ca_crt.pem'
-                  else
-                    File.read '/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem'
-                  end
-    certificate = OpenSSL::X509::Certificate.new raw_ca_cert
-    result = certificate.not_after - Time.now
-    { S0005: result > 7_776_000 }
+    cacert = Puppet.settings[:cacert]
+    next unless File.exist?(cacert)
+
+    x509_cert = OpenSSL::X509::Certificate.new(File.read(cacert))
+    { S0005: (x509_cert.not_after - Time.now) > 7_776_000 }
   end
 
   chunk(:S0006) do
-    next unless PEStatusCheck.primary?
+    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+
     # Is puppet_metrics_collector running
     { S0006: PEStatusCheck.service_running_enabled('puppet_puppetserver-metrics.timer') }
   end
 
   chunk(:S0007) do
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.postgres?
-    # check postgres data mount has at least 20% free
-    pg_version = Facter.value(:pe_postgresql_info)['installed_server_version']
-    data_dir = Facter.value(:pe_postgresql_info)['versions'][pg_version].fetch('data_dir', '/opt/puppetlabs/server/data/postgresql')
+    next unless ['primary', 'replica', 'postgres'].include?(Facter.value('pe_status_check_role'))
 
-    { S0007: PEStatusCheck.filesystem_free(data_dir) >= 20 }
+    begin
+      # check postgres data mount has at least 20% free
+      postgres_info = Facter.value(:pe_postgresql_info)
+      pg_version = postgres_info['installed_server_version']
+      data_dir = postgres_info['versions'][pg_version].fetch('data_dir', '/opt/puppetlabs/server/data/postgresql')
+
+      { S0007: PEStatusCheck.filesystem_free(data_dir) >= 20 }
+    rescue StandardError => e
+      Facter.warn("Error in fact 'pe_status_check.:S0007' when checking postgres info: #{e.message}")
+      Facter.debug(e.backtrace)
+
+      next
+    end
   end
 
   chunk(:S0008) do
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+
     # check codedir data mount has at least 20% free
     { S0008: PEStatusCheck.filesystem_free(Puppet.settings['codedir']) >= 20 }
   end
 
   chunk(:S0009) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+
     # Is the Pe-puppetsever Service Running and Enabled
     { S0009: PEStatusCheck.service_running_enabled('pe-puppetserver') }
   end
 
   chunk(:S0010) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
+
     # Is the pe-puppetdb Service Running and Enabled
     { S0010: PEStatusCheck.service_running_enabled('pe-puppetdb') }
   end
 
   chunk(:S0011) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.postgres? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'postgres'].include?(Facter.value('pe_status_check_role'))
+
     # Is the pe-postgres Service Running and Enabled
     postgresversion = PEStatusCheck.pe_postgres_service_name
     { S0011: PEStatusCheck.service_running_enabled(postgresversion.to_s) }
@@ -96,6 +109,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0012) do
     summary_path = Puppet.settings['lastrunfile']
     next unless File.exist?(summary_path)
+
     # Did Puppet Produce a report in the last run interval
     lastrunfile = YAML.load_file(summary_path)
     time_lastrun = lastrunfile.dig('time', 'last_run')
@@ -110,6 +124,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0013) do
     summary_path = Puppet.settings['lastrunfile']
     next unless File.exist?(summary_path)
+
     # Did catalog apply successfully on last puppet run
     { S0013: File.open(summary_path).read.include?('catalog_application') }
   end
@@ -131,7 +146,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0016) do
     # Puppetserver
-    next unless PEStatusCheck.primary? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.replica?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+
     time_now = Time.now - Puppet.settings['runinterval']
     log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/'
     error_pid_log = Dir.glob(log_path + '*_err_pid*.log').find { |f| time_now.to_i < File.mtime(f).to_i }
@@ -146,7 +162,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0017) do
     # PuppetDB
-    next unless PEStatusCheck.primary? || PEStatusCheck.compiler?
+    next unless ['primary', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
+
     time_now = Time.now - Puppet.settings['runinterval']
     log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetdb/'
     error_pid_log = Dir.glob(log_path + '*_err_pid*.log').find { |f| time_now.to_i < File.mtime(f).to_i }
@@ -161,7 +178,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0018) do
     # Orchestrator
-    next unless PEStatusCheck.primary?
+    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+
     time_now = Time.now - Puppet.settings['runinterval']
     log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/orchestration-services/'
     error_pid_log = Dir.glob(log_path + '*_err_pid*.log').find { |f| time_now.to_i < File.mtime(f).to_i }
@@ -175,7 +193,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0019) do
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+
     response = PEStatusCheck.http_get('/status/v1/services/pe-jruby-metrics?level=debug', 8140)
     if response
       free_jrubies = response.dig('status', 'experimental', 'metrics', 'average-free-jrubies')
@@ -193,7 +212,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0022) do
     # Is there a valid license present, which does not expire in 90 days
     # Also takes into account if the license type is Perpetual
-    next unless PEStatusCheck.primary?
+    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+
     license_file = '/etc/puppetlabs/license.key'
     if File.exist?(license_file)
       begin
@@ -203,16 +223,16 @@ Facter.add(:pe_status_check, type: :aggregate) do
         elsif license_type.include? 'Subscription'
           require 'date'
           begin
-            end_date = Date.parse(File.readlines(license_file).grep(%r{end:}).first)
-            today_date = Date.today
-            daysexp = (end_date - today_date).to_i
-            validity = (today_date <= end_date) && (daysexp >= 90) ? true : false
+        end_date = Date.parse(File.readlines(license_file).grep(%r{end:}).first)
+        today_date = Date.today
+        daysexp = (end_date - today_date).to_i
+        validity = (today_date <= end_date) && (daysexp >= 90) ? true : false
           rescue StandardError => e
             Facter.warn("Error in fact 'pe_status_check.S0022' when checking license end date: #{e.message}")
             Facter.debug(e.backtrace)
             # license file has missing or invalid end date
             validity = false
-          end
+      end
         else
           # license file has invalid license_type
           validity = false
@@ -229,7 +249,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0024) do
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler?
+    next unless ['primary', 'replica', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
 
     # Check discard directory. Newest file should not be less than a run interval old. Recent files indicate an issue that causes PuppetDB to reject incoming data.
     newestfile = Dir.glob('/opt/puppetlabs/server/data/puppetdb/stockpile/discard/*.*').max_by { |f| File.mtime(f) }
@@ -245,7 +265,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0029) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.postgres? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'postgres'].include?(Facter.value('pe_status_check_role'))
     # check if concurrnet connections to Postgres approaching 90% defined
 
     maximum = PEStatusCheck.max_connections.to_i
@@ -264,7 +284,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0031) do
     # check for Old pe_repo versions have been cleaned up
-    next unless PEStatusCheck.primary?
+    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+
     pe_version = Facter.value(:pe_server_version)
     packages_dir = '/opt/puppetlabs/server/data/packages/public'
     no_old_packages = true
@@ -288,7 +309,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0033) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+
     hiera_config_path = Puppet.settings['hiera_config']
     next unless File.exist?(hiera_config_path)
     hiera_config_file = YAML.load_file(hiera_config_path)
@@ -296,8 +318,26 @@ Facter.add(:pe_status_check, type: :aggregate) do
     { S0033: hiera_config_file.dig('version') == 5 }
   end
 
+  chunk(:S0036) do
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+
+    str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
+    max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
+    if max_queued_requests.nil?
+      { S0036: true }
+    else
+      { S0036: max_queued_requests[1].to_i < 150 }
+    end
+  end
+
+  chunk(:S0040) do
+    # Is puppet_metrics_collector::system configured
+    { S0040: PEStatusCheck.service_running_enabled('puppet_system_processes-metrics.timer') }
+  end
+
   chunk(:S0034) do
-    next unless PEStatusCheck.primary?
+    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+
     # PE has not been upgraded / updated in 1 year
     # It was decided not to include infra components as this was deemed unecessary as they should align with the primary.
 
@@ -313,13 +353,13 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0035) do
     # restrict to primary/replica/compiler
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
     # return false if any Warnings appear in the 'puppet module list...'
     { S0035: !`/opt/puppetlabs/bin/puppet module list --tree 2>&1`.encode('ASCII', 'UTF-8', undef: :replace).match?(%r{Warning:\s+}) }
   end
 
   chunk(:S0036) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
     max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
     if max_queued_requests.nil?
@@ -330,7 +370,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0038) do
-    next unless PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler? || PEStatusCheck.primary?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
     response = PEStatusCheck.http_get('/puppet/v3/environments', 8140)
     if response
       envs_count = response.dig('environments').length
@@ -342,7 +382,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0039) do
     # PuppetServer
-    next unless PEStatusCheck.primary? || PEStatusCheck.replica? || PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+
     logfile = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver-access.log'
     apache_regex = %r{^(\S+) \S+ (\S+) (?<time>\[([^\]]+)\]) "([A-Z]+) ([^ "]+)? HTTP/[0-9.]+" (?<status>[0-9]{3})}
 
@@ -366,7 +407,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0041) do
-    next unless PEStatusCheck.compiler? || PEStatusCheck.legacy_compiler?
+    next unless ['pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+
     # Is pcp broker connected to another broker
     result = Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8143 | grep java').strip
     { S0041: !result.empty? }
