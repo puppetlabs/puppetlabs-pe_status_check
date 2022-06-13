@@ -4,6 +4,9 @@
 Facter.add(:pe_status_check, type: :aggregate) do
   confine kernel: 'Linux'
   confine { Facter.value(:pe_build) }
+  confine 'pe_status_check_role' do |pe_status_check_role|
+    pe_status_check_role != 'unknown'
+  end
   require 'puppet'
   require 'yaml'
   require_relative '../shared/pe_status_check'
@@ -25,7 +28,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0004) do
     # Are All Services running
-    next unless ['primary', 'replica', 'pe_compiler', 'compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     response = PEStatusCheck.http_get('/status/v1/services', 8140)
     if response

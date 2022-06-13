@@ -1,7 +1,7 @@
 Facter.add(:pe_status_check_role) do
+  confine { Facter.value(:pe_build) }
   require 'puppet'
   require_relative '../shared/pe_status_check'
-
   setcode do
     classfile = Puppet.settings[:classfile]
     return nil unless File.file?(classfile)
