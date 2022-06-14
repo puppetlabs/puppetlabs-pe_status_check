@@ -1,10 +1,18 @@
 Facter.add(:pe_status_check_role) do
   confine { Facter.value(:pe_build) }
-  require 'puppet'
-  require_relative '../shared/pe_status_check'
+
   setcode do
-    classfile = Puppet.settings[:classfile]
-    return nil unless File.file?(classfile)
+    begin
+      require 'puppet'
+      require_relative '../shared/pe_status_check'
+
+      classfile = Puppet.settings[:classfile]
+      return 'unknown' unless File.file?(classfile)
+    # Return 'unknown' if there is an error with the above during installation
+    rescue StandardError => e
+      Facter.debug("Error in fact 'pe_status_check_role': #{e.message}")
+      'unknown'
+    end
 
     node_profiles = []
     # Turn the list of infra roles defined in the module constant into a regex we can use with grep()
