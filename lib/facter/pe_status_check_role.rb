@@ -18,8 +18,10 @@ Facter.add(:pe_status_check_role) do
         node_profiles |= [short_profile]
       end
 
-      if node_profiles.include?('certificate_authority')
+      if node_profiles.include?('certificate_authority') && node_profiles.include?('database')
           then 'primary'
+      elsif node_profiles.include?('certificate_authority')
+          then 'legacy_primary'
       elsif node_profiles.include?('primary_master_replica')
           then 'replica'
         # Use array subtraction to determine if more than one role is present
