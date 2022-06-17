@@ -66,6 +66,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
       # check postgres data mount has at least 20% free
       postgres_info = Facter.value(:pe_postgresql_info)
       pg_version = postgres_info['installed_server_version']
+      # to cover standalone postgres configurations this test will skip if postgres is not available on the primary
+      next unless !pg_version.nil?
       data_dir = postgres_info['versions'][pg_version].fetch('data_dir', '/opt/puppetlabs/server/data/postgresql')
 
       { S0007: PEStatusCheck.filesystem_free(data_dir) >= 20 }
