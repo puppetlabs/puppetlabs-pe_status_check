@@ -28,7 +28,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0004) do
     # Are All Services running
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     response = PEStatusCheck.http_get('/status/v1/services', 8140)
     if response
@@ -53,7 +53,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0006) do
-    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary'].include?(Facter.value('pe_status_check_role'))
 
     # Is puppet_metrics_collector running
     { S0006: PEStatusCheck.service_running_enabled('puppet_puppetserver-metrics.timer') }
@@ -78,21 +78,21 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0008) do
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     # check codedir data mount has at least 20% free
     { S0008: PEStatusCheck.filesystem_free(Puppet.settings['codedir']) >= 20 }
   end
 
   chunk(:S0009) do
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     # Is the Pe-puppetsever Service Running and Enabled
     { S0009: PEStatusCheck.service_running_enabled('pe-puppetserver') }
   end
 
   chunk(:S0010) do
-    next unless ['primary', 'replica', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
 
     # Is the pe-puppetdb Service Running and Enabled
     { S0010: PEStatusCheck.service_running_enabled('pe-puppetdb') }
@@ -146,7 +146,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0016) do
     # Puppetserver
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     time_now = Time.now - Puppet.settings['runinterval']
     log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/'
@@ -162,7 +162,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0017) do
     # PuppetDB
-    next unless ['primary', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
 
     time_now = Time.now - Puppet.settings['runinterval']
     log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetdb/'
@@ -178,7 +178,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0018) do
     # Orchestrator
-    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary'].include?(Facter.value('pe_status_check_role'))
 
     time_now = Time.now - Puppet.settings['runinterval']
     log_path = File.dirname(Puppet.settings['logdir'].to_s) + '/orchestration-services/'
@@ -193,7 +193,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0019) do
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     response = PEStatusCheck.http_get('/status/v1/services/pe-jruby-metrics?level=debug', 8140)
     if response
@@ -249,7 +249,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0024) do
-    next unless ['primary', 'replica', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
 
     # Check discard directory. Newest file should not be less than a run interval old. Recent files indicate an issue that causes PuppetDB to reject incoming data.
     newestfile = Dir.glob('/opt/puppetlabs/server/data/puppetdb/stockpile/discard/*.*').max_by { |f| File.mtime(f) }
@@ -284,7 +284,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0031) do
     # check for Old pe_repo versions have been cleaned up
-    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary'].include?(Facter.value('pe_status_check_role'))
 
     pe_version = Facter.value(:pe_server_version)
     packages_dir = '/opt/puppetlabs/server/data/packages/public'
@@ -309,7 +309,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0033) do
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     hiera_config_path = Puppet.settings['hiera_config']
     next unless File.exist?(hiera_config_path)
@@ -319,7 +319,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0036) do
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
     max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
@@ -336,7 +336,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0034) do
-    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary'].include?(Facter.value('pe_status_check_role'))
 
     # PE has not been upgraded / updated in 1 year
     # It was decided not to include infra components as this was deemed unecessary as they should align with the primary.
@@ -353,13 +353,13 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0035) do
     # restrict to primary/replica/compiler
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
     # return false if any Warnings appear in the 'puppet module list...'
     { S0035: !`/opt/puppetlabs/bin/puppet module list --tree 2>&1`.encode('ASCII', 'UTF-8', undef: :replace).match?(%r{Warning:\s+}) }
   end
 
   chunk(:S0036) do
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
     str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
     max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
     if max_queued_requests.nil?
@@ -370,7 +370,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0038) do
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
     response = PEStatusCheck.http_get('/puppet/v3/environments', 8140)
     if response
       envs_count = response.dig('environments').length
@@ -382,7 +382,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0039) do
     # PuppetServer
-    next unless ['primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     logfile = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver-access.log'
     apache_regex = %r{^(\S+) \S+ (\S+) (?<time>\[([^\]]+)\]) "([A-Z]+) ([^ "]+)? HTTP/[0-9.]+" (?<status>[0-9]{3})}
