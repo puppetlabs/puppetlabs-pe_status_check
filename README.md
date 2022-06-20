@@ -12,9 +12,11 @@
     - [Ad-hoc Report (Plans)](#ad-hoc-report-plans)
       - [Setup Requirements](#setup-requirements-1)
       - [Running the plans](#running-the-plans)
+      - [Using a Puppet Query to report status](#Using-a-Puppet-Query-to-report-status)
   - [Reference](#reference)
-  - [Fact: pe_status_check](#fact-pe_status_check)
-  - [Fact: agent_status_check](#fact-agent_status_check)
+    - [Fact: pe_status_check_role](#fact-pe_status_check_role)
+    - [Fact: pe_status_check](#fact-pe_status_check)
+    - [Fact: agent_status_check](#fact-agent_status_check)
   - [How to report an issue or contribute to the module](#how-to-report-an-issue-or-contribute-to-the-module)
 
 ## Description
@@ -31,7 +33,7 @@ This module installs two structured facts named `pe_status_check` and `agent_sta
 
 ### Setup requirements
 
-Enable plug-in sync to deliver required facts for this module.
+Install the module, plug-in sync will be used to deliver required facts for this module, to each agent node in the environment the module is installed in.
 
 ### Beginning with pe_status_check
 
@@ -41,7 +43,7 @@ This module primarily provides indicators using facts, so installing the module 
 
 The facts in this module can be directly consumed by monitoring tools such as Splunk, any element in the structured facts `pe_status_check` or `agent_status_check` reporting as `false` indicates a fault state in Puppet Enterprise. When any element reports as `false`, look up the incident ID in the reference section for next steps.
 
-Alternatively, assigning the `class pe_status_check` to the infrastructure notifies on each Puppet run if any indicator is reporting as `false`.
+Alternatively, assigning the `class pe_status_check` to the infrastructure notifies on each Puppet run if any indicator is reporting as `false`, this can be viewed in the Puppet report for each node.
 
 ## Reporting Options
 
@@ -112,6 +114,25 @@ The plans, `pe_status_check::infra_summary` and `pe_status_check::agent_summary`
 }
 ```
 
+### Using a Puppet Query to report status.
+
+As the pe_status_check module uses Puppet's existing fact behaviour to gather the status data from each of the agents, it is possible to use PQL (puppet query language) to gather this information.
+
+Consult with your local Puppet administrator to construct a query suited to your organisational needs. 
+Please find some examples of using pe_client_tools to query the status check facts below:
+
+1. To find the complete output of pe_status_check from all nodes listed by certname:
+
+        `puppet query 'facts[certname,value] { name = "pe_status_check" }'`
+
+2. To find the complete output of agen_status_check from all nodes listed by certname (this could be a large query based on the number of agent nodes, further filtering is advised ):
+
+        `puppet query 'facts[certname,value] { name = "agent_status_check" }'`
+
+3. To find those nodes with a  specific status check set to false:
+
+        `puppet query 'inventory[certname] { facts.pe_status_check.S0001 = false }'`
+
 #### Setup Requirements
 
 `pe_status_check::infra_summary` and `pe_status_check::agent_summary` utilize [hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html) to lookup test definitions, this requires placing a static hierarchy in your **environment level** [hiera.yaml](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html).
@@ -159,10 +180,29 @@ puppet plan run pe_status_check::agent_summary -p '{"indicator_exclusions": ["AS
 
 ## Reference
 
-Refer to this section for next steps when any indicator reports a `false`.
+### Fact: pe_status_check_role
 
-## Fact: pe_status_check
+This fact is used to determine which individual status checks should be run on each individual infrastructure node. The fact queries which Puppet Enterprise Roles have been classified to each node and uses this to make the determination.
 
+
+| Role | Description |
+|---|---|
+| primary | The node is both a certificate authority and a postgres host |
+| replica | The node has the primary_master_replica role |
+| pe_compiler | The node has both the master and puppetdb roles |
+| postgres | The node has just the database role |
+| legacy_compiler | The node has the master role but not the puppetdb role |
+| legacy_primary | The node is a certificate authority but not a postgres host |
+| unknown | Then node type could not be determined |
+
+A failure to determine node type will result in a safe subset of checks being run that will work on all infrastructure node types.
+
+
+### Fact: pe_status_check
+
+This fact is confined to run on infrastructure nodes only.
+
+Refer  below for next steps when any indicator reports a `false`.
 | Indicator ID | Description                                                                        | Self-service steps                                                                                                                                                                                                                                                                                                                                                                                                                                                          | What to include in a Support ticket                                                                                                                                                                                                   |
 |--------------|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | S0001        | Determines if the puppet service is running on agents.                                      | Starts the puppet service - `puppet resource service puppet ensure=running`                                                                                                                                                                                                                                                                                                                                                                                                    | If the service fails to start, open a Support ticket referencing S0001, and provide `syslog` and any errors output when attempting to restart the service.                                           |
@@ -200,8 +240,11 @@ Refer to this section for next steps when any indicator reports a `false`.
 | S0041        | Determines if the pxp broker on a compiler  has an established connection to another pxp broker  | To resolve a connection issue from a compiler to a pcp broker examine the following log `/var/log/puppetlabs/puppetserver/pcp-broker.log` for an explanation, Compilers should be attempting to make a connection to port 8143 on the primary server, ssl can not be terminated on a network appliance and must passthrough directly to the primary server. Ensure the connnection attempt is not to another compiler in the pool            | If unable to make a connection to a broker, raise a ticket with the support team quoting S0041 and attaching the file `/var/log/puppetlabs/puppetserver/pcp-broker.log` along with the conclusions of your investigation so far            |
 | S0042        |Determines if the pxp-agent has an established connection to a pxp broker                   | Ensure the pxp-agent service is running. Check S0002 can make that determination. if running check `/var/log/puppetlabs/pxp-agent/pxp-agent.log` for connection issues, first ensuring the agent is connecting to the proper endpoint, for example, a compiler and not the primary. This fact can also be used as a target filter for running tasks, ensuring time is not wasted sending instructions to agents not connected to a broker                   | If unable to make a connection to a broker, raise a ticket with the support team quoting S0042 and attaching the file `/var/log/puppetlabs/pxp-agent/pxp-agent.log` along with the conclusions of your investigation so far             |
 
-## Fact: agent_status_check
+### Fact: agent_status_check
 
+This fact is confined to run on only agent nodes that a NOT infrastructure nodes.
+
+Refer below for next steps when any indicator reports a `false`.
 | Indicator ID | Description                                                                        | Self-service steps                                                                                                                                                                                                                                                                                                                                                                                                                                                          | What to include in a Support ticket                                                                                                                                                                                                   |
 |--------------|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | AS001        | Determines if the agent host certificate is expiring in the next 90 days.                                     | Puppet Enterprise has a plan built into extend agent certificates. Use a puppet query to find expiring host certificates and pass the node ID to this plan:   `puppet plan run enterprise_tasks::agent_cert_regen agent=$(puppet query 'inventory[certname] { facts.agent_status_check.AS001 = false }' \| jq  -r '.[].certname' \|  paste -sd, -) master=$(puppet config print certname)`  |  If the plan fails to run, open a support ticket referencing AS001 and provide the error message recieved when running the plan.                                                                               | 
