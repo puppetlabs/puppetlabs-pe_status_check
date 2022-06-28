@@ -6,10 +6,11 @@ require 'openssl'
 # PEStatusCheck - Shared code for pe_status_check facts
 module PEStatusCheck
   class << self
-    attr_accessor :infra_profiles, :pup_paths
+    attr_accessor :infra_profiles, :pup_paths, :facter_timeout
   end
 
   self.pup_paths ||= { server_bin: '/opt/puppetlabs/server/bin' }.freeze
+  self.facter_timeout ||= 2
 
   # List of profiles classes applied to PE nodes we can use to determine a node's role
   self.infra_profiles = [
@@ -130,7 +131,7 @@ module PEStatusCheck
   # Get the maximum defined and current connections to Postgres
   def psql_return_result(sql, psql_options = '')
     command = %(su pe-postgres --shell /bin/bash --command "cd /tmp && #{pup_paths[:server_bin]}/psql #{psql_options} --command \\"#{sql}\\"")
-    Facter::Core::Execution.execute(command)
+    Facter::Core::Execution.execute(command, { timeout: facter_timeout })
   end
 
   def max_connections

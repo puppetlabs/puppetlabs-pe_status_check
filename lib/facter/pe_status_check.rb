@@ -268,13 +268,20 @@ Facter.add(:pe_status_check, type: :aggregate) do
     next unless ['primary', 'replica', 'postgres'].include?(Facter.value('pe_status_check_role'))
     # check if concurrnet connections to Postgres approaching 90% defined
 
-    maximum = PEStatusCheck.max_connections.to_i
-    current = PEStatusCheck.cur_connections.to_i
-    percent_used = (current / maximum.to_f) * 100
-    { S0029: percent_used <= 90 }
-  rescue ZeroDivisionError
-    Facter.warn('pe_status_check.S0029 failed to get max_connections')
-    { S0029: false }
+    begin
+      maximum = PEStatusCheck.max_connections.to_i
+      current = PEStatusCheck.cur_connections.to_i
+      percent_used = (current / maximum.to_f) * 100
+
+      { S0029: percent_used <= 90 }
+    rescue ZeroDivisionError
+      Facter.warn("Fact 'pe_status_check.S0029' failed to get max_connections: #{e.message}")
+      Facter.debug(e.backtrace)
+      { S0029: false }
+    rescue StandardError => e
+      Facter.warn("Error in fact 'pe_status_check.S0029' when querying postgres: #{e.message}")
+      Facter.debug(e.backtrace)
+    end
   end
 
   chunk(:S0030) do
@@ -410,7 +417,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
     next unless ['pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     # Is pcp broker connected to another broker
-    result = Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8143 | grep java').strip
+    result = Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8143 | grep java', { timeout: PEStatusCheck.facter_timeout }).strip
     { S0041: !result.empty? }
   rescue Facter::Core::Execution::ExecutionFailure => e
     Facter.warn('pe_status_check.S0041 failed to get socket status from SS')
@@ -421,11 +428,11 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0042) do
     # Has the PXP agent establish a connection with a remote Broker
     #
-    result = Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8142 | grep pxp-agent')
+    result = Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8142 | grep pxp-agent', { timeout: PEStatusCheck.facter_timeout })
     { S0042: !result.empty? }
   rescue Facter::Core::Execution::ExecutionFailure => e
-    Facter.warn('pe_status_check.S0042 failed to get socket status from SS')
-    Facter.debug(e)
+    Facter.warn("pe_status_check.S0042 failed to get socket status from SS: #{e.message}")
+    Facter.debug(e.backtrace)
     { S0042: false }
   end
 end
