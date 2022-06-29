@@ -20,14 +20,16 @@ Facter.add(:agent_status_check, type: :aggregate) do
     valid_families = ['windows', 'Debian', 'RedHat', 'Suse']
     next unless valid_families.include?(Facter.value(:os)['family'])
     result = if Facter.value(:os)['family'] == 'windows'
-               Facter::Core::Execution.execute('netstat -n | findstr /c:"8142"  | findstr /c:"TCP"  | findstr /c:"ESTABLISHED"')
+               Facter::Core::Execution.execute('netstat -n | findstr /c:"8142"  | findstr /c:"TCP"  | findstr /c:"ESTABLISHED"',
+                                               { timeout: PEStatusCheck.facter_timeout })
              else
-               Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8142 | grep pxp-agent')
+               Facter::Core::Execution.execute('ss -tunp | grep ESTAB | grep 8142 | grep pxp-agent',
+                                               { timeout: PEStatusCheck.facter_timeout })
              end
     { AS002: !result.empty? }
   rescue Facter::Core::Execution::ExecutionFailure => e
-    Facter.warn('agent_status_check.AS002 failed to get socket status')
-    Facter.debug(e)
+    Facter.warn("agent_status_check.AS002 failed to get socket status: #{e.message}")
+    Facter.debug(e.backtrace)
     { AS002: false }
   end
 end
