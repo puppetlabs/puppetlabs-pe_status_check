@@ -7,8 +7,10 @@
     - [Setup requirements](#setup-requirements)
     - [Beginning with pe_status_check](#beginning-with-pe_status_check)
   - [Usage](#usage)
+    - [Enabling agent_status_check](#enabling-agent_status_check)
+    - [Disabling agent_status_check](#disabling-agent_status_check)
   - [Reporting Options](#reporting-options)
-    - [Class declaration (optional)](#class-declaration-optional)
+    - [Class declaration pe_status_check (optional)](#class-declaration-pe_status_check-optional)
     - [Ad-hoc Report (Plans)](#ad-hoc-report-plans)
     - [Using a Puppet Query to report status.](#using-a-puppet-query-to-report-status)
       - [Setup Requirements](#setup-requirements-1)
@@ -38,6 +40,7 @@ Install the module, plug-in sync will be used to deliver the required facts for 
 ### Beginning with pe_status_check
 
 This module primarily provides indicators using facts, so installing the module and allowing plug-in sync to occur lets the module start functioning.
+Collection of the `agent_status_check` fact is disabled by default so as not to affect all puppet agents indiscriminately
 
 ## Usage
 
@@ -45,9 +48,19 @@ The facts in this module can be directly consumed by monitoring tools such as Sp
 
 Alternatively, assigning the `class pe_status_check` to the infrastructure notifies on each Puppet run if any indicator is reporting as `false`, this can be viewed in the Puppet report for each node.
 
+### Enabling agent_status_check
+
+By default your normal agent population will not collect the `agent_status_check` fact, this can be enabled for all agents or a subset of agents, by classifying pe_status_check::agent_status_enable to your nodes.
+
+### Disabling agent_status_check
+
+Following the addition of the class `pe_status_check::agent_status_enable` to an agent node, disable the collection of agent_status_check fact, set the following parameter:
+
+`pe_status_check::agent_status_enable::agent_status_enabled = false`
+
 ## Reporting Options
 
-### Class declaration (optional)
+### Class declaration pe_status_check (optional)
 
 To activate the notification functions of this module, classify your Puppet Infrastructure with the `pe_status_check` class using [your preferred classification method](https://puppet.com/docs/pe/latest/grouping_and_classifying_nodes.html#enable_console_configuration_data). Below is an example using `site.pp`.
 

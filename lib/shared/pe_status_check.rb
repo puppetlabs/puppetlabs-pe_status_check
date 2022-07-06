@@ -151,7 +151,7 @@ module PEStatusCheck
   end
 
   # Get the free disk percentage from a path
-  # @param name [String] The path on the file system
+  # @param path [String] The path on the file system
   # @return [Integer] The percentage of free disk space on the mount
   def filesystem_free(path)
     require 'sys/filesystem'

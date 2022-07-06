@@ -5,7 +5,7 @@
 #
 # @example
 #   include pe_status_check
-# @param [Array[String]] indicator_exclusions
+# @param [[Array][String]] indicator_exclusions
 #  List of disabled indicators, place any indicator ids you do not wish to report on in this list
 class pe_status_check (
   Array[String[1]] $indicator_exclusions = [],
