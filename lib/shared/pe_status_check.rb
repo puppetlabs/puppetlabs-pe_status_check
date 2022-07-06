@@ -163,4 +163,13 @@ module PEStatusCheck
     Facter.debug(e.backtrace)
     0
   end
+
+  def enabled?
+    enabled_file = '/opt/puppetlabs/puppet/cache/state/status_check_enable'
+    if Facter.value('os')['name'] == 'windows'
+      enabled_file = File.join(Facter.value('common_appdata'),
+                               'PuppetLabs/puppet/cache/state/status_check_enable')
+    end
+    File.exist?(enabled_file)
+  end
 end

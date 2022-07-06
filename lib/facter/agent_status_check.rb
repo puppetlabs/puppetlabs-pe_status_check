@@ -4,7 +4,7 @@
 
 Facter.add(:agent_status_check, type: :aggregate) do
   confine { !Facter.value(:pe_build) }
-  next unless File.exist?('/opt/puppetlabs/puppet/cache/state/status_check_enable')
+  confine { PEStatusCheck.enabled? }
   require 'puppet'
 
   chunk(:AS001) do
