@@ -7,6 +7,7 @@
 ### Classes
 
 * [`pe_status_check`](#pe_status_check): This class should be enabled if you wish Puppet to notify when pe_status_check indicators are not at optimal values
+* [`pe_status_check::agent_status_enable`](#pe_status_checkagent_status_enable): Enables the execution of agent_status_check fact
 
 ### Plans
 
@@ -45,6 +46,33 @@ Data type: `Array[String[1]]`
 List of disabled indicators, place any indicator ids you do not wish to report on in this list
 
 Default value: `[]`
+
+### <a name="pe_status_checkagent_status_enable"></a>`pe_status_check::agent_status_enable`
+
+Adding this class will enable the execution of the agent_status_check fact,
+This allows the fact to be targeted to a specific agent or group of agents
+
+#### Examples
+
+##### 
+
+```puppet
+include pe_status_check::agent_status_enable
+```
+
+#### Parameters
+
+The following parameters are available in the `pe_status_check::agent_status_enable` class:
+
+* [`agent_status_enabled`](#agent_status_enabled)
+
+##### <a name="agent_status_enabled"></a>`agent_status_enabled`
+
+Data type: `Boolean`
+
+Flag to enable or disable agent_status_check fact
+
+Default value: ``true``
 
 ## Plans
 

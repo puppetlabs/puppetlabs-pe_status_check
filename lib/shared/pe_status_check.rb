@@ -151,7 +151,7 @@ module PEStatusCheck
   end
 
   # Get the free disk percentage from a path
-  # @param name [String] The path on the file system
+  # @param path [String] The path on the file system
   # @return [Integer] The percentage of free disk space on the mount
   def filesystem_free(path)
     require 'sys/filesystem'
@@ -162,5 +162,14 @@ module PEStatusCheck
     Facter.warn("Error in fact 'pe_status_check': #{e.message}")
     Facter.debug(e.backtrace)
     0
+  end
+
+  def enabled?
+    enabled_file = '/opt/puppetlabs/puppet/cache/state/status_check_enable'
+    if Facter.value('os')['name'] == 'windows'
+      enabled_file = File.join(Facter.value('common_appdata'),
+                               'PuppetLabs/puppet/cache/state/status_check_enable')
+    end
+    File.exist?(enabled_file)
   end
 end

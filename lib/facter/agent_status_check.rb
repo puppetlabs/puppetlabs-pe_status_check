@@ -1,8 +1,10 @@
 # Agent Status Check fact aims to have all chunks reporting as true, indicating ideal state, any individual chunk reporting false should be alerted on and checked against documentation for next steps
 # Use shared logic from PEStatusCheck
+# Disabled by default requires bundled class too create /opt/puppetlabs/puppet/cache/status_check_enable
 
 Facter.add(:agent_status_check, type: :aggregate) do
   confine { !Facter.value(:pe_build) }
+  confine { PEStatusCheck.enabled? }
   require 'puppet'
 
   chunk(:AS001) do
