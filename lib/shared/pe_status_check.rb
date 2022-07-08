@@ -30,6 +30,10 @@ module PEStatusCheck
   def get_resource(resource, name)
     name += '.service' if (resource == 'service') && !name.include?('.')
     Puppet::Indirector::Indirection.instance(:resource).find("#{resource}/#{name}")
+  rescue ScriptError, StandardError => e
+    Facter.debug("Error when finding resource #{resource}: #{e.message}")
+    Facter.debug(e.backtrace)
+    nil
   end
 
   # checks puppetlabs.services.ca.certificate-authority-service/certificate-authority-service  exists in puppetserver bootstrap
