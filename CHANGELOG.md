@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.1.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.1.0) (2022-07-08)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.0.2...v2.1.0)
+
+### Added
+
+- \(SUP-3450\) make agent\_status\_check collection optional [\#141](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/141) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-3426\) Use shorter timeout for facter execute [\#139](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/139) ([m0dular](https://github.com/m0dular))
+- \(SUP-3400\)\(SUP-3401\)\(SUP-3402\) Update Readme to explain facts further [\#137](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/137) ([MartyEwings](https://github.com/MartyEwings))
+
+### Fixed
+
+- SUP-3457 get\_resource error handling [\#143](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/143) ([m0dular](https://github.com/m0dular))
+- \(SUP-3442\) Update ss commands so timeout kills the process [\#142](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/142) ([elainemccloskey](https://github.com/elainemccloskey))
+
 ## [v2.0.2](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.0.2) (2022-06-17)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.0.1...v2.0.2)
