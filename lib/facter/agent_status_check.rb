@@ -10,6 +10,7 @@ Facter.add(:agent_status_check, type: :aggregate) do
   chunk(:AS001) do
     # Is the hostcert expiring within 90 days
     #
+    next unless File.exist?(Puppet.settings['hostcert'])
     raw_hostcert = File.read(Puppet.settings['hostcert'])
     certificate = OpenSSL::X509::Certificate.new raw_hostcert
     result = certificate.not_after - Time.now
