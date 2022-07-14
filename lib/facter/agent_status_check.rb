@@ -37,6 +37,6 @@ Facter.add(:agent_status_check, type: :aggregate) do
   chunk(:AS003) do
     # certname is configured in section other than [main]
     #
-    { AS003: !Puppet.settings.set_in_section?(:certname, :agent) || !Puppet.settings.set_in_section?(:certname, :server) || !Puppet.settings.set_in_section?(:certname, :user) }
+    { AS003: !Puppet.settings.set_in_section?(:certname, :agent) && !Puppet.settings.set_in_section?(:certname, :server) && !Puppet.settings.set_in_section?(:certname, :user) }
   end
 end
