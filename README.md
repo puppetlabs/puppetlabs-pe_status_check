@@ -136,15 +136,21 @@ Please find some examples of using pe_client_tools to query the status check fac
 
 1. To find the complete output of pe_status_check from all nodes listed by certname:
 
-        `puppet query 'facts[certname,value] { name = "pe_status_check" }'`
-
+      ```shell
+      puppet query 'facts[certname,value] { name = "pe_status_check" }'
+      ```
+        
 2. To find the complete output of agen_status_check from all nodes listed by certname (this could be a large query based on the number of agent nodes, further filtering is advised ):
 
-        `puppet query 'facts[certname,value] { name = "agent_status_check" }'`
+      ```shell
+      puppet query 'facts[certname,value] { name = "agent_status_check" }'
+      ```
 
 3. To find those nodes with a  specific status check set to false:
 
-        `puppet query 'inventory[certname] { facts.pe_status_check.S0001 = false }'`
+      ```shell
+      puppet query 'inventory[certname] { facts.pe_status_check.S0001 = false }'
+      ```
 
 #### Setup Requirements
 
@@ -216,6 +222,7 @@ A failure to determine node type will result in a safe subset of checks being ru
 This fact is confined to run on infrastructure nodes only.
 
 Refer  below for next steps when any indicator reports a `false`.
+
 | Indicator ID | Description                                                                        | Self-service steps                                                                                                                                                                                                                                                                                                                                                                                                                                                          | What to include in a Support ticket                                                                                                                                                                                                   |
 |--------------|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | S0001        | Determines if the puppet service is running on agents.                                      | Starts the puppet service - `puppet resource service puppet ensure=running`                                                                                                                                                                                                                                                                                                                                                                                                    | If the service fails to start, open a Support ticket referencing S0001, and provide `syslog` and any errors output when attempting to restart the service.                                           |
@@ -258,10 +265,12 @@ Refer  below for next steps when any indicator reports a `false`.
 This fact is confined to run on only agent nodes that a NOT infrastructure nodes.
 
 Refer below for next steps when any indicator reports a `false`.
+
 | Indicator ID | Description                                                                        | Self-service steps                                                                                                                                                                                                                                                                                                                                                                                                                                                          | What to include in a Support ticket                                                                                                                                                                                                   |
 |--------------|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | AS001        | Determines if the agent host certificate is expiring in the next 90 days.                                     | Puppet Enterprise has a plan built into extend agent certificates. Use a puppet query to find expiring host certificates and pass the node ID to this plan:   `puppet plan run enterprise_tasks::agent_cert_regen agent=$(puppet query 'inventory[certname] { facts.agent_status_check.AS001 = false }' \| jq  -r '.[].certname' \|  paste -sd, -) master=$(puppet config print certname)`  |  If the plan fails to run, open a support ticket referencing AS001 and provide the error message received when running the plan.                                                                               | 
 | AS002        | Determines if the pxp-agent has an established connection to a pxp broker                                     | Ensure the pxp-agent service is running, if running check `/var/log/puppetlabs/pxp-agent/pxp-agent.log` (on *nix) or `C:/ProgramData/PuppetLabs/pxp-agent/var/log/pxp-agent.log` (on Windows) — Contains the for connection issues, first ensuring the agent is connecting to the proper endpoint, for example, a compiler and not the primary. This fact can also be used as a target filter for running tasks, ensuring time is not wasted sending instructions to agents not connected to a broker| If unable to make a connection to a broker, raise a ticket with the support team quoting AS002 and attaching the file  `/var/log/puppetlabs/pxp-agent/pxp-agent.log` (on *nix) or `C:/ProgramData/PuppetLabs/pxp-agent/var/log/pxp-agent.log` (on Windows) along with the conclusions of your investigation so far                                                                            | 
+| AS003        | Determines the certname configuration parameter is incorrectly set outside of the [main] section of the puppet.conf file.                                 | The Puppet documentation states clearly certname should always be placed solely in the [main] section to prevent unforseen issues with the operation of the puppet agent https://puppet.com/docs/puppet/7/configuration.html#certname | If unable to determine why the indicator is being raised. Open a ticket with the support team quoting AS003 and attaching the file  `puppet.conf`  along with the conclusions of your investigation so far .                                                                           | 
 
 ## How to report an issue or contribute to the module
 

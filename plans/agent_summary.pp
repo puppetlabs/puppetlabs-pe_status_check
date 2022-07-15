@@ -78,7 +78,7 @@ plan pe_status_check::agent_summary(
         'failed_tests_count'   => $failing.length,
         'failed_tests_details' => $failing.keys.map |$items| {
           unless $hiera_result_or_error =~ Error {
-            lookup("agent_status_check::${items}", String)
+            lookup("pe_status_check::${items}", String)
           }
         },
       },
