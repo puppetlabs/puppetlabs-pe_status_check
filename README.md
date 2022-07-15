@@ -136,15 +136,21 @@ Please find some examples of using pe_client_tools to query the status check fac
 
 1. To find the complete output of pe_status_check from all nodes listed by certname:
 
-      ```puppet query 'facts[certname,value] { name = "pe_status_check" }'```
+      ```shell
+      puppet query 'facts[certname,value] { name = "pe_status_check" }'
+      ```
         
 2. To find the complete output of agen_status_check from all nodes listed by certname (this could be a large query based on the number of agent nodes, further filtering is advised ):
 
-      ```puppet query 'facts[certname,value] { name = "agent_status_check" }'```
+      ```shell
+      puppet query 'facts[certname,value] { name = "agent_status_check" }'
+      ```
 
 3. To find those nodes with a  specific status check set to false:
 
-      ```puppet query 'inventory[certname] { facts.pe_status_check.S0001 = false }'```
+      ```shell
+      puppet query 'inventory[certname] { facts.pe_status_check.S0001 = false }'
+      ```
 
 #### Setup Requirements
 
