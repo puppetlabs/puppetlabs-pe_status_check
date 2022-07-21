@@ -39,4 +39,12 @@ Facter.add(:agent_status_check, type: :aggregate) do
     #
     { AS003: !Puppet.settings.set_in_section?(:certname, :agent) && !Puppet.settings.set_in_section?(:certname, :server) && !Puppet.settings.set_in_section?(:certname, :user) }
   end
+  chunk(:AS004) do
+    # Is the host copy of the crl expiring in the next 90 days
+    hostcrl = Puppet.settings[:hostcrl]
+    next unless File.exist?(hostcrl)
+
+    x509_cert = OpenSSL::X509::CRL.new(File.read(hostcrl))
+    { AS004: (x509_cert.next_update - Time.now) > 7_776_000 }
+  end
 end

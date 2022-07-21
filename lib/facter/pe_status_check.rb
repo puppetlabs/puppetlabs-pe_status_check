@@ -258,7 +258,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0023) do
-    # Is the CRL expiring in the next 90 days
+    # Is the CA_CRL expiring in the next 90 days
     next unless ['primary', 'legacy_primary'].include?(Facter.value('pe_status_check_role'))
     cacrl = Puppet.settings[:cacrl]
     next unless File.exist?(cacrl)
@@ -266,7 +266,6 @@ Facter.add(:pe_status_check, type: :aggregate) do
     x509_cert = OpenSSL::X509::CRL.new(File.read(cacrl))
     { S0023: (x509_cert.next_update - Time.now) > 7_776_000 }
   end
-
 
   chunk(:S0024) do
     next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
@@ -282,6 +281,15 @@ Facter.add(:pe_status_check, type: :aggregate) do
     else
       { S0024: true }
     end
+  end
+
+  chunk(:S0025) do
+    # Is the host copy of the crl expiring in the next 90 days
+    hostcrl = Puppet.settings[:hostcrl]
+    next unless File.exist?(hostcrl)
+
+    x509_cert = OpenSSL::X509::CRL.new(File.read(hostcrl))
+    { S0025: (x509_cert.next_update - Time.now) > 7_776_000 }
   end
 
   chunk(:S0029) do
