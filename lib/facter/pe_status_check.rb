@@ -199,7 +199,15 @@ Facter.add(:pe_status_check, type: :aggregate) do
     response = PEStatusCheck.http_get('/status/v1/services/pe-jruby-metrics?level=debug', 8140)
     if response
       free_jrubies = response.dig('status', 'experimental', 'metrics', 'average-free-jrubies')
-      { S0019: free_jrubies >= 0.9 }
+      {
+        S0019: if free_jrubies.nil?
+                 false
+               elsif free_jrubies.is_a?(String)
+                 false
+               else
+                 free_jrubies.to_f >= 0.9
+               end
+      }
     else
       { S0019: false }
     end
