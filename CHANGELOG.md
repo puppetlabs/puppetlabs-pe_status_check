@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.3.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.3.0) (2022-07-27)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.2.0...v2.3.0)
+
+### Added
+
+- \(SUP-3362\) add CRL expiration check [\#149](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/149) ([MartyEwings](https://github.com/MartyEwings))
+
+### Fixed
+
+- \(SUP-3491\) Cast free\_jrubies value to float [\#151](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/151) ([m0dular](https://github.com/m0dular))
+
 ## [v2.2.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.2.0) (2022-07-15)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.1.1...v2.2.0)
