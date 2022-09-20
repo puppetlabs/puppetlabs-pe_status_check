@@ -20,7 +20,7 @@ pe_status_check::S0017: "S0017 Determines if there are any OutOfMemory errors in
 pe_status_check::S0018: "S0018 Determines if there are any OutOfMemory errors in the Orchestrator JVM"
 pe_status_check::S0019: "S0019 Determines if there are sufficent jrubies available to serve agents"
 pe_status_check::S0020: "S0020 Determines"
-pe_status_check::S0021: "S0021 Determines if there are sufficent jrubies available to serve agents"
+pe_status_check::S0021: "S0021 Determines if free memory is less than 10%."
 pe_status_check::S0022: "S0022 Determines if there is a valid Puppet Enterprise license in place at /etc/puppetlabs/license.key on your primary which is not going to expire in the next 90 days"
 pe_status_check::S0023: "S0023 Determines if the CA CRL expires within 90 days"
 pe_status_check::S0024: "S0024 Determines if there are files in the puppetdb discard directory newer than 1 week old"
