@@ -295,16 +295,16 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0026) do
     next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
-    response = PEStatusCheck.http_get('/status/v1/services/pe-jruby-metrics?level=debug', 8140)
+    response = PEStatusCheck.http_get('/status/v1/services?level=debug', 8140)
     if response
-      heap_max = response.dig('status', 'experimental', 'metrics', 'jvm-metrics', 'heap-memory', 'init')
+      heap_max = response.dig('status-service', 'status', 'experimental', 'jvm-metrics', 'heap-memory', 'init')
       {
         S0026: if heap_max.nil?
                  false
                elsif heap_max.is_a?(String)
                  false
                else
-                 (heap_max > 33_285_996_544) && (heap_max < 51_539_607_552)
+                 (heap_max > 33_285_996_544) && (heap_max < 51_539_607_552) ? false : true
                end
       }
     else
@@ -315,16 +315,16 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0027) do
     next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler'].include?(Facter.value('pe_status_check_role'))
 
-    response = PEStatusCheck.http_get('/status/v1/services/pe-jruby-metrics?level=debug', 8081)
+    response = PEStatusCheck.http_get('/status/v1/services/services?level=debug', 8081)
     if response
-      heap_max = response.dig('status', 'experimental', 'metrics', 'jvm-metrics', 'heap-memory', 'init')
+      heap_max = response.dig('status-service', 'status', 'experimental', 'jvm-metrics', 'heap-memory', 'init')
       {
         S0027: if heap_max.nil?
                  false
                elsif heap_max.is_a?(String)
                  false
                else
-                 (heap_max > 33_285_996_544) && (heap_max < 51_539_607_552)
+                 (heap_max > 33_285_996_544) && (heap_max < 51_539_607_552) ? false : true
                end
       }
     else
