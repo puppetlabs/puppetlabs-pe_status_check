@@ -449,7 +449,15 @@ Facter.add(:pe_status_check, type: :aggregate) do
     response = PEStatusCheck.http_get('/puppet/v3/environments', 8140)
     if response
       envs_count = response.dig('environments').length
-      { S0038: (envs_count < 100) }
+      {
+        S0038: if envs_count.nil?
+                 true
+               elsif envs_count.is_a?(String)
+                 true
+               else
+                 (envs_count < 100)
+               end
+      }
     else
       { S0038: false }
     end
