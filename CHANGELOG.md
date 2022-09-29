@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.4.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.4.0) (2022-09-29)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.3.1...v2.4.0)
+
+### Added
+
+- \(SUP-3665\) add check for ineffeicent heap max values [\#161](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/161) ([MartyEwings](https://github.com/MartyEwings))
+
+### Fixed
+
+- \(sup-3676\) Handle Nill Value in S0038 [\#162](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/162) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-3622\)Correct description of S0021 in hiera [\#160](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/160) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-3594\) readme updates for clarity [\#158](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/158) ([MartyEwings](https://github.com/MartyEwings))
+
 ## [v2.3.1](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.3.1) (2022-08-15)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.3.0...v2.3.1)
