@@ -227,7 +227,9 @@ Facter.add(:pe_status_check, type: :aggregate) do
     if File.exist?(license_file)
       begin
         license_type = File.readlines(license_file).grep(%r{license_type:}).first
-        if license_type.include? 'Perpetual'
+        if license_type.nil?
+          validity = true
+        elsif license_type.include? 'Perpetual'
           validity = true
         elsif license_type.include? 'Subscription'
           require 'date'
