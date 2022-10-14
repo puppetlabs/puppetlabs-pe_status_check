@@ -496,4 +496,17 @@ Facter.add(:pe_status_check, type: :aggregate) do
     Facter.debug(e.backtrace)
     { S0042: false }
   end
+
+  chunk(:S0043) do
+    # Is the console cert expiring in the next 90 days (skips if not in default location)
+     next unless ['primary', 'legacy_primary'].include?(Facter.value('pe_status_check_role'))
+    next unless File.exists?('/opt/puppetlabs/server/data/console-services/certs/console-cert.cert.pem')
+    consolecert = '/opt/puppetlabs/server/data/console-services/certs/console-cert.cert.pem'
+    raw_consolecert = File.read(consolecert)
+     certificate = OpenSSL::X509::Certificate.new raw_consolecert
+    result = certificate.not_after - Time.now
+
+    { S0043: result > 7_776_000 }
+  end
+
 end
