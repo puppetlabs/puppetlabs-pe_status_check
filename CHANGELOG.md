@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.4.1](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.4.1) (2022-10-14)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.4.0...v2.4.1)
+
+### Fixed
+
+- \(SUP-3724\) error handling for access log parsing [\#167](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/167) ([MartyEwings](https://github.com/MartyEwings))
+- \(Sup-3700\) Handle missing licence type [\#165](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/165) ([MartyEwings](https://github.com/MartyEwings))
+- Remove duplicate Chunks [\#164](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/164) ([MartyEwings](https://github.com/MartyEwings))
+
 ## [v2.4.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.4.0) (2022-09-29)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.3.1...v2.4.0)
