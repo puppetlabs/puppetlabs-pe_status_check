@@ -464,6 +464,9 @@ Facter.add(:pe_status_check, type: :aggregate) do
       current = since_lastrun.to_i <= Puppet.settings['runinterval']
 
       match[:status] == '503' and current
+    rescue StandardError => e
+      Facter.warn("Error in fact 'pe_status_check.S0039' when querying puppetserver access logs: #{e.message}")
+      Facter.debug(e.backtrace)
     end
 
     { S0039: !has_503 }
