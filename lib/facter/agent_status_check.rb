@@ -26,8 +26,23 @@ Facter.add(:agent_status_check, type: :aggregate) do
       result = Facter::Core::Execution.execute('netstat -np tcp', { timeout: PEStatusCheck.facter_timeout })
       { AS002: result.match?(%r{8142\s*ESTABLISHED}) }
     else
-      result = Facter::Core::Execution.execute("ss -onp state established '( dport = :8142 )' ", { timeout: PEStatusCheck.facter_timeout })
-      { AS002: result.include?('pxp-agent') }
+      # Obtain all inodes associated with any sockets established outbound to TCP/8142:
+      socket_state = Facter::Core::Execution.execute("ss -tone state established '( dport = :8142 )' ", { timeout: PEStatusCheck.facter_timeout })
+      socket_matches = Set.new(socket_state.scan(%r{ino:(\d+)}).flatten)
+
+      # Look for the pxp-agent process in the process table:
+      cmdline_path = Dir.glob('/proc/[0-9]*/cmdline').find { |path| File.read(path).split("\0").first == '/opt/puppetlabs/puppet/bin/pxp-agent' }
+
+      # If no match was found, then the connection to 8142 is not the pxp-agent process because it is not in the process table:
+      if cmdline_path.nil?
+        { AS002: false }
+      else
+        # Find all of the file descriptors associated with pxp-agent which are sockets, and extract just the associated inode number:
+        fd_path = File.join(File.dirname(cmdline_path), 'fd', '*')
+        pxp_socket_inodes = Set.new(Dir.glob(fd_path).map { |path| File.readlink(path) }.select { |t| t.start_with?('socket:') }.map { |str| str.tr('^0-9', '') })
+
+        { AS002: socket_matches.intersect?(pxp_socket_inodes) }
+      end
     end
   rescue Facter::Core::Execution::ExecutionFailure => e
     Facter.warn("agent_status_check.AS002 failed to get socket status: #{e.message}")
