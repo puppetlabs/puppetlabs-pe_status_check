@@ -297,9 +297,9 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0026) do
     next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
-    response = PEStatusCheck.http_get('/status/v1/services?level=debug', 8140)
+    response = PEStatusCheck.http_get('/status/v1/services/status-service?level=debug', 8140)
     if response
-      heap_max = response.dig('status-service', 'status', 'experimental', 'jvm-metrics', 'heap-memory', 'init')
+      heap_max = response.dig('status', 'experimental', 'jvm-metrics', 'heap-memory', 'init')
       {
         S0026: if heap_max.nil?
                  false
