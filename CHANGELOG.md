@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.4.2](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.4.2) (2022-11-09)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.4.1...v2.4.2)
+
+### Fixed
+
+- \(SUP-3777\) Stop loop in S0039 if log is in unreadable format [\#174](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/174) ([elainemccloskey](https://github.com/elainemccloskey))
+- \(\#170\) Improve agent\_status\_check.AS002 performance [\#171](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/171) ([seanmil](https://github.com/seanmil))
+
+### UNCATEGORIZED PRS; LABEL THEM ON GITHUB
+
+- \(\#172\) Improve query time on S0026 [\#173](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/173) ([seanmil](https://github.com/seanmil))
+
 ## [v2.4.1](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.4.1) (2022-10-14)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.4.0...v2.4.1)
