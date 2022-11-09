@@ -467,6 +467,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
     rescue StandardError => e
       Facter.warn("Error in fact 'pe_status_check.S0039' when querying puppetserver access logs: #{e.message}")
       Facter.debug(e.backtrace)
+      break
     end
 
     { S0039: !has_503 }
