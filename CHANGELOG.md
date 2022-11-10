@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.5.1](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.5.1) (2022-11-10)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.5.0...v2.5.1)
+
+### Fixed
+
+- \(SUP-3786\) Update s00036 to not trigger on 150 [\#178](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/178) ([elainemccloskey](https://github.com/elainemccloskey))
+
 ## [v2.5.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.5.0) (2022-11-09)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.4.1...v2.5.0)
