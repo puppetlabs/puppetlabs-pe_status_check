@@ -425,7 +425,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
     if max_queued_requests.nil?
       { S0036: true }
     else
-      { S0036: max_queued_requests[1].to_i < 150 }
+      { S0036: max_queued_requests[1].to_i < 151 }
     end
   end
 
