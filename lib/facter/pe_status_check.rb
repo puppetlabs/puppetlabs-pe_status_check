@@ -500,4 +500,33 @@ Facter.add(:pe_status_check, type: :aggregate) do
     Facter.debug(e.backtrace)
     { S0042: false }
   end
+
+  chunk(:S0043) do
+    # Are there nodes with Puppet agent versions ahead of the primary server's agent version
+    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+    primary_agent_version = Gem::Version.new(Facter.value(:aio_agent_version))
+    response = PEStatusCheck.http_get('/analytics/v1/collections/snapshots', 8140)
+    if response
+        # assume the indicator should be true unless we encounter a higher version number in the API response
+        no_versions_greater_than_primary = true
+        begin
+            versions = response.dig(0, 'aio-agent-versions', 'value')
+            versions.each do |version|
+                if Gem::Version.new(version.dig('version')) > primary_agent_version
+                    # upon the first occurence of a higher version number set the indicator to false and break
+                    no_versions_greater_than_primary = false
+                    break
+                end
+            end
+        rescue StandardError => e
+            Facter.warn("Error in fact 'pe_status_check.S0043' when checking Puppet agent versions: #{e.message}")
+            Facter.debug(e.backtrace)
+            { S0043: false }
+        end
+        { S0043: no_versions_greater_than_primary }
+    else
+        # no response from the analytics API
+        { S0043: false }
+    end
+  end
 end
