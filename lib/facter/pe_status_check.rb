@@ -526,4 +526,10 @@ Facter.add(:pe_status_check, type: :aggregate) do
       { S0043: false }
     end
   end
+
+  chunk(:S0044) do
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    classifier_is_node_terminus = (Puppet.settings.set_in_section(:node_terminus, :master) == 'classifier') || (Puppet.settings.set_in_section(:node_terminus, :server) == 'classifier')
+    { S0044: classifier_is_node_terminus }
+  end
 end
