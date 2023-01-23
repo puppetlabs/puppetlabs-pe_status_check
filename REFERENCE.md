@@ -7,14 +7,14 @@
 ### Classes
 
 * [`pe_status_check`](#pe_status_check): This class should be enabled if you wish Puppet to notify when pe_status_check indicators are not at optimal values
-* [`pe_status_check::agent_status_enable`](#pe_status_checkagent_status_enable): Enables the execution of agent_status_check fact
+* [`pe_status_check::agent_status_enable`](#pe_status_check--agent_status_enable): Enables the execution of agent_status_check fact
 
 ### Plans
 
-* [`pe_status_check::agent_summary`](#pe_status_checkagent_summary): Summary report if the state of agent_status_check on each node
+* [`pe_status_check::agent_summary`](#pe_status_check--agent_summary): Summary report if the state of agent_status_check on each node
 Uses the facts task to get the current status from each node
 and produces a summary report in JSON
-* [`pe_status_check::infra_summary`](#pe_status_checkinfra_summary): Summary report if the state of pe_status check on each node
+* [`pe_status_check::infra_summary`](#pe_status_check--infra_summary): Summary report if the state of pe_status check on each node
 Uses the facts task to get the current status from each node
 and produces a summary report in JSON
 
@@ -37,9 +37,9 @@ include pe_status_check
 
 The following parameters are available in the `pe_status_check` class:
 
-* [`indicator_exclusions`](#indicator_exclusions)
+* [`indicator_exclusions`](#-pe_status_check--indicator_exclusions)
 
-##### <a name="indicator_exclusions"></a>`indicator_exclusions`
+##### <a name="-pe_status_check--indicator_exclusions"></a>`indicator_exclusions`
 
 Data type: `Array[String[1]]`
 
@@ -47,7 +47,7 @@ List of disabled indicators, place any indicator ids you do not wish to report o
 
 Default value: `[]`
 
-### <a name="pe_status_checkagent_status_enable"></a>`pe_status_check::agent_status_enable`
+### <a name="pe_status_check--agent_status_enable"></a>`pe_status_check::agent_status_enable`
 
 Adding this class will enable the execution of the agent_status_check fact,
 This allows the fact to be targeted to a specific agent or group of agents
@@ -64,19 +64,19 @@ include pe_status_check::agent_status_enable
 
 The following parameters are available in the `pe_status_check::agent_status_enable` class:
 
-* [`agent_status_enabled`](#agent_status_enabled)
+* [`agent_status_enabled`](#-pe_status_check--agent_status_enable--agent_status_enabled)
 
-##### <a name="agent_status_enabled"></a>`agent_status_enabled`
+##### <a name="-pe_status_check--agent_status_enable--agent_status_enabled"></a>`agent_status_enabled`
 
 Data type: `Boolean`
 
 Flag to enable or disable agent_status_check fact
 
-Default value: ``true``
+Default value: `true`
 
 ## Plans
 
-### <a name="pe_status_checkagent_summary"></a>`pe_status_check::agent_summary`
+### <a name="pe_status_check--agent_summary"></a>`pe_status_check::agent_summary`
 
 Summary report if the state of agent_status_check on each node
 Uses the facts task to get the current status from each node
@@ -86,19 +86,19 @@ and produces a summary report in JSON
 
 The following parameters are available in the `pe_status_check::agent_summary` plan:
 
-* [`targets`](#targets)
-* [`indicator_exclusions`](#indicator_exclusions)
+* [`targets`](#-pe_status_check--agent_summary--targets)
+* [`indicator_exclusions`](#-pe_status_check--agent_summary--indicator_exclusions)
 
-##### <a name="targets"></a>`targets`
+##### <a name="-pe_status_check--agent_summary--targets"></a>`targets`
 
 Data type: `Optional[TargetSpec]`
 
 A comma seprated list of FQDN's of Puppet agent nodes
 Defaults to using a PuppetDB query to identify nodes
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="indicator_exclusions"></a>`indicator_exclusions`
+##### <a name="-pe_status_check--agent_summary--indicator_exclusions"></a>`indicator_exclusions`
 
 Data type: `Array[String[1]]`
 
@@ -106,7 +106,7 @@ List of disabled indicators, place any indicator ids you do not wish to report o
 
 Default value: `[]`
 
-### <a name="pe_status_checkinfra_summary"></a>`pe_status_check::infra_summary`
+### <a name="pe_status_check--infra_summary"></a>`pe_status_check::infra_summary`
 
 Summary report if the state of pe_status check on each node
 Uses the facts task to get the current status from each node
@@ -116,19 +116,19 @@ and produces a summary report in JSON
 
 The following parameters are available in the `pe_status_check::infra_summary` plan:
 
-* [`targets`](#targets)
-* [`indicator_exclusions`](#indicator_exclusions)
+* [`targets`](#-pe_status_check--infra_summary--targets)
+* [`indicator_exclusions`](#-pe_status_check--infra_summary--indicator_exclusions)
 
-##### <a name="targets"></a>`targets`
+##### <a name="-pe_status_check--infra_summary--targets"></a>`targets`
 
 Data type: `Optional[TargetSpec]`
 
 A comma seprated list of FQDN's of Puppet infrastructure agent nodes
 Defaults to using a PuppetDB query to identify nodes
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="indicator_exclusions"></a>`indicator_exclusions`
+##### <a name="-pe_status_check--infra_summary--indicator_exclusions"></a>`indicator_exclusions`
 
 Data type: `Array[String[1]]`
 

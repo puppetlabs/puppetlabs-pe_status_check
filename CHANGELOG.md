@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.6.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.6.0) (2023-01-23)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.5.1...v2.6.0)
+
+### Added
+
+- \(SUP-3703\) Add indicator S0044 node\_terminus is the PE classifier [\#181](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/181) ([taikaa](https://github.com/taikaa))
+- \(SUP-3696\) Added S0043 to determine whether there are nodes with Puppet agent versions ahead of the primary server [\#180](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/180) ([taikaa](https://github.com/taikaa))
+
 ## [v2.5.1](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.5.1) (2022-11-10)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.5.0...v2.5.1)
