@@ -391,8 +391,13 @@ Facter.add(:pe_status_check, type: :aggregate) do
     hiera_config_path = Puppet.settings['hiera_config']
     next unless File.exist?(hiera_config_path)
     hiera_config_file = YAML.load_file(hiera_config_path)
+    hiera_version = hiera_config_file.dig('version')
+    if hiera_version.nil?
+      { S0033: false }
     # Is Hiera 5 in use?
-    { S0033: hiera_config_file.dig('version') == 5 }
+    else
+      { S0033: hiera_version.to_i == 5 }
+    end
   end
 
   chunk(:S0034) do
