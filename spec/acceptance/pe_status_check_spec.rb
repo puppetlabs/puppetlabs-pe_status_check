@@ -127,7 +127,7 @@ describe 'pe_status_check class' do
         run_shell('export lastrunfile=$(puppet config print lastrunfile) && mv -f ${lastrunfile}.bk $lastrunfile')
       end
       it 'if S0014 conditions for false are met' do
-        run_shell('touch -d "40 minutes ago" /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
+        run_shell('touch -d "65 minutes ago" /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
         result = run_shell('facter -p pe_status_check.S0014')
         expect(result.stdout).to match(%r{false})
         run_shell('rm -f /opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/acceptance.txt')
