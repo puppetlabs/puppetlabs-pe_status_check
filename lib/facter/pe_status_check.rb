@@ -130,7 +130,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   end
 
   chunk(:S0014) do
-    time_now = Time.now - Puppet.settings['runinterval']
+    time_now = Time.now - (Puppet.settings['runinterval'].to_i * 2)
     res = Dir.glob('/opt/puppetlabs/server/data/puppetdb/stockpile/cmd/q/*').find { |f| time_now.to_i > File.mtime(f).to_i }
     { S0014: res.nil? }
   end
