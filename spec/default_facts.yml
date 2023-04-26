@@ -7,5 +7,5 @@ ipaddress6: "FE80:0000:0000:0000:AAAA:AAAA:AAAA"
 is_pe: false
 macaddress: "AA:AA:AA:AA:AA:AA"
 pe_build: 2021.4.0
-common_appdata: C:/ProgramData
+common_appdata: 'C:/ProgramData'
 
