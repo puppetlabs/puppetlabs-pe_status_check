@@ -237,7 +237,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
         end_date = Date.parse(File.readlines(license_file).grep(%r{end:}).first)
         today_date = Date.today
         daysexp = (end_date - today_date).to_i
-        validity = (today_date <= end_date) && (daysexp >= 90) ? true : false
+        validity = ((today_date <= end_date) && (daysexp >= 90)) ? true : false
           rescue StandardError => e
             Facter.warn("Error in fact 'pe_status_check.S0022' when checking license end date: #{e.message}")
             Facter.debug(e.backtrace)
@@ -306,7 +306,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
                elsif heap_max.is_a?(String)
                  false
                else
-                 (heap_max > 33_285_996_544) && (heap_max < 51_539_607_552) ? false : true
+                 ((heap_max > 33_285_996_544) && (heap_max < 51_539_607_552)) ? false : true
                end
       }
     else
@@ -326,7 +326,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
                elsif heap_max.is_a?(String)
                  false
                else
-                 (heap_max > 33_285_996_544) && (heap_max < 51_539_607_552) ? false : true
+                 ((heap_max > 33_285_996_544) && (heap_max < 51_539_607_552)) ? false : true
                end
       }
     else

@@ -41,6 +41,11 @@ Rakefile:
 spec/default_facts.yml:
   extra_facts:
     pe_build: '2021.4.0'
+    common_appdata: 'C:/ProgramData'
+.rubocop.yml:
+  default_configs:
+    "Layout/BlockAlignment":
+       Enabled: False
 
 Gemfile:
   optional:
