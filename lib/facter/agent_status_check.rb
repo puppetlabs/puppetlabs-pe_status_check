@@ -62,4 +62,17 @@ Facter.add(:agent_status_check, type: :aggregate) do
     x509_cert = OpenSSL::X509::CRL.new(File.read(hostcrl))
     { AS004: (x509_cert.next_update - Time.now) > 7_776_000 }
   end
+  chunk(:AS005) do
+    # Did the last Puppet run have any errors or warnings?
+    last_run_report = Puppet.settings[:lastrunreport]
+    next unless File.exist?(last_run_report)
+    begin
+      last_run_report_file = YAML.load_file(last_run_report)
+      { AS005: last_run_report_file.logs.none? { |l| [:warning, :err].include?(l.level) } }
+    rescue Facter::Core::Execution::ExecutionFailure => e
+      Facter.warn("agent_status_check.AS005 failed to get last run report: #{e.message}")
+      Facter.debug(e.backtrace)
+      { AS005: false }
+    end
+  end
 end

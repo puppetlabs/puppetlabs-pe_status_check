@@ -47,3 +47,5 @@ pe_status_check::AS001: "AS001 Determines if the agent host certificate is expir
 pe_status_check::AS002: "AS002 Determines if the pxp-agent has an established connection to a pxp broker"
 pe_status_check::AS003: "AS003 Determines the certname configuration parameter is incorrectly set outside of the [main] section of the puppet.conf file"
 pe_status_check::AS004: "AS004 Determines if the host copy of the CRL expires within 90 days"
+pe_status_check::AS005: "AS005 Determines if there were warnings or errors in the lastrunreport"
+
