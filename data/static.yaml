@@ -37,7 +37,7 @@ pe_status_check::S0034: "S0034 Determines if PE installation has not been upgrad
 pe_status_check::S0035: "S0035 Determines if puppet module list is returning any warnings"
 pe_status_check::S0036: "S0036 Determines if max-queued-requests is set above 150"
 pe_status_check::S0037: "S0037 Determines"
-pe_status_check::S0038: "S0038 Determines"
+pe_status_check::S0038: "S0038 Determines whether the number of environments within $codedir/environments is less than 100"
 pe_status_check::S0039: "S0039 Determines if Puppetserver has a non zero queue-limit-hit-rate"
 pe_status_check::S0040: "S0040 Determines if the deployment is collecting system metrics"
 pe_status_check::S0041: "S0041 Determines if the pxp broker  has an established connection to another pxp broker"
