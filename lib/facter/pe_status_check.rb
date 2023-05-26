@@ -534,7 +534,13 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0044) do
     next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
-    classifier_is_node_terminus = (Puppet.settings.set_in_section(:node_terminus, :master) == 'classifier') || (Puppet.settings.set_in_section(:node_terminus, :server) == 'classifier')
-    { S0044: classifier_is_node_terminus }
+    begin
+      classifier_is_node_terminus = (Puppet.settings.set_in_section(:node_terminus, :master) == 'classifier') || (Puppet.settings.set_in_section(:node_terminus, :server) == 'classifier')
+      { S0044: classifier_is_node_terminus }
+    rescue StandardError => e
+      Facter.warn("pe_status_check.S0044 failed to get setting from puppet.conf #{e.message}")
+      Facter.debug(e.backtrace)
+      { S0044: false }
+    end
   end
 end
