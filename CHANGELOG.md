@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v3.0.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v3.0.0) (2023-06-12)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.6.0...v3.0.0)
+
+### Changed
+
+- \(SUP-3952\) Remove Puppet 6 as a supported platform [\#186](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/186) ([elainemccloskey](https://github.com/elainemccloskey))
+
+### Added
+
+- \(SUP-4275\) Update Hiera definition of S0038 [\#191](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/191) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-4192\) Puppet 8 release prep [\#188](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/188) ([elainemccloskey](https://github.com/elainemccloskey))
+
+### Fixed
+
+- \(SUP-4282\) add error handling to S0044 [\#192](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/192) ([taikaa](https://github.com/taikaa))
+- \(SUP-4129\) Empty Yaml load error handling  and PDK Update [\#185](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/185) ([MartyEwings](https://github.com/MartyEwings))
+- \(SUP-4076\) Make the check time period 2\* run interval [\#184](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/184) ([MartyEwings](https://github.com/MartyEwings))
+
+### UNCATEGORIZED PRS; LABEL THEM ON GITHUB
+
+- Testing nightly & peadm workflow [\#183](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/183) ([elainemccloskey](https://github.com/elainemccloskey))
+
 ## [v2.6.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v2.6.0) (2023-01-23)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.5.1...v2.6.0)
