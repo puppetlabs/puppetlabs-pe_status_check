@@ -271,7 +271,7 @@ Refer  below for next steps when any indicator reports a `false`.
 
 ### Fact: agent_status_check
 
-This fact is confined to run on only agent nodes that a NOT infrastructure nodes.
+This fact is confined to run on only agent nodes that are NOT infrastructure nodes.
 
 Refer below for next steps when any indicator reports a `false`.
 
