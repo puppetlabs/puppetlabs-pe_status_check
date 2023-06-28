@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe 'pe_status_check' do
+  let(:hiera_config) { 'hiera.yaml' }
+
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:facts) { os_facts }
@@ -12,7 +14,6 @@ describe 'pe_status_check' do
   end
 
   context 'Reporting' do
-    let(:hiera_config) { 'hiera.yaml' }
     let(:facts) do
       { pe_status_check: { 'S0001' => false } }
     end
