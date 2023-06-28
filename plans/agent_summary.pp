@@ -24,13 +24,8 @@ plan pe_status_check::agent_summary(
   } else {
     get_targets($targets)
   }
-  # Validate that hiera lookups are functional
-  $hiera_result_or_error = catch_errors() || {
-    lookup('pe_status_check::AS001', String)
-  }
-  if $hiera_result_or_error =~ Error {
-    log::warn('Hiera lookups are not functional with plans. See the "Setup Requirements" section of the README')
-  }
+  # Trapping errors doesn't work here since the lookup will fail regardless
+  $checks = lookup('pe_status_check::checks', Hash)
 
   # Get the facts from the Targets to use for processing
   $results = without_default_logging() || {
@@ -76,11 +71,7 @@ plan pe_status_check::agent_summary(
       $res.target.name => {
         'passing_tests_count' => $passing.length,
         'failed_tests_count'   => $failing.length,
-        'failed_tests_details' => $failing.keys.map |$items| {
-          unless $hiera_result_or_error =~ Error {
-            lookup("pe_status_check::${items}", String)
-          }
-        },
+        'failed_tests_details' => $failing.keys.map |$key| { $checks[$key] },
       },
     }
     $memo + {
