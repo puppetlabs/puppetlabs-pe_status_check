@@ -26,7 +26,7 @@ plan pe_status_check::infra_summary(
   }
   # Validate that hiera lookups are functional
   $hiera_result_or_error = catch_errors() || {
-    lookup('pe_status_check.S0001', String)
+    lookup('pe_status_check::checks.S0001', String)
   }
   if $hiera_result_or_error =~ Error {
     log::warn('Hiera lookups are not functional with plans. See the "Setup Requirements" section of the README')
@@ -78,7 +78,7 @@ plan pe_status_check::infra_summary(
         'failed_tests_count'   => $failing.length,
         'failed_tests_details' => $failing.keys.map |$item| {
           unless $hiera_result_or_error =~ Error {
-            lookup("pe_status_check.${item}", String)
+            lookup("pe_status_check::checks.${item}", String)
           }
         },
       },

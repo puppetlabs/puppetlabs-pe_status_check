@@ -10,7 +10,7 @@
 class pe_status_check (
   Array[String[1]] $indicator_exclusions = [],
 ) {
-  $indicators = lookup('pe_status_check')
+  $indicators = lookup('pe_status_check::checks')
   $negatives = getvar('facts.pe_status_check', []).filter | $k, $v | { $v == false and ! ($k in $indicator_exclusions) }
 
   $negatives.each |$indicator, $_v| {
