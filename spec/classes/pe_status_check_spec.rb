@@ -11,15 +11,15 @@ describe 'pe_status_check' do
     end
   end
 
-  context "Reporting" do
+  context 'Reporting' do
     let(:hiera_config) { 'hiera.yaml' }
     let(:facts) do
-      { :pe_status_check => { 'S0001' => false } }
+      { pe_status_check: { 'S0001' => false } }
     end
-    let(:message) { "S0001 is at fault. The indicator S0001 Determines if Puppet agent Service is running, refer to documentation for required action"}
+    let(:message) { 'S0001 is at fault. The indicator S0001 Determines if Puppet agent Service is running, refer to documentation for required action' }
+
     it 'on a negative indicator' do
       is_expected.to contain_notify('pe_status_check S0001').with_message(message)
     end
   end
-
 end
