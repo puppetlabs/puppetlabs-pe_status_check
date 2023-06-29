@@ -14,7 +14,11 @@ class pe_status_check (
   $negatives = getvar('facts.pe_status_check', []).filter | $k, $v | { $v == false and ! ($k in $indicator_exclusions) }
 
   $negatives.each |$indicator, $_v| {
-    $in_message = pick($indicators[$indicator], 'Determines there is a fault')
+    if $indicators[$indicator] {
+      $in_message = $indicators[$indicator]
+    } else {
+      $in_message = 'Determines there is a fault'
+    }
     notify { "pe_status_check ${indicator}":
       message => "${indicator} is at fault. The indicator ${indicator} ${in_message}, refer to documentation for required action",
     }
