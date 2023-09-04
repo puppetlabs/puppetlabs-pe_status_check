@@ -5,14 +5,11 @@ require 'fileutils'
 
 # Tests pe_status_check class for default behaviours, no notification on all facts passing
 # Ensures default PE deployment passes all test cases
-# removes s0019 as its always a false positive
 describe 'pe_status_check class' do
   context 'activates module default parameters' do
     it 'applies the class with default parameters' do
       pp = <<-MANIFEST
-        class {'pe_status_check':
-            indicator_exclusions => ['S0019'],
-            }
+        include pe_status_check
         MANIFEST
       idempotent_apply(pp)
     end
@@ -41,7 +38,7 @@ describe 'pe_status_check class' do
       it 'if in the exclude list a parameter should not notify' do
         ppp = <<-MANIFEST
         class {'pe_status_check':
-            indicator_exclusions => ['S0001,S0019'],
+            indicator_exclusions => ['S0001'],
             }
         MANIFEST
         idempotent_apply(ppp)
