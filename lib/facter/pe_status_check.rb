@@ -387,16 +387,22 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0033) do
     next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
-
     hiera_config_path = Puppet.settings['hiera_config']
-    next unless File.exist?(hiera_config_path)
-    hiera_config_file = YAML.load_file(hiera_config_path)
-    hiera_version = hiera_config_file.dig('version')
-    if hiera_version.nil?
-      { S0033: false }
-    # Is Hiera 5 in use?
+    if File.exist?(hiera_config_path)
+      hiera_config_file = YAML.load_file(hiera_config_path)
     else
-      { S0033: hiera_version.to_i == 5 }
+      { S0033: false }
+    end
+
+    if hiera_config_file.is_a?(Hash) && !hiera_config_file.empty?
+      hiera_version = hiera_config_file.dig('version')
+      if hiera_version.nil?
+        { S0033: false }
+      else
+        { S0033: hiera_version.to_i == 5 }
+      end
+    else
+      { S0033: false }
     end
   end
 
