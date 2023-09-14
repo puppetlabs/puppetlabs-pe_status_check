@@ -1,5 +1,5 @@
 # @summary This class should be enabled if you wish Puppet to notify when pe_status_check indicators are not at optimal values
-#
+#TESTINGS PsR
 # When this class is enabled, when any of the indicators in the pe_status_check fact are false puppet will notify of this,
 #  individual tests can be disabled by adding the ID to the indicator_exclusions parameter
 #
