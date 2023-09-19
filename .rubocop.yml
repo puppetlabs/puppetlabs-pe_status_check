@@ -373,8 +373,6 @@ RSpec/VoidExpect:
   Enabled: false
 RSpec/Yield:
   Enabled: false
-Security/Open:
-  Enabled: false
 Style/AccessModifierDeclarations:
   Enabled: false
 Style/AccessorGrouping:
@@ -628,10 +626,6 @@ RSpec/SortMetadata:
 RSpec/SubjectDeclaration:
   Enabled: false
 RSpec/VerifiedDoubleReference:
-  Enabled: false
-Security/CompoundHash:
-  Enabled: false
-Security/IoMethods:
   Enabled: false
 Style/ArgumentsForwarding:
   Enabled: false

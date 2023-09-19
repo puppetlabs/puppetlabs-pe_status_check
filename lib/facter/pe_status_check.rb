@@ -431,7 +431,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0036) do
     next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
-    str = IO.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
+    str = File.read('/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf')
     max_queued_requests = str.match(%r{max-queued-requests: (\d+)})
     if max_queued_requests.nil?
       { S0036: true }
