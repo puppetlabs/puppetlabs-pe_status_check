@@ -18,7 +18,7 @@ pe_status_check::checks:
   S0017: "Determines if there are any OutOfMemory errors in the Puppetdb JVM"
   S0018: "Determines if there are any OutOfMemory errors in the Orchestrator JVM"
   S0019: "Determines if there are sufficient jrubies available to serve agents"
-  S0020: "Determines if the status endpoint for puppet server returns for port 4433"
+  S0020: "Determines if the console-service endpoint for puppet server returns true"
   S0021: "Determines if free memory is less than 10%"
   S0022: "Determines if there is a valid Puppet Enterprise license in place at /etc/puppetlabs/license.key on your primary which is not going to expire in the next 90 days"
   S0023: "Determines if the CA CRL expires within 90 days"
