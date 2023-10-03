@@ -18,7 +18,8 @@ describe 'pe_status_check class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no pe_status_check fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['pe_status_check'].size).to eq(39)
+        #Increment Test
+        expect(host_inventory['facter']['pe_status_check'].size).to eq(40)
         expect(host_inventory['facter']['pe_status_check'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -184,6 +185,12 @@ describe 'pe_status_check class' do
       #         result = run_shell('facter -p pe_status_check.S0019')
       #         expect(result.stdout).to match(%r{false})
       #       end
+      it 'if S0020 conditions for false are met' do
+        run_shell('puppet resource service pe-puppetserver  ensure=stopped')
+        result = run_shell('facter -p pe_status_check.S0020')
+        expect(result.stdout).to match(%r{false})
+        run_shell('puppet resource service pe-puppetserver  ensure=running')
+      end
       it 'if S0021 conditions for false are met' do
         run_shell('mkdir -p /etc/puppetlabs/facter/facts.d/;echo \'{
   "memory": {

@@ -26,6 +26,9 @@ Facter.add(:pe_status_check, type: :aggregate) do
     { S0003: !Puppet.settings['noop'] }
   end
 
+
+  # Repeat for SUP-4458 to change ports to 4433 - ONLY BRING 'primary', remove all 4 other ones
+  # Change ID number of course
   chunk(:S0004) do
     # Are All Services running
     next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
@@ -210,6 +213,21 @@ Facter.add(:pe_status_check, type: :aggregate) do
       }
     else
       { S0019: false }
+    end
+  end
+
+  chunk(:S0020) do
+    Are All Services running
+    next unless ['primary', ].include?(Facter.value('pe_status_check_role'))
+
+    response = PEStatusCheck.http_get('/status/v1/services', 4433)
+    if response
+      all_running = response.values.all? do |service|
+        service['state'] == 'running'
+      end
+      { S0004: all_running }
+    else
+      { S0004: false }
     end
   end
 
