@@ -186,7 +186,7 @@ describe 'pe_status_check class' do
       #       end
       it 'if S0020 conditions for false are met' do
         run_shell('puppet resource service pe-console-services  ensure=stopped')
-        result = run_shell('facter -p pe_.S0020')
+        result = run_shell('facter -p pe_status_check.S0020')
         expect(result.stdout).to match(%r{false})
         run_shell('puppet resource service pe-console-services  ensure=running')
       end
