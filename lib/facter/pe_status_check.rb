@@ -213,6 +213,20 @@ Facter.add(:pe_status_check, type: :aggregate) do
     end
   end
 
+  chunk(:S0020) do
+    # Are All Services running
+    next unless ['primary'].include?(Facter.value('pe_status_check_role'))
+    response = PEStatusCheck.http_get('/status/v1/services', 4433)
+    if response
+      all_running = response.values.all? do |service|
+        service['state'] == 'running'
+      end
+      { S0020: all_running }
+    else
+      { S0020: false }
+    end
+  end
+
   chunk(:S0021) do
     # Is there at least 9% memory available
     { S0021: Facter.value(:memory)['system']['capacity'].to_f <= 90 }
