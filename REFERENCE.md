@@ -38,6 +38,7 @@ include pe_status_check
 The following parameters are available in the `pe_status_check` class:
 
 * [`indicator_exclusions`](#-pe_status_check--indicator_exclusions)
+* [`checks`](#-pe_status_check--checks)
 
 ##### <a name="-pe_status_check--indicator_exclusions"></a>`indicator_exclusions`
 
@@ -46,6 +47,12 @@ Data type: `Array[String[1]]`
 List of disabled indicators, place any indicator ids you do not wish to report on in this list
 
 Default value: `[]`
+
+##### <a name="-pe_status_check--checks"></a>`checks`
+
+Data type: `Hash`
+
+Hash containing a descriptiong for each key indicator
 
 ### <a name="pe_status_check--agent_status_enable"></a>`pe_status_check::agent_status_enable`
 
@@ -103,8 +110,9 @@ Default value: `undef`
 Data type: `Array[String[1]]`
 
 List of disabled indicators, place any indicator ids you do not wish to report on in this list
+Static Hiera Data can be used to set indicator_exclusions in a plan - for more information see https://www.puppet.com/docs/pe/latest/writing_plans_in_puppet_language_pe.html#using_hiera_with_plans
 
-Default value: `[]`
+Default value: `lookup('pe_status_check::indicator_exclusions', undef, undef, [])`
 
 ### <a name="pe_status_check--infra_summary"></a>`pe_status_check::infra_summary`
 
@@ -133,6 +141,7 @@ Default value: `undef`
 Data type: `Array[String[1]]`
 
 List of disabled indicators, place any indicator ids you do not wish to report on in this list
+Static Hiera Data can be used to set indicator_exclusions in a plan - for more information see https://www.puppet.com/docs/pe/latest/writing_plans_in_puppet_language_pe.html#using_hiera_with_plans
 
-Default value: `[]`
+Default value: `lookup('pe_status_check::indicator_exclusions', undef, undef, [])`
 
