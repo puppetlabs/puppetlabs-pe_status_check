@@ -166,7 +166,20 @@ plan_hierarchy:
     data_hash: yaml_data
 ```
 
+
 See the following [documentation](https://puppet.com/docs/bolt/latest/hiera.html#outside-apply-blocks) for further explanation.
+
+#### Using Static Hiera data to populate indicator_exclusions when executing plans
+
+Place the plan_hierarchy listed in the step above, in the environment layer (https://www.puppet.com/docs/pe/latest/writing_plans_in_puppet_language_pe.html#using_hiera_with_plans)
+
+Create a [static.yaml] file in the environment layer hiera data directory```
+```yaml
+pe_status_check::indicator_exclusions:                                             
+  - '<TEST ID>'                                                                
+``` 
+
+Indicator ID's within array will be excluded when `running pe_status_check::infra_summary` and `pe_status_check::agent_summary` p
 
 #### Running the plans
 
