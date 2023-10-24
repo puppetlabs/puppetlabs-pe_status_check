@@ -6,8 +6,9 @@
 #   Defaults to using a PuppetDB query to identify nodes
 # @param indicator_exclusions
 #   List of disabled indicators, place any indicator ids you do not wish to report on in this list
+#   Static Hiera Data can be used to set indicator_exclusions in a plan - for more information see https://www.puppet.com/docs/pe/latest/writing_plans_in_puppet_language_pe.html#using_hiera_with_plans 
 plan pe_status_check::agent_summary(
-  Array[String[1]] $indicator_exclusions = [],
+  Array[String[1]] $indicator_exclusions = lookup('pe_status_check::indicator_exclusions', undef, undef, []),
   Optional[TargetSpec] $targets          = undef,
 ) {
   # Query PuppetDB if $targets is not unspecified

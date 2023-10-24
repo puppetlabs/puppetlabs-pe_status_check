@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.0.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.0.0) (2023-10-18)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v3.0.0...v4.0.0)
+
+### Changed
+
+- \(SUP-4433\) Refactor hieradata into single hash [\#199](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/199) ([m0dular](https://github.com/m0dular))
+
+### Added
+
+- \(SUP-3709\) - Indicator Exclusion using code manager and Hiera lookup [\#205](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/205) ([Aaronoftheages](https://github.com/Aaronoftheages))
+- SUP-4458 addition of test S0020 to test console-service endpoint [\#204](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/204) ([Aaronoftheages](https://github.com/Aaronoftheages))
+
+### Fixed
+
+- \(SUP-4402\) pe\_status\_check fails if hiera.yaml is empty [\#200](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/200) ([MartyEwings](https://github.com/MartyEwings))
+
 ## [v3.0.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v3.0.0) (2023-06-12)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v2.6.0...v3.0.0)
