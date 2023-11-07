@@ -360,6 +360,30 @@ hierarchy:
         expect(result.stdout).to match(%r{false})
         run_shell('puppet config set --section master node_terminus classifier')
       end
+      it 'if S0045 conditions for false are met' do
+        manifest = <<-PUPPETCODE
+        pe_hocon_setting { 'jruby-puppet.max-active-instances':
+          ensure  => present,
+          path    => '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf',
+          setting => 'jruby-puppet.max-active-instances',
+          value   => 13,
+        }
+        PUPPETCODE
+
+        apply_manifest(manifest)
+        result = run_shell('facter -p pe_status_check.S0045')
+        expect(result.stdout).to match(%r{false})
+
+        manifest = <<-PUPPETCODE
+        pe_hocon_setting { 'jruby-puppet.max-active-instances':
+          ensure  => present,
+          path    => '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf',
+          setting => 'jruby-puppet.max-active-instances',
+          value   => 1,
+        }
+        PUPPETCODE
+        apply_manifest(manifest)
+      end
     end
   end
 end
