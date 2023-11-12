@@ -18,7 +18,7 @@ describe 'pe_status_check class' do
     # Test Confirms all facts are false which is another indicator the class is performing correctly
     describe 'check no pe_status_check fact is false' do
       it 'if idempotent all facts should be true' do
-        expect(host_inventory['facter']['pe_status_check'].size).to eq(40)
+        expect(host_inventory['facter']['pe_status_check'].size).to eq(41)
         expect(host_inventory['facter']['pe_status_check'].filter { |_k, v| !v }).to be_empty
       end
     end
@@ -359,6 +359,32 @@ hierarchy:
         result = run_shell('facter -p pe_status_check.S0044')
         expect(result.stdout).to match(%r{false})
         run_shell('puppet config set --section master node_terminus classifier')
+      end
+      it 'if S0045 conditions for false are met' do
+        manifest = <<-PUPPETCODE
+        pe_hocon_setting { 'jruby-puppet.max-active-instances':
+          ensure  => present,
+          path    => '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf',
+          setting => 'jruby-puppet.max-active-instances',
+          value   => 13,
+        }
+        PUPPETCODE
+
+        apply_manifest(manifest)
+        run_shell('systemctl restart pe-puppetserver')
+        result = run_shell('facter -p pe_status_check.S0045')
+        expect(result.stdout).to match(%r{false})
+
+        manifest = <<-PUPPETCODE
+        pe_hocon_setting { 'jruby-puppet.max-active-instances':
+          ensure  => present,
+          path    => '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf',
+          setting => 'jruby-puppet.max-active-instances',
+          value   => 1,
+        }
+        PUPPETCODE
+        apply_manifest(manifest)
+        run_shell('systemctl restart pe-puppetserver')
       end
     end
   end

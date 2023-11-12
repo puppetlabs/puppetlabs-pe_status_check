@@ -563,4 +563,27 @@ Facter.add(:pe_status_check, type: :aggregate) do
       { S0044: false }
     end
   end
+
+  chunk(:S0045) do
+    next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
+    begin
+      response = PEStatusCheck.http_get('/status/v1/services/jruby-metrics?level=debug', 8140)
+
+      if response
+        num_jrubies = response.dig('status', 'experimental', 'metrics', 'num-jrubies')
+
+        unless num_jrubies.nil?
+          { S0045: false }
+        end
+
+        { S0045: num_jrubies <= 12 }
+      else
+        { S0045: false }
+      end
+    rescue StandardError => e
+      Facter.warn("Error in fact 'pe_status_check.S0045': #{e.message}")
+      Facter.debug(e.backtrace)
+      { S0045: false }
+    end
+  end
 end
