@@ -19,7 +19,7 @@ class pe_status_check (
   $negatives.each |$indicator, $_v| {
     $msg = $checks[$indicator]
     notify { "pe_status_check ${indicator}":
-      message => "${indicator} is at fault. The indicator ${indicator} ${msg}, refer to documentation for required action",
+      message => "${indicator} is at fault. The indicator ${indicator} ${msg}. Refer to documentation for required action.",
     }
   }
 }
