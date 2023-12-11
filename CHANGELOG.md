@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.1.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.1.0) (2023-12-11)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.0.1...v4.1.0)
+
+### Added
+
+- \(MAINT\) Edit indicator descriptions for consistent style and accurate grammar [\#210](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/210) ([J-Hunniford](https://github.com/J-Hunniford))
+- \(SUP-4625\) Add check for excessive JRubies [\#209](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/209) ([m0dular](https://github.com/m0dular))
+
+### Fixed
+
+- \(SUP-4714\) Check if logfile exists during runtime of S0039 [\#214](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/214) ([Aaronoftheages](https://github.com/Aaronoftheages))
+
 ## [v4.0.1](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.0.1) (2023-10-26)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.0.0...v4.0.1)
