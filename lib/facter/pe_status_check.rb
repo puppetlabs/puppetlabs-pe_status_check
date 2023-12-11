@@ -478,6 +478,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
     next unless ['primary', 'legacy_primary', 'replica', 'pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
     logfile = File.dirname(Puppet.settings['logdir'].to_s) + '/puppetserver/puppetserver-access.log'
+    next unless File.exist?(logfile)
     apache_regex = %r{^(\S+) \S+ (\S+) (?<time>\[([^\]]+)\]) "([A-Z]+) ([^ "]+)? HTTP/[0-9.]+" (?<status>[0-9]{3})}
 
     has_503 = File.foreach(logfile).any? do |line|
