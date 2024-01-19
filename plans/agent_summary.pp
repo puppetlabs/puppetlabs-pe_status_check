@@ -1,4 +1,4 @@
-# @summary Summary report if the state of agent_status_check on each node
+# @summary Summary report of the state of agent_status_check on each node
 #   Uses the facts task to get the current status from each node
 #   and produces a summary report in JSON
 # @param targets
