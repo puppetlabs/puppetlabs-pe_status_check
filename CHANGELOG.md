@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.2.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.2.0) (2024-03-20)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.1.0...v4.2.0)
+
+### Added
+
+- \(SUP-4724/SUP-4728/SUP-4729\) added self resolution documentation links in README for S0024, S0041 and S0042 [\#222](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/222) ([Aaronoftheages](https://github.com/Aaronoftheages))
+- \(SUP-4722/SUP-4723/SUP-4727\) added self resolution documentation links in README for S0010, S0011 and S0029 [\#221](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/221) ([Aaronoftheages](https://github.com/Aaronoftheages))
+- \(SUP-4721\) added self resolution documentation link in README for S0009 [\#220](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/220) ([Aaronoftheages](https://github.com/Aaronoftheages))
+- \(SUP-4671\) added self resolution documentation link in README for S0008 [\#218](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/218) ([Aaronoftheages](https://github.com/Aaronoftheages))
+- \(SUP-4786\) \) added Self Resolution Documentation to S0002 with Formatting Fix [\#217](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/217) ([Aaronoftheages](https://github.com/Aaronoftheages))
+
 ## [v4.1.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.1.0) (2023-12-11)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.0.1...v4.1.0)

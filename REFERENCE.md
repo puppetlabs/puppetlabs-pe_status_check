@@ -11,7 +11,7 @@
 
 ### Plans
 
-* [`pe_status_check::agent_summary`](#pe_status_check--agent_summary): Summary report if the state of agent_status_check on each node
+* [`pe_status_check::agent_summary`](#pe_status_check--agent_summary): Summary report of the state of agent_status_check on each node
 Uses the facts task to get the current status from each node
 and produces a summary report in JSON
 * [`pe_status_check::infra_summary`](#pe_status_check--infra_summary): Summary report if the state of pe_status check on each node
@@ -85,7 +85,7 @@ Default value: `true`
 
 ### <a name="pe_status_check--agent_summary"></a>`pe_status_check::agent_summary`
 
-Summary report if the state of agent_status_check on each node
+Summary report of the state of agent_status_check on each node
 Uses the facts task to get the current status from each node
 and produces a summary report in JSON
 
