@@ -14,6 +14,7 @@
 * [`pe_status_check::agent_summary`](#pe_status_check--agent_summary): Summary report of the state of agent_status_check on each node
 Uses the facts task to get the current status from each node
 and produces a summary report in JSON
+* [`pe_status_check::infra_role_summary`](#pe_status_check--infra_role_summary): provides an overview of all *PE* systems and their role
 * [`pe_status_check::infra_summary`](#pe_status_check--infra_summary): Summary report if the state of pe_status check on each node
 Uses the facts task to get the current status from each node
 and produces a summary report in JSON
@@ -113,6 +114,10 @@ List of disabled indicators, place any indicator ids you do not wish to report o
 Static Hiera Data can be used to set indicator_exclusions in a plan - for more information see https://www.puppet.com/docs/pe/latest/writing_plans_in_puppet_language_pe.html#using_hiera_with_plans
 
 Default value: `lookup('pe_status_check::indicator_exclusions', undef, undef, [])`
+
+### <a name="pe_status_check--infra_role_summary"></a>`pe_status_check::infra_role_summary`
+
+provides an overview of all *PE* systems and their role
 
 ### <a name="pe_status_check--infra_summary"></a>`pe_status_check::infra_summary`
 
