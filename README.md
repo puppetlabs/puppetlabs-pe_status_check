@@ -131,6 +131,32 @@ The plans, `pe_status_check::infra_summary` and `pe_status_check::agent_summary`
 }
 ```
 
+The plan `pe_status_check::infra_role_summary` will provide you a hash with all PE infrastructure nodes, grouped by their role:
+
+```json
+{
+    "primary": [
+        "primary.bastelfreak.local"
+    ],
+    "replica": [
+        "replica.bastelfreak.local"
+    ],
+    "compiler": [
+        "compiler01.bastelfreak.local",
+        "compiler02.bastelfreak.local"
+    ],
+    "postgres": [],
+    "legacy_primary": [],
+    "legacy_compiler": []
+}
+```
+
+The data is obtained from PuppetDB by checking the classes in the last catalog
+of every node. You can reuse the data in other plans or use it to inspect your
+environment. You can plott it in a more human-readable way with the
+[puppet/format](https://github.com/voxpupuli/puppet-format?tab=readme-ov-file#puppet-format)
+modules.
+
 ### Using a Puppet Query to report status.
 
 As the pe_status_check module uses Puppet's existing fact behavior to gather the status data from each of the agents, it is possible to use PQL (puppet query language) to gather this information.
