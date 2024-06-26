@@ -230,6 +230,38 @@ describe 'pe_status_check class' do
         expect(result.stdout).to match(%r{false})
         run_shell('mv -f /tmp/license.key /etc/puppetlabs/license.key')
       end
+      it 'if S0022 conditions when license.key is not present but suite-license is present to be true' do
+        run_shell('touch /etc/puppetlabs/suite-license.lic && mv /etc/puppetlabs/license.key /tmp/license.key')
+        result = run_shell('facter -p pe_status_check.S0022')
+        expect(result.stdout).to match(%r{true})
+        run_shell('mv -f /tmp/license.key /etc/puppetlabs/license.key')
+      end
+      it 'if S0022 conditions when both license files are not present to be false' do
+        run_shell('mv /etc/puppetlabs/license.key /tmp/license.key && mv /etc/puppetlabs/suite-license.lic /tmp/suite-license.lic')
+        result = run_shell('facter -p pe_status_check.S0022')
+        expect(result.stdout).to match(%r{false})
+        run_shell('mv -f /tmp/license.key /etc/puppetlabs/license.key && mv -f /tmp/suite-license.lic /etc/puppetlabs/suite-license.lic')
+      end
+      it 'if S0022 conditions when both license files are present and one is invalid' do
+        myexpiredlicensefile = <<~EOF
+          #######################
+          #  Begin License File #
+          #######################
+          # PUPPET ENTERPRISE LICENSE - Puppet Labs
+          to: test
+          nodes: 100
+          license_type: Subscription
+          support_type: PE Premium
+          start: 2014-02-10
+          end: 2022-03-13
+          #####################
+          #  End License File #
+          #####################
+          EOF
+        write_file(myexpiredlicensefile, '/etc/puppetlabs/license.key')
+        result = run_shell('facter -p pe_status_check.S0022')
+        expect(result.stdout).to match(%r{true})
+      end
       it 'if S0024 conditions for false are met' do
         run_shell('touch -d "30 minutes ago"  /opt/puppetlabs/server/data/puppetdb/stockpile/discard/test.file')
         result = run_shell('facter -p pe_status_check.S0024')

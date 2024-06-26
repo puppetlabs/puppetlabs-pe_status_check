@@ -237,39 +237,48 @@ Facter.add(:pe_status_check, type: :aggregate) do
     # Also takes into account if the license type is Perpetual
     next unless ['primary'].include?(Facter.value('pe_status_check_role'))
 
+    # Check for suite license file
+    suite_license_file = '/etc/puppetlabs/suite-license.lic'
+
+    # Check for license key file
     license_file = '/etc/puppetlabs/license.key'
-    if File.exist?(license_file)
+
+    if File.exist?(suite_license_file)
+      # Presence of suite-license.lic file satisfies check
+      validity = true
+    elsif !validity && File.exist?(license_file)
       begin
-        license_type = File.readlines(license_file).grep(%r{license_type:}).first
-        if license_type.nil?
-          validity = true
-        elsif license_type.include? 'Perpetual'
-          validity = true
-        elsif license_type.include? 'Subscription'
-          require 'date'
-          begin
-        end_date = Date.parse(File.readlines(license_file).grep(%r{end:}).first)
-        today_date = Date.today
-        daysexp = (end_date - today_date).to_i
-        validity = ((today_date <= end_date) && (daysexp >= 90)) ? true : false
-          rescue StandardError => e
-            Facter.warn("Error in fact 'pe_status_check.S0022' when checking license end date: #{e.message}")
-            Facter.debug(e.backtrace)
-            # license file has missing or invalid end date
+          license_type = File.readlines(license_file).grep(%r{license_type:}).first
+          if license_type.nil?
+            validity = true
+          elsif license_type.include?('Perpetual')
+            validity = true
+          elsif license_type.include?('Subscription')
+            require 'date'
+            begin
+              end_date = Date.parse(File.readlines(license_file).grep(%r{end:}).first)
+              today_date = Date.today
+              daysexp = (end_date - today_date).to_i
+              validity = (today_date <= end_date) && (daysexp >= 90)
+            rescue StandardError => e
+              Facter.warn("Error in fact 'pe_status_check.S0022' when checking license end date: #{e.message}")
+              Facter.debug(e.backtrace)
+              # License file has missing or invalid end date
+              validity = false
+            end
+          else
+            # License file has invalid license_type
             validity = false
-      end
-        else
-          # license file has invalid license_type
-          validity = false
-        end
+          end
       rescue StandardError => e
         Facter.warn("Error in fact 'pe_status_check.S0022' when checking license type: #{e.message}")
         validity = false
-      end
+        end
     else
-      # license file doesn't exist
+      # Neither suite-license.lic nor license.key exist
       validity = false
     end
+
     { S0022: validity }
   end
 
