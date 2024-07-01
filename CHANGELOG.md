@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.3.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.3.0) (2024-07-01)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.2.0...v4.3.0)
+
+### Added
+
+- \(SUP-4929\) Update to S0022 for handling license files with .key and .lic file [\#230](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/230) ([Aaronoftheages](https://github.com/Aaronoftheages))
+- Add infra\_role\_summary plan [\#225](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/225) ([bastelfreak](https://github.com/bastelfreak))
+
+### UNCATEGORIZED PRS; LABEL THEM ON GITHUB
+
+- Create LICENSE [\#228](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/228) ([binford2k](https://github.com/binford2k))
+
 ## [v4.2.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.2.0) (2024-03-20)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.1.0...v4.2.0)
