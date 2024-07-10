@@ -238,12 +238,12 @@ Facter.add(:pe_status_check, type: :aggregate) do
     next unless ['primary'].include?(Facter.value('pe_status_check_role'))
 
     # Check for suite license file
-    suite_license_file = '/etc/puppetlabs/suite-license.lic'
+    suite_license_pattern = '/etc/puppetlabs/*.lic'
 
     # Check for license key file
     license_file = '/etc/puppetlabs/license.key'
 
-    if File.exist?(suite_license_file)
+    if !Dir.glob(suite_license_pattern).empty?
       # Presence of suite-license.lic file satisfies check
       validity = true
     elsif !validity && File.exist?(license_file)
