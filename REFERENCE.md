@@ -11,6 +11,7 @@
 
 ### Plans
 
+* [`pe_status_check::agent_state_summary`](#pe_status_check--agent_state_summary): provides an overview of all Puppet agents and their error states
 * [`pe_status_check::agent_summary`](#pe_status_check--agent_summary): Summary report of the state of agent_status_check on each node
 Uses the facts task to get the current status from each node
 and produces a summary report in JSON
@@ -83,6 +84,42 @@ Flag to enable or disable agent_status_check fact
 Default value: `true`
 
 ## Plans
+
+### <a name="pe_status_check--agent_state_summary"></a>`pe_status_check::agent_state_summary`
+
+provides an overview of all Puppet agents and their error states
+
+#### Parameters
+
+The following parameters are available in the `pe_status_check::agent_state_summary` plan:
+
+* [`runinterval`](#-pe_status_check--agent_state_summary--runinterval)
+* [`log_healthy_nodes`](#-pe_status_check--agent_state_summary--log_healthy_nodes)
+* [`log_unhealthy_nodes`](#-pe_status_check--agent_state_summary--log_unhealthy_nodes)
+
+##### <a name="-pe_status_check--agent_state_summary--runinterval"></a>`runinterval`
+
+Data type: `Integer[0]`
+
+the runinterval for the Puppet Agent in minutes. We consider latest reports that are older than runinterval as unresponsive
+
+Default value: `30`
+
+##### <a name="-pe_status_check--agent_state_summary--log_healthy_nodes"></a>`log_healthy_nodes`
+
+Data type: `Boolean`
+
+optionally return all healthy nodes, not only the unhealthy
+
+Default value: `false`
+
+##### <a name="-pe_status_check--agent_state_summary--log_unhealthy_nodes"></a>`log_unhealthy_nodes`
+
+Data type: `Boolean`
+
+optionally hide unhealthy nodes
+
+Default value: `true`
 
 ### <a name="pe_status_check--agent_summary"></a>`pe_status_check::agent_summary`
 
