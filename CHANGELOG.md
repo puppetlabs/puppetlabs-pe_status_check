@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.4.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.4.0) (2024-09-19)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.3.0...v4.4.0)
+
+### Added
+
+- \(SUP-4955\) Wildcard Operator Added for file license ingestion [\#233](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/233) ([Aaronoftheages](https://github.com/Aaronoftheages))
+- Add plan for Puppet agent state summary [\#226](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/226) ([bastelfreak](https://github.com/bastelfreak))
+
 ## [v4.3.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.3.0) (2024-07-01)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.2.0...v4.3.0)
