@@ -157,6 +157,101 @@ environment. You can plott it in a more human-readable way with the
 [puppet/format](https://github.com/voxpupuli/puppet-format?tab=readme-ov-file#puppet-format)
 modules.
 
+
+The plan `pe_status_check::agent_state_summary` provides you a hash with all nodes, grouped by failure state:
+
+```json
+{
+  "noop": [ ],
+  "corrective_changes": [ ],
+  "used_cached_catalog": [ ],
+  "failed": [ ],
+  "changed": [ "student2.local" ],
+  "unresponsive": [ "student3.local", "student4.local", "student1.local", "login.local" ],
+  "responsive": [ "pe.bastelfreak.local"],
+  "unhealthy": [ "student2.local", "student3.local", "student4.local", "student1.local", "login.local" ],
+  "unhealthy_counter": 5,
+  "healthy": [ "pe.bastelfreak.local" ],
+  "healthy_counter": 1,
+  "total_counter": 6
+}
+```
+
+* `noop`: last catalog was applied in noop mode
+* `failed`: The last catalog couldn't be compiled or catalog application raised an error
+* `changed`: A node reported a change
+* `unresponsive`: Last report is older than 30 minutes (can be configured via the `runinterval` parameter)
+* `corrective_changes`: A node reported corrective changes
+* `used_cached_catalog`: The node didn't apply a new catalog but used a cached version
+* `unhealthy`: List of nodes that are in any of the above categories
+* `responsive`: Last report isn't older than 30 minutes (can be configured via the `runinterval` parameter). Doesn't matter if the report is healthy.
+* `healthy`: All nodes - unhealthy
+* `unhealthy_counter`: Amount of unhealthy nodes
+* `healthy_counter`: Amount of healthy nodes
+* `total_counter`: Amount of all nodes in PuppetDB
+
+The goal of this plan is to run it before doing major upgrades, to ensure that your agents are in a healthy state.
+
+To turn this into a table:
+
+```
+$result = run_plan('pe_status_check::agent_state_summary')
+$table = format::table(
+  {
+    title => 'Puppet Agent states',
+    head  => ['status check', 'Nodes'],
+    rows  => $result.map |$key, $data| { [$key, [$data].flatten.join(', ')]},
+  }
+)
+out::message($table)
+```
+
+example output:
+
+```
++------------------------------------------------+
+|              Puppet Agent states               |
++---------------------+--------------------------+
+| status check        | Nodes                    |
++---------------------+--------------------------+
+| noop                |                          |
+| corrective_changes  |                          |
+| used_cached_catalog |                          |
+| failed              |                          |
+| changed             |                          |
+| unresponsive        |                          |
+| responsive          | puppet.bastelfreak.local |
+| unhealthy           |                          |
+| unhealthy_counter   | 0                        |
+| healthy             | puppet.bastelfreak.local |
+| healthy_counter     | 1                        |
+| total_counter       | 1                        |
++---------------------+--------------------------+
+```
+
+The plan has two parameters. By default it will log all unhealthy nodes. You can disable it by setting `log_unhealthy_nodes` to `false`. Then you will get:
+
+```json
+{
+    "total_counter": 1,
+    "healthy_counter": 1,
+    "unhealthy_counter": 0
+}
+```
+
+You can also enable the logging of of healthy nodes by setting `log_healthy_nodes` to `true`. In combination with `log_unhealthy_nodes` to `false` you get:
+
+```json
+{
+    "healthy": [
+        "puppet.bastelfreak.local"
+    ],
+    "total_counter": 1,
+    "healthy_counter": 1,
+    "unhealthy_counter": 0
+}
+```
+
 ### Using a Puppet Query to report status.
 
 As the pe_status_check module uses Puppet's existing fact behavior to gather the status data from each of the agents, it is possible to use PQL (puppet query language) to gather this information.
