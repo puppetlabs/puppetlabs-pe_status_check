@@ -36,7 +36,8 @@ plan pe_status_check::agent_state_summary (
   $corrective_changes = $nodes.map |$node| { if ($node['latest_report_corrective_change'] == true){ $node['certname'] } }.filter |$node| { $node =~ NotUndef }
 
   # all nodes that used a cached catalog on the last run
-  $used_cached_catalog = $nodes.map |$node| { if ($node['cached_catalog_status'] != 'not_used'){ $node['certname'] } }.filter |$node| { $node =~ NotUndef }
+  # explicitly check if `cached_catalog_status` is set, will be null on nodes without a catalog
+  $used_cached_catalog = $nodes.map |$node| { if ($node['cached_catalog_status'] and $node['cached_catalog_status'] != 'not_used'){ $node['certname'] } }.filter |$node| { $node =~ NotUndef }
 
   # all nodes with failed resources in the last report
   $failed = $nodes.map |$node| { if ($node['latest_report_status'] == 'failed'){ $node['certname'] } }.filter |$node| { $node =~ NotUndef }
