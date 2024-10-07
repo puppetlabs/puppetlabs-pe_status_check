@@ -16,18 +16,23 @@ plan pe_status_check::agent_state_summary (
   $nodes = puppetdb_query('nodes[certname,latest_report_noop,latest_report_corrective_change,cached_catalog_status,latest_report_status,report_timestamp]{}')
   $fqdns = $nodes.map |$node| { $node['certname'] }
 
-  # check if the last catalog is older than X minutes
+  # check if the node has a report
+  # `report_timestamp` will be undef, or null, if no report exists
+  $no_report_nodes = $nodes.filter |$node| { $node['report_timestamp'] =~ Undef }
+  $no_report = $no_report_nodes.map |$node| { $node['certname'] }
+
+  # check if the last report is older than X minutes, for all nodes that have a report
   $current_timestamp = Integer(Timestamp().strftime('%s'))
   $runinterval_seconds = $runinterval * 60
-  $unresponsive = $nodes.map |$node| {
+  $unresponsive = ($nodes - $no_report_nodes).map |$node| {
     $old_timestamp = Integer(Timestamp($node['report_timestamp']).strftime('%s'))
     if ($current_timestamp - $old_timestamp) >= $runinterval_seconds {
-      $node['certname']
+      $node
     }
   }.filter |$node| { $node =~ NotUndef }
 
   # all nodes that delivered a report in time
-  $responsive = $fqdns - $unresponsive
+  $responsive = $fqdns - $unresponsive - $no_report
 
   # all nodes that used noop for the last catalog
   $noop = $nodes.map |$node| { if ($node['latest_report_noop'] == true){ $node['certname'] } }.filter |$node| { $node =~ NotUndef }
@@ -45,7 +50,7 @@ plan pe_status_check::agent_state_summary (
   $changed = $nodes.map |$node| { if ($node['latest_report_status'] == 'changed'){ $node['certname'] } }.filter |$node| { $node =~ NotUndef }
 
   # all nodes that aren't healthy in any form
-  $unhealthy = [$noop, $corrective_changes, $used_cached_catalog, $failed, $changed, $unresponsive].flatten.unique
+  $unhealthy = [$noop, $corrective_changes, $used_cached_catalog, $failed, $changed, $unresponsive, $no_report].flatten.unique
 
   # all healthy nodes
   $healthy = $fqdns - $unhealthy
@@ -58,6 +63,7 @@ plan pe_status_check::agent_state_summary (
       'failed'              => $failed,
       'changed'             => $changed,
       'unresponsive'        => $unresponsive,
+      'no_report'           => $no_report,
       'responsive'          => $responsive,
       'unhealthy'           => $unhealthy,
       'unhealthy_counter'   => $unhealthy.count,

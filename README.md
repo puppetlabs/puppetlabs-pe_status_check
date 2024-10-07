@@ -168,6 +168,7 @@ The plan `pe_status_check::agent_state_summary` provides you a hash with all nod
   "failed": [ ],
   "changed": [ "student2.local" ],
   "unresponsive": [ "student3.local", "student4.local", "student1.local", "login.local" ],
+  "no_report": [ "newnode.with.report.local" ],
   "responsive": [ "pe.bastelfreak.local"],
   "unhealthy": [ "student2.local", "student3.local", "student4.local", "student1.local", "login.local" ],
   "unhealthy_counter": 5,
@@ -181,6 +182,7 @@ The plan `pe_status_check::agent_state_summary` provides you a hash with all nod
 * `failed`: The last catalog couldn't be compiled or catalog application raised an error
 * `changed`: A node reported a change
 * `unresponsive`: Last report is older than 30 minutes (can be configured via the `runinterval` parameter)
+* `no_report`: The node exists in PuppetDB but has no reports
 * `corrective_changes`: A node reported corrective changes
 * `used_cached_catalog`: The node didn't apply a new catalog but used a cached version
 * `unhealthy`: List of nodes that are in any of the above categories
