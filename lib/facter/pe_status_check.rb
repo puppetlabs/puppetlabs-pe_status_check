@@ -493,8 +493,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
     has_503 = File.foreach(logfile).any? do |line|
       match = line.match(apache_regex)
       next unless match && match[:time] && match[:status]
-
-      time = Time.strptime(match[:time], '[%d/%b/%Y:%H:%M:%S %Z]')
+      time = Time.strptime(match[:time].gsub('Sept', 'Sep'), '[%d/%b/%Y:%H:%M:%S %Z]')
       since_lastrun = Time.now - time
       current = since_lastrun.to_i <= Puppet.settings['runinterval']
 
