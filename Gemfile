@@ -36,7 +36,7 @@ group :development do
   gem "rb-readline", '= 0.5.5',                  require: false, platforms: [:mswin, :mingw, :x64_mingw]
   gem "rexml", '>= 3.0.0', '< 3.2.7',            require: false
   gem "github_changelog_generator",              require: false
-  gem "octokit", '= 4.21.0',                     require: false
+  gem "faraday", '= 1.10.3',                     require: false
 end
 group :development, :release_prep do
   gem "puppet-strings", '~> 4.0',         require: false
