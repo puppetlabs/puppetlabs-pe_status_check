@@ -3,7 +3,6 @@ require:
 - rubocop-performance
 - rubocop-rspec
 AllCops:
-  NewCops: enable
   DisplayCopNames: true
   TargetRubyVersion: '2.6'
   Include:
@@ -72,8 +71,6 @@ Style/TrailingCommaInArrayLiteral:
 Style/SymbolArray:
   Description: Using percent style obscures symbolic intent of array's contents.
   EnforcedStyle: brackets
-Layout/BlockAlignment:
-  Enabled: false
 RSpec/MessageSpies:
   EnforcedStyle: receive
 Style/Documentation:
@@ -376,8 +373,6 @@ RSpec/VoidExpect:
   Enabled: false
 RSpec/Yield:
   Enabled: false
-Security/Open:
-  Enabled: false
 Style/AccessModifierDeclarations:
   Enabled: false
 Style/AccessorGrouping:
@@ -530,8 +525,6 @@ Lint/DuplicateBranch:
   Enabled: false
 Lint/DuplicateMagicComment:
   Enabled: false
-Lint/DuplicateMatchPattern:
-  Enabled: false
 Lint/DuplicateRegexpCharacterClassElement:
   Enabled: false
 Lint/EmptyBlock:
@@ -634,10 +627,6 @@ RSpec/SubjectDeclaration:
   Enabled: false
 RSpec/VerifiedDoubleReference:
   Enabled: false
-Security/CompoundHash:
-  Enabled: false
-Security/IoMethods:
-  Enabled: false
 Style/ArgumentsForwarding:
   Enabled: false
 Style/ArrayIntersect:
@@ -647,8 +636,6 @@ Style/CollectionCompact:
 Style/ComparableClamp:
   Enabled: false
 Style/ConcatArrayLiterals:
-  Enabled: false
-Style/DataInheritance:
   Enabled: false
 Style/DirEmpty:
   Enabled: false
@@ -717,8 +704,6 @@ Style/RedundantEach:
 Style/RedundantHeredocDelimiterQuotes:
   Enabled: false
 Style/RedundantInitialize:
-  Enabled: false
-Style/RedundantLineContinuation:
   Enabled: false
 Style/RedundantSelfAssignmentBranch:
   Enabled: false
