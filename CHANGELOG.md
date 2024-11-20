@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.5.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.5.0) (2024-11-20)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.4.0...v4.5.0)
+
+### Added
+
+- \(\#236\) agent\_state\_summary: Count nodes without report as unhealthy [\#238](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/238) ([bastelfreak](https://github.com/bastelfreak))
+
+### UNCATEGORIZED PRS; LABEL THEM ON GITHUB
+
+- \(\#236\) agent\_state\_summary: Check if cached\_catalog\_status is null [\#237](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/237) ([bastelfreak](https://github.com/bastelfreak))
+- \(SUP-4990\) S0039 Accommodate parsing of unicode dates in September [\#234](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/234) ([EdwardBenton](https://github.com/EdwardBenton))
+
 ## [v4.4.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.4.0) (2024-09-19)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.3.0...v4.4.0)
