@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.5.1](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.5.1) (2024-11-25)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.5.0...v4.5.1)
+
+### Fixed
+
+- fix: prevent random failures in agent\_status\_check [\#244](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/244) ([vchepkov](https://github.com/vchepkov))
+
 ## [v4.5.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.5.0) (2024-11-20)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.4.0...v4.5.0)
