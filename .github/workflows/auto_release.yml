@@ -9,7 +9,7 @@ env:
 jobs:
   auto_release:
     name: "Automatic release prep"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: "Checkout Source"
@@ -20,7 +20,7 @@ jobs:
         persist-credentials: false
 
     - name: "PDK Release prep"
-      uses: docker://puppet/puppet-dev-tools:4.29.2
+      uses: docker://puppet/puppet-dev-tools:4.x
       with:
         args: 'pdk release prep --force --debug'
       env:
