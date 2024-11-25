@@ -31,7 +31,11 @@ Facter.add(:agent_status_check, type: :aggregate) do
       socket_matches = Set.new(socket_state.scan(%r{ino:(\d+)}).flatten)
 
       # Look for the pxp-agent process in the process table:
-      cmdline_path = Dir.glob('/proc/[0-9]*/cmdline').find { |path| File.read(path).split("\0").first == '/opt/puppetlabs/puppet/bin/pxp-agent' }
+      cmdline_path = Dir.glob('/proc/[0-9]*/cmdline').find do |path|
+        File.read(path).split("\0").first == '/opt/puppetlabs/puppet/bin/pxp-agent'
+      rescue Errno::ENOENT
+        next
+      end
 
       # If no match was found, then the connection to 8142 is not the pxp-agent process because it is not in the process table:
       if cmdline_path.nil?
