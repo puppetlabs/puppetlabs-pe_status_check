@@ -1,6 +1,6 @@
 # Agent Status Check fact aims to have all chunks reporting as true, indicating ideal state, any individual chunk reporting false should be alerted on and checked against documentation for next steps
 # Use shared logic from PEStatusCheck
-# Disabled by default requires bundled class too create /opt/puppetlabs/puppet/cache/status_check_enable
+# Disabled by default requires bundled class to create /opt/puppetlabs/puppet/cache/status_check_enable
 
 Facter.add(:agent_status_check, type: :aggregate) do
   confine { !Facter.value(:pe_build) }
@@ -15,7 +15,7 @@ Facter.add(:agent_status_check, type: :aggregate) do
     certificate = OpenSSL::X509::Certificate.new raw_hostcert
     result = certificate.not_after - Time.now
 
-    { AS001: result > 7_776_000 }
+    { AS001: result > 2_592_000 }
   end
   chunk(:AS002) do
     # Has the PXP agent establish a connection with a remote Broker

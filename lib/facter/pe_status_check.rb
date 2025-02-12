@@ -142,7 +142,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
     certificate = OpenSSL::X509::Certificate.new raw_hostcert
     result = certificate.not_after - Time.now
 
-    { S0015: result > 7_776_000 }
+    { S0015: result > 2_592_000 }
   end
 
   chunk(:S0016) do
