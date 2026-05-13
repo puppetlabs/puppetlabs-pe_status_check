@@ -38,7 +38,7 @@ module PEStatusCheck
 
   # checks puppetlabs.services.ca.certificate-authority-service/certificate-authority-service  exists in puppetserver bootstrap
   def ca_bootstrap?
-    return true if File.exist?('/etc/puppetlabs/puppetserver/bootstrap.cfg') && File.foreach('/etc/puppetlabs/puppetserver/bootstrap.cfg').grep(%r{certificate-authority-service}).any?
+    true if File.exist?('/etc/puppetlabs/puppetserver/bootstrap.cfg') && File.foreach('/etc/puppetlabs/puppetserver/bootstrap.cfg').grep(%r{certificate-authority-service}).any?
   end
 
   # Check if the service is running

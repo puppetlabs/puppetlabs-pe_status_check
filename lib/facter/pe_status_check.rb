@@ -581,11 +581,11 @@ Facter.add(:pe_status_check, type: :aggregate) do
       if response
         num_jrubies = response.dig('status', 'experimental', 'metrics', 'num-jrubies')
 
-        unless num_jrubies.nil?
+        if num_jrubies.nil?
           { S0045: false }
+        else
+          { S0045: num_jrubies <= 12 }
         end
-
-        { S0045: num_jrubies <= 12 }
       else
         { S0045: false }
       end
