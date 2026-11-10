@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.6.1](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.6.1) (2026-11-10)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.6.0...v4.6.1)
+
+### Fixed
+
+- \(PE-47146\) Use TCP-only ss and inode matching for S0041/S0042 [\#254](https://github.com/puppetlabs/puppetlabs-pe_status_check/pull/254) ([beechtom](https://github.com/beechtom))
+
 ## [v4.6.0](https://github.com/puppetlabs/puppetlabs-pe_status_check/tree/v4.6.0) (2025-02-20)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-pe_status_check/compare/v4.5.2...v4.6.0)
