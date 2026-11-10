@@ -37,13 +37,26 @@ describe PEStatusCheck do
   end
 
   describe '.service_main_pid' do
-    it 'returns the PID of a running unit' do
-      allow(Facter::Core::Execution).to receive(:execute).with(%r{systemctl show .*pxp-agent\.service}, anything).and_return("1234\n")
+    it 'returns the PID of a running unit from the MainPID= line' do
+      allow(Facter::Core::Execution).to receive(:execute).with(%r{systemctl show .*pxp-agent\.service}, anything).and_return("MainPID=1234\n")
       expect(described_class.service_main_pid('pxp-agent')).to eq(1234)
     end
 
+    it 'does not use --value, which needs systemd 230+ (RHEL/CentOS/OL 7 have 219)' do
+      expect(Facter::Core::Execution).to receive(:execute) do |cmd, _opts|
+        expect(cmd).not_to include('--value')
+        "MainPID=1234\n"
+      end
+      described_class.service_main_pid('pxp-agent')
+    end
+
     it 'returns nil when the unit is not running' do
-      allow(Facter::Core::Execution).to receive(:execute).and_return("0\n")
+      allow(Facter::Core::Execution).to receive(:execute).and_return("MainPID=0\n")
+      expect(described_class.service_main_pid('pxp-agent')).to be_nil
+    end
+
+    it 'returns nil when the output has no MainPID line' do
+      allow(Facter::Core::Execution).to receive(:execute).and_return('')
       expect(described_class.service_main_pid('pxp-agent')).to be_nil
     end
   end

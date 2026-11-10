@@ -195,7 +195,9 @@ module PEStatusCheck
   # @param unit [String] The systemd unit name, e.g. 'pxp-agent'
   # @return [Integer, nil] The PID, or nil if the unit is not running
   def service_main_pid(unit)
-    pid = Facter::Core::Execution.execute("systemctl show --property=MainPID --value #{unit}.service", { timeout: facter_timeout }).to_s.strip.to_i
+    # `--value` needs systemd 230+, so parse the `MainPID=<n>` line instead (RHEL/CentOS/OL 7 ship systemd 219)
+    output = Facter::Core::Execution.execute("systemctl show --property=MainPID #{unit}.service", { timeout: facter_timeout }).to_s
+    pid = output[%r{^MainPID=(\d+)}, 1].to_i
     pid.positive? ? pid : nil
   end
 
