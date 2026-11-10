@@ -515,9 +515,8 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0041) do
     next unless ['pe_compiler', 'legacy_compiler'].include?(Facter.value('pe_status_check_role'))
 
-    # Is pcp broker connected to another broker
-    result = Facter::Core::Execution.execute("ss -onp state established '( dport = :8143 )' ", { timeout: PEStatusCheck.facter_timeout })
-    { S0041: result.include?('java') }
+    # Is pcp broker connected to another broker (on compilers the broker runs inside pe-puppetserver)
+    { S0041: PEStatusCheck.process_connected_to?(8143, PEStatusCheck.service_main_pid('pe-puppetserver')) }
   rescue Facter::Core::Execution::ExecutionFailure => e
     Facter.warn('pe_status_check.S0041 failed to get socket status from SS')
     Facter.debug(e)
@@ -527,8 +526,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
   chunk(:S0042) do
     # Has the PXP agent establish a connection with a remote Broker
     #
-    result = Facter::Core::Execution.execute("ss -onp state established '( dport = :8142 )' ", { timeout: PEStatusCheck.facter_timeout })
-    { S0042: result.include?('pxp-agent') }
+    { S0042: PEStatusCheck.process_connected_to?(8142, PEStatusCheck.service_main_pid('pxp-agent')) }
   rescue Facter::Core::Execution::ExecutionFailure => e
     Facter.warn("pe_status_check.S0042 failed to get socket status from SS: #{e.message}")
     Facter.debug(e.backtrace)

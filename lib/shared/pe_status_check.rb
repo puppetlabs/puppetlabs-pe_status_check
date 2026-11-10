@@ -2,6 +2,7 @@ require 'puppet'
 require 'json'
 require 'net/http'
 require 'openssl'
+require 'set'
 
 # PEStatusCheck - Shared code for pe_status_check facts
 module PEStatusCheck
@@ -166,6 +167,46 @@ module PEStatusCheck
     Facter.warn("Error in fact 'pe_status_check': #{e.message}")
     Facter.debug(e.backtrace)
     0
+  end
+
+  # Socket inodes of established outbound TCP connections to a remote port.
+  # Uses `ss -t` so only the TCP diag queries are sent, and omits `-p` so ss does not
+  # walk /proc/<pid>/fd for every process (both can trigger SELinux denials/warnings).
+  # @param port [Integer] The remote port
+  # @return [Set<String>] Inode numbers of the matching sockets
+  def established_socket_inodes(port)
+    output = Facter::Core::Execution.execute("ss -tone state established '( dport = :#{port} )' ", { timeout: facter_timeout })
+    Set.new(output.scan(%r{ino:(\d+)}).flatten)
+  end
+
+  # Socket inodes held open by a single process
+  # @param pid [Integer] The process ID
+  # @return [Set<String>] Inode numbers of the process's open sockets, empty if it cannot be read
+  def process_socket_inodes(pid)
+    links = Dir.glob("/proc/#{pid}/fd/*").map do |path|
+      File.readlink(path)
+    rescue Errno::ENOENT, Errno::EACCES, Errno::ESRCH
+      nil
+    end
+    Set.new(links.compact.select { |l| l.start_with?('socket:') }.map { |l| l.tr('^0-9', '') })
+  end
+
+  # Main PID of a systemd unit
+  # @param unit [String] The systemd unit name, e.g. 'pxp-agent'
+  # @return [Integer, nil] The PID, or nil if the unit is not running
+  def service_main_pid(unit)
+    pid = Facter::Core::Execution.execute("systemctl show --property=MainPID --value #{unit}.service", { timeout: facter_timeout }).to_s.strip.to_i
+    pid.positive? ? pid : nil
+  end
+
+  # Whether a given process owns an established outbound TCP connection to a remote port
+  # @param port [Integer] The remote port
+  # @param pid [Integer, nil] The process ID expected to own the connection
+  # @return [Boolean] false if pid is nil
+  def process_connected_to?(port, pid)
+    return false if pid.nil?
+
+    established_socket_inodes(port).intersect?(process_socket_inodes(pid))
   end
 
   def enabled?
