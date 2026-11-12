@@ -10,6 +10,7 @@ Facter.add(:agent_status_check, type: :aggregate) do
   chunk(:AS001) do
     # Is the hostcert expiring within 90 days
     #
+    next unless PEStatusCheck.openssl_available?
     next unless File.exist?(Puppet.settings['hostcert'])
     raw_hostcert = File.read(Puppet.settings['hostcert'])
     certificate = OpenSSL::X509::Certificate.new raw_hostcert
@@ -60,6 +61,7 @@ Facter.add(:agent_status_check, type: :aggregate) do
   end
   chunk(:AS004) do
     # Is the host copy of the crl expiring in the next 90 days
+    next unless PEStatusCheck.openssl_available?
     hostcrl = Puppet.settings[:hostcrl]
     next unless File.exist?(hostcrl)
 

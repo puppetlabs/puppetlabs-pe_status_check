@@ -45,6 +45,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0005) do
     # Is the CA expiring in the next 90 days
+    next unless PEStatusCheck.openssl_available?
     cacert = Puppet.settings[:cacert]
     next unless File.exist?(cacert)
 
@@ -137,6 +138,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0015) do
     # Is the hostcert expiring within 90 days
+    next unless PEStatusCheck.openssl_available?
     next unless File.exist?(Puppet.settings['hostcert'])
     raw_hostcert = File.read(Puppet.settings['hostcert'])
     certificate = OpenSSL::X509::Certificate.new raw_hostcert
@@ -284,6 +286,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0023) do
     # Is the CA_CRL expiring in the next 90 days
+    next unless PEStatusCheck.openssl_available?
     next unless ['primary', 'legacy_primary'].include?(Facter.value('pe_status_check_role'))
     cacrl = Puppet.settings[:cacrl]
     next unless File.exist?(cacrl)
@@ -310,6 +313,7 @@ Facter.add(:pe_status_check, type: :aggregate) do
 
   chunk(:S0025) do
     # Is the host copy of the crl expiring in the next 90 days
+    next unless PEStatusCheck.openssl_available?
     hostcrl = Puppet.settings[:hostcrl]
     next unless File.exist?(hostcrl)
 
