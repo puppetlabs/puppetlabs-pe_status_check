@@ -4,8 +4,9 @@
 
 Facter.add(:agent_status_check, type: :aggregate) do
   confine { !Facter.value(:pe_build) }
-  confine { PEStatusCheck.enabled? }
   require 'puppet'
+  require_relative '../shared/pe_status_check'
+  confine { PEStatusCheck.enabled? }
 
   chunk(:AS001) do
     # Is the hostcert expiring within 90 days

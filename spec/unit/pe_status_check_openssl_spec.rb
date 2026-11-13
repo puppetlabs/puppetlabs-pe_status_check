@@ -41,6 +41,12 @@ describe 'pe_status_check without openssl' do
     end
   end
 
+  it 'does not warn when the shared file is loaded a second time' do
+    # Agents can load it from both the modulepath and the pluginsync cache
+    shared = File.expand_path('../../lib/shared/pe_status_check.rb', __dir__)
+    expect { load shared }.not_to output(%r{already initialized constant}).to_stderr
+  end
+
   it 'reports openssl as available on MRI' do
     expect(PEStatusCheck.openssl_available?).to be(true)
   end

@@ -20,7 +20,10 @@ module PEStatusCheck
     false
   end
 
-  OPENSSL_AVAILABLE = load_openssl
+  # This file can be loaded twice in one process (from the modulepath and from the
+  # pluginsync cache), so only assign the constant once to avoid an
+  # "already initialized constant" warning on agent runs.
+  OPENSSL_AVAILABLE = load_openssl unless const_defined?(:OPENSSL_AVAILABLE, false)
 
   # @return [Boolean] true if openssl can be used in this Ruby
   def self.openssl_available?
