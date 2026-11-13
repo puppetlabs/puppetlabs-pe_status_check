@@ -1,11 +1,35 @@
 require 'puppet'
 require 'json'
 require 'net/http'
-require 'openssl'
 require 'set'
 
 # PEStatusCheck - Shared code for pe_status_check facts
 module PEStatusCheck
+  # Puppet Server's JRuby on a FIPS host cannot load openssl at all: no FIPS
+  # BouncyCastle jar provides the lightweight-API classes jruby-openssl needs,
+  # so `require 'openssl'` raises NameError. The facts must still load there,
+  # so degrade instead of raising. Do not test this with defined?(OpenSSL):
+  # Puppet's openssl_loader installs stub constants under that name on FIPS
+  # JRuby, so the constant exists while the crypto does not. See PE-45614.
+  # @return [Boolean] true if openssl was loaded
+  def self.load_openssl
+    require 'openssl'
+    true
+  rescue LoadError, NameError => e
+    Facter.debug("pe_status_check: openssl is unavailable, skipping checks that need it: #{e.message}") if defined?(Facter)
+    false
+  end
+
+  # This file can be loaded twice in one process (from the modulepath and from the
+  # pluginsync cache), so only assign the constant once to avoid an
+  # "already initialized constant" warning on agent runs.
+  OPENSSL_AVAILABLE = load_openssl unless const_defined?(:OPENSSL_AVAILABLE, false)
+
+  # @return [Boolean] true if openssl can be used in this Ruby
+  def self.openssl_available?
+    OPENSSL_AVAILABLE
+  end
+
   class << self
     attr_accessor :infra_profiles, :pup_paths, :facter_timeout
   end
@@ -103,6 +127,8 @@ module PEStatusCheck
   # @param port [Integer] The port to use
   # @param host [String] The FQDN to use in making the connection.  Defaults to the Puppet certname
   def http_get(path, port, host = Puppet[:certname])
+    return false unless openssl_available?
+
     # Use an instance variable to only create an SSLContext once
     @ssl_context ||= Puppet::SSL::SSLContext.new(
       cacerts: Puppet[:localcacert],
