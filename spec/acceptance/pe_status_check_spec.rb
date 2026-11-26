@@ -78,7 +78,10 @@ describe 'pe_status_check class' do
 
       context 'when filesystem usage exceeds 80%' do
         before(:all) do
-          run_shell('fallocate -l $(($(facter -p mountpoints.\'/\'.available_bytes)-1073741824)) /largefile.txt')
+          # Leave 1 GiB free. If less than that is free, the disk is already past the
+          # 80% threshold, and a non-positive length would make fallocate fail.
+          run_shell('size=$(($(facter -p mountpoints.\'/\'.available_bytes)-1073741824)); ' \
+                    'if [ "$size" -gt 0 ]; then fallocate -l "$size" /largefile.txt; fi')
         end
 
         after(:all) do
