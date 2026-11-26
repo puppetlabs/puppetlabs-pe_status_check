@@ -4,6 +4,12 @@ on:
   workflow_dispatch:
   workflow_call:
 
+env:
+  # PE 2026.x fills the default-sized boot disk of some GCP images (AlmaLinux 8,
+  # Ubuntu 22.04/24.04), which makes S0007/S0008 report false and the
+  # fallocate-based disk test fail. Read by the provision_service task.
+  PROVISION_DISK_SIZE_GB: "40"
+
 jobs:
   setup_matrix:
     name: "Setup Test Matrix"
